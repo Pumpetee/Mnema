@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mnema — настройки</title>
+    <style>
+      body {
+        font:
+          14px/1.5 "Segoe UI",
+          system-ui,
+          sans-serif;
+        color: #16181d;
+        margin: 0;
+        padding: 16px;
+        width: 320px;
+      }
+      h1 {
+        font-size: 16px;
+        margin: 0 0 6px;
+      }
+      p {
+        color: #4b505a;
+        margin: 0 0 12px;
+        font-size: 13px;
+      }
+      label {
+        display: block;
+        font-size: 12px;
+        color: #8a909a;
+        margin: 10px 0 4px;
+      }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #e5e3dc;
+        border-radius: 9px;
+        padding: 8px 10px;
+        font: inherit;
+      }
+      button {
+        margin-top: 12px;
+        border: 0;
+        border-radius: 9px;
+        padding: 8px 14px;
+        font: 600 13px inherit;
+        background: #5b5bd6;
+        color: #fff;
+        cursor: pointer;
+      }
+      #st {
+        margin-top: 10px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mnema — память для ИИ</h1>
+    <p>Открой приложение Mnema на компьютере → «Подключения» → скопируй токен расширения и вставь сюда.</p>
+    <label>Токен</label><input id="token" placeholder="вставь токен" /> <label>Порт приложения</label
+    ><input id="port" type="number" value="7461" />
+    <button id="save">Сохранить и проверить</button>
+    <div id="st"></div>
+    <script src="options.js"></script>
+  </body>
+</html>

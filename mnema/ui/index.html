@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mnema</title>
+    <link rel="stylesheet" href="/ui/css/app.css" />
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute">
+      <defs>
+        <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.3A8 8 0 1121 12z" /></symbol>
+        <symbol id="i-mem" viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="3.6" />
+          <path d="M5 20c1.3-3.6 4-5.4 7-5.4s5.7 1.8 7 5.4" />
+        </symbol>
+        <symbol id="i-set" viewBox="0 0 24 24">
+          <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+          <circle cx="16" cy="7" r="2.2" />
+          <circle cx="10" cy="17" r="2.2" />
+        </symbol>
+        <symbol id="i-left" viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="16" rx="3" />
+          <path d="M9 4v16" />
+        </symbol>
+        <symbol id="i-right" viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="16" rx="3" />
+          <path d="M15 4v16" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+        <symbol id="i-session" viewBox="0 0 24 24"><path d="M4 7h11M4 12h7M4 17h7M17 11v8M13 15h8" /></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="6.5" />
+          <path d="M20 20l-4-4" />
+        </symbol>
+        <symbol id="i-dots" viewBox="0 0 24 24">
+          <circle cx="5" cy="12" r="1.3" />
+          <circle cx="12" cy="12" r="1.3" />
+          <circle cx="19" cy="12" r="1.3" />
+        </symbol>
+        <symbol id="i-clip" viewBox="0 0 24 24">
+          <path
+            d="M21 11.5l-8.6 8.6a5.5 5.5 0 01-7.8-7.8l8.6-8.6a3.7 3.7 0 015.2 5.2l-8.6 8.6a1.8 1.8 0 01-2.6-2.6l8-8"
+          />
+        </symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24">
+          <rect x="8" y="8" width="12" height="12" rx="2.5" />
+          <path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2" />
+        </symbol>
+        <symbol id="i-like" viewBox="0 0 24 24">
+          <path d="M7 11v9H4v-9zM7 11l4-7a2 2 0 012 2v4h5.5a2 2 0 012 2.3l-1.2 7A2 2 0 0117.3 21H7" />
+        </symbol>
+        <symbol id="i-redo" viewBox="0 0 24 24"><path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7" /></symbol>
+        <symbol id="i-reply" viewBox="0 0 24 24"><path d="M10 8L4 13l6 5M4 13h11a5 5 0 015 5v1" /></symbol>
+        <symbol id="i-quote" viewBox="0 0 24 24"><path d="M7 7h4v4c0 3-1.5 5-4 6M14 7h4v4c0 3-1.5 5-4 6" /></symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <rect x="5" y="11" width="14" height="10" rx="2.5" />
+          <path d="M8 11V8a4 4 0 018 0v3" />
+        </symbol>
+        <symbol id="i-folder" viewBox="0 0 24 24">
+          <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+        </symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"
+          />
+        </symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></symbol>
+        <symbol id="i-mic" viewBox="0 0 24 24">
+          <rect x="9" y="3" width="6" height="11" rx="3" />
+          <path d="M5 11a7 7 0 0014 0M12 18v3" />
+        </symbol>
+        <symbol id="i-wave" viewBox="0 0 24 24"><path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 7v10M21 12h0" /></symbol>
+        <symbol id="i-cc" viewBox="0 0 24 24"><path d="M8 9l-3 3 3 3M16 9l3 3-3 3M13 7l-2 10" /></symbol>
+        <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 4h6l-1 5 3 3H7l3-3zM12 15v6" /></symbol>
+        <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4" /></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24">
+          <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+        </symbol>
+        <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12M6 11l6 6 6-6M5 20h14" /></symbol>
+        <symbol id="i-users" viewBox="0 0 24 24">
+          <circle cx="9" cy="8" r="3.2" />
+          <path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" />
+          <circle cx="17" cy="9" r="2.6" />
+          <path d="M15.5 14.2c2.4-.3 4.4 1.2 5 4.3" />
+        </symbol>
+        <symbol id="i-hint" viewBox="0 0 24 24">
+          <path d="M4 18V6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H9l-5 4z" />
+          <path d="M9.5 8.5a2.5 2.5 0 114 2c-.9.5-1.5 1-1.5 2" />
+          <path d="M12 14.5v.01" />
+        </symbol>
+        <symbol id="i-book" viewBox="0 0 24 24">
+          <path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5z" />
+          <path d="M4 20.5A2.5 2.5 0 006.5 23H20v-5" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7" /></symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24">
+          <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
+        <symbol id="i-trophy" viewBox="0 0 24 24">
+          <path d="M8 4h8v5a4 4 0 01-8 0zM8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8.5 20h7M10 17h4v3h-4z" />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+          <path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z" />
+          <path d="M8.5 12l2.5 2.5 4.5-5" />
+        </symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+          />
+        </symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z" /></symbol>
+        <symbol id="i-auto" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 3.5v17a8.5 8.5 0 000-17z" fill="currentColor" stroke="none" />
+        </symbol>
+        <symbol id="i-palette" viewBox="0 0 24 24">
+          <path
+            d="M12 3a9 9 0 100 18c1.1 0 1.5-.8 1.5-1.6 0-1.3-1-1.7-1-2.9 0-1 .8-1.5 1.8-1.5H17a4 4 0 004-4c0-4.4-4-8-9-8z"
+          />
+          <circle cx="7.5" cy="11" r="1" />
+          <circle cx="10" cy="7" r="1" />
+          <circle cx="14.5" cy="7" r="1" />
+        </symbol>
+        <symbol id="i-thermo" viewBox="0 0 24 24">
+          <path d="M14 14.8V5a2 2 0 10-4 0v9.8a4 4 0 104 0z" />
+          <path d="M12 9v8" />
+        </symbol>
+        <symbol id="i-user" viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="3.6" />
+          <path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6" />
+        </symbol>
+        <symbol id="i-list" viewBox="0 0 24 24">
+          <path d="M9 6h11M9 12h11M9 18h11" />
+          <circle cx="4.5" cy="6" r="1" />
+          <circle cx="4.5" cy="12" r="1" />
+          <circle cx="4.5" cy="18" r="1" />
+        </symbol>
+        <symbol id="i-inbox" viewBox="0 0 24 24">
+          <path d="M4 13l2.5-7h11L20 13v5a1 1 0 01-1 1H5a1 1 0 01-1-1z" />
+          <path d="M4 13h4.5l1 2h5l1-2H20" />
+        </symbol>
+        <symbol id="i-coin" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="8" />
+          <path
+            d="M14.8 9.2c-.5-.8-1.5-1.2-2.8-1.2-1.7 0-2.8.8-2.8 2s1.1 1.7 2.8 2 2.8.8 2.8 2-1.1 2-2.8 2c-1.3 0-2.3-.4-2.8-1.2M12 6.5V8M12 16v1.5"
+          />
+        </symbol>
+        <symbol id="i-heart" viewBox="0 0 24 24">
+          <path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 7.5V12l3 2" />
+        </symbol>
+        <symbol id="i-cloud" viewBox="0 0 24 24">
+          <path d="M7 18a4 4 0 01-.6-8A5.5 5.5 0 0117 8.5a4.8 4.8 0 01.3 9.5z" />
+        </symbol>
+        <symbol id="i-cards" viewBox="0 0 24 24">
+          <rect x="4" y="7" width="13" height="13" rx="2" />
+          <path d="M8 4h10a2 2 0 012 2v10" />
+        </symbol>
+        <symbol id="i-globe" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z" />
+        </symbol>
+        <symbol id="i-eyeoff" viewBox="0 0 24 24">
+          <path
+            d="M3 3l18 18M10.6 6.1A9.8 9.8 0 0112 6c5 0 9 6 9 6a17 17 0 01-3 3.6M6.6 6.6C4.3 8.1 3 12 3 12s4 6 9 6a9 9 0 004.2-1M9.9 9.9a3 3 0 004.2 4.2"
+          />
+        </symbol>
+        <symbol id="i-file" viewBox="0 0 24 24">
+          <path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z" />
+          <path d="M14 3v5h5" />
+        </symbol>
+        <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14" /></symbol>
+        <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z" /></symbol>
+      </defs>
+    </svg>
+    <div id="splash" aria-hidden="true">
+      <div class="splogo">
+        <svg class="lgm" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            class="lgline"
+            d="M5 19.5V9.6M5.6 6.8L12 14.2l6.4-7.4M19 9.6v9.9"
+            fill="none"
+            stroke="#fff"
+            stroke-width="2.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <g class="lgeyes">
+            <circle cx="5" cy="6.6" r="2.5" fill="#fff" />
+            <circle cx="19" cy="6.6" r="2.5" fill="#fff" />
+          </g>
+        </svg>
+      </div>
+      <b>Mnema</b>
+      <small data-noi18n>Free Memory AI Interface</small>
+    </div>
+    <script>
+      setTimeout(() => window.hideSplash && hideSplash(), 4000); // whatever happens on start, it never stays
+    </script>
+    <div class="app">
+      <nav class="rail">
+        <div class="logo" title="Mnema">
+          <svg class="lgm" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              class="lgline"
+              d="M5 19.5V9.6M5.6 6.8L12 14.2l6.4-7.4M19 9.6v9.9"
+              fill="none"
+              stroke="#fff"
+              stroke-width="2.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <g class="lgeyes">
+              <circle cx="5" cy="6.6" r="2.5" fill="#fff" />
+              <circle cx="19" cy="6.6" r="2.5" fill="#fff" />
+            </g>
+          </svg>
+        </div>
+        <button data-v="chat" class="on">
+          <svg class="i"><use href="#i-chat" /></svg><span class="rl">Чаты</span>
+        </button>
+        <button data-v="memory">
+          <svg class="i"><use href="#i-mem" /></svg><span class="rl">Память</span>
+        </button>
+        <button data-v="settings">
+          <svg class="i"><use href="#i-set" /></svg><span class="rl">Настройки</span>
+        </button>
+        <button id="achbtn">
+          <svg class="i"><use href="#i-trophy" /></svg><span class="rl">Достижения</span
+          ><span class="badge" id="achbadge" hidden></span>
+        </button>
+        <div class="sp"></div>
+      </nav>
+      <main class="view" id="view"></main>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script>
+      const TOKEN = "__MNEMA_TOKEN__";
+    </script>
+    <script src="/ui/js/01-core.js"></script>
+    <script src="/ui/js/02-markdown.js"></script>
+    <script src="/ui/js/03-settings-cards.js"></script>
+    <script src="/ui/js/04-settings-scenes.js"></script>
+    <script src="/ui/js/05-local-models.js"></script>
+    <script src="/ui/js/06-meeting.js"></script>
+    <script src="/ui/js/07-vpn.js"></script>
+    <script src="/ui/js/08-onboarding.js"></script>
+    <script src="/ui/js/09-composer.js"></script>
+    <script src="/ui/js/10-heat.js"></script>
+    <script src="/ui/js/11-access-table.js"></script>
+    <script src="/ui/js/12-meeting-plans.js"></script>
+    <script src="/ui/js/13-round-table.js"></script>
+    <script src="/ui/js/14-gear.js"></script>
+    <script src="/ui/js/15-memory-tour.js"></script>
+    <script src="/ui/js/16-paperclip.js"></script>
+    <script src="/ui/js/17-composer-tour.js"></script>
+    <script src="/ui/js/18-vpn-key.js"></script>
+    <script src="/ui/js/19-chat.js"></script>
+    <script src="/ui/js/20-right-panel.js"></script>
+    <script src="/ui/js/21-memory.js"></script>
+    <script src="/ui/js/22-languages.js"></script>
+    <script src="/ui/js/23-themes.js"></script>
+    <script src="/ui/js/24-achievements.js"></script>
+    <script src="/ui/js/25-help.js"></script>
+    <script src="/ui/js/26-settings.js"></script>
+    <script src="/ui/js/27-local-model.js"></script>
+    <script src="/ui/js/28-window.js"></script>
+    <script src="/ui/js/29-navigation.js"></script>
+    <script src="/ui/js/30-boot.js"></script>
+  </body>
+</html>

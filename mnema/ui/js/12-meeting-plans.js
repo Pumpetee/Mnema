@@ -1,0 +1,87 @@
+// ---------------------------------------------------------------- meetings: how to transcribe, as plans — what it costs, how fast, where the audio goes
+// Cloud price: OpenAI whisper-1, $0.006 per minute (OpenAI price list) → $0.36 per hour of recording.
+function scribePlans(sc, mode, compact) {
+  const hour = sc.rtf ? Math.max(1, Math.round(sc.rtf * 60)) : 0,
+    spd = hour ? tr("час записи ≈") + " " + hour + " " + tr("мин") : tr("замерю на первой записи");
+  const P = [
+    [
+      "local",
+      "💻",
+      "Бесплатно на компьютере",
+      "free",
+      "Бесплатно",
+      [
+        ["💰", "0 ₽"],
+        ["⏱", spd],
+        ["🔒", tr("запись не уходит с компьютера")],
+      ],
+    ],
+    [
+      "auto",
+      "🧠",
+      "Сам решает",
+      "free",
+      "Бесплатно",
+      [
+        ["💰", tr("0 ₽, пока компьютер успевает")],
+        ["⏱", tr("замеряет на первой минуте записи")],
+        ["🔒", tr("в облако — только после вопроса")],
+      ],
+    ],
+    [
+      "partial",
+      "⚖️",
+      "Длинные — в облако",
+      "mix",
+      "Частично платно",
+      [
+        ["💰", tr("что не успевает компьютер — ≈ $0.36 за час")],
+        ["⏱", tr("не дольше самой встречи")],
+        ["☁️", tr("длинные записи уходят в облако")],
+      ],
+    ],
+    [
+      "cloud",
+      "☁️",
+      "Облачный Whisper",
+      "paid",
+      "Платно",
+      [
+        ["💰", tr("≈ $0.36 за час записи, по твоему ключу")],
+        ["⏱", tr("быстро, компьютер не грузит")],
+        ["☁️", tr("запись уходит в облако")],
+      ],
+    ],
+  ];
+  const ul = (rows) =>
+    `<ul>${rows.map(([i, x]) => `<li>${ic({ "💰": "coin", "⏱": "clock", "🔒": "lock", "☁️": "cloud" }[i])}<span>${x}</span></li>`).join("")}</ul>`;
+  return `<div class="splans ${compact ? "cmp" : ""}">${P.map(
+    (
+      [k, icn, t, cls, tag, rows],
+      n,
+    ) => `<button class="splan ${k === mode ? "on" : ""}" data-plan="${k}" style="--d:${n * 0.05}s"><span class="spi">${icn}</span><b>${tr(t)}</b><em class="stag ${cls}">${tr(tag)}</em>
+    ${compact ? "" : ul(rows)}${k === mode ? `<i class="spck">${ic("check")}</i>` : ""}</button>`,
+  ).join("")}</div>${compact ? `<div class="spdet">${ul((P.find((x) => x[0] === mode) || P[0])[5])}</div>` : ""}
+    ${(mode === "cloud" || mode === "partial") && !sc.cloud_ready ? `<div class="snokey">${ic("x")}${tr("Для облака нужен ключ OpenAI или свой адрес — без него расшифрую на компьютере бесплатно.")}</div>` : ""}`;
+}
+const SQ = [
+  ["auto", "Авто", "сама выберет: «Точнее», если уже скачана", 0, 0, ""],
+  ["small", "Быстрее", "для чистого звука и одного голоса", 2, 4, "464 МБ"],
+  ["medium", "Точнее", "шум, несколько голосов, термины", 3, 2, "1,5 ГБ"],
+  ["large-v3", "Максимум", "самое точное, нужен мощный компьютер", 4, 1, "≈ 3 ГБ"],
+];
+function scribeQuality(q) {
+  const dots = (n, c) =>
+    `<span class="sqd ${c}">${[1, 2, 3, 4].map((i) => `<i class="${i <= n ? "f" : ""}"></i>`).join("")}</span>`;
+  return `<div class="sqs">${SQ.map(
+    ([
+      k,
+      t,
+      d,
+      acc,
+      sp,
+      size,
+    ]) => `<button class="sq ${k === q ? "on" : ""}" data-sq="${k}"><b>${tr(t)}</b><small>${tr(d)}</small>
+    ${acc ? `<div class="sqm"><span>${tr("точность")}</span>${dots(acc, "a")}</div><div class="sqm"><span>${tr("скорость")}</span>${dots(sp, "s")}</div><em>${size} · ${tr("бесплатно")}</em>` : `<em>${tr("бесплатно")}</em>`}</button>`,
+  ).join("")}</div>`;
+}

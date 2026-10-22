@@ -1,0 +1,307 @@
+"""What differs between Windows, macOS and Linux, in one place: program names, hidden child processes, opening a folder,
+the computer's memory, where other programs keep their settings, the system theme and language, a message box,
+start at login and the single-instance lock. The rest of Mnema asks here instead of checking the system itself.
+"""
+
+from __future__ import annotations
+
+import os
+import plistlib
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+IS_WIN = sys.platform == "win32"
+IS_MAC = sys.platform == "darwin"
+IS_LINUX = sys.platform.startswith("linux")
+NAME = "windows" if IS_WIN else "macos" if IS_MAC else "linux"
+
+
+def exe(name: str) -> str:
+    """A program's file name on this system: «llama-server.exe» on Windows, «llama-server» elsewhere."""
+    return name + ".exe" if IS_WIN else name
+
+
+def quiet(low_priority: bool = False) -> dict:
+    """subprocess arguments for a helper process: no console window on Windows, a lower priority if asked."""
+    if IS_WIN:
+        flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+        if low_priority:
+            flags |= getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0)
+        return {"creationflags": flags}
+    if low_priority:
+        return {"preexec_fn": lambda: os.nice(5)}
+    return {}
+
+
+def open_path(p: Path | str) -> None:
+    """Open a file or folder the way the owner would by double-clicking it."""
+    p = str(p)
+    if IS_WIN:
+        os.startfile(p)  # noqa: S606 — the owner's own file
+    else:
+        subprocess.Popen(["open" if IS_MAC else "xdg-open", p], start_new_session=True)
+
+
+def reveal(p: Path | str) -> None:
+    """Show a file selected in its folder (Explorer, Finder); on Linux open the folder."""
+    p = Path(p)
+    if IS_WIN:
+        subprocess.Popen(["explorer", "/select,", str(p)])
+    elif IS_MAC:
+        subprocess.Popen(["open", "-R", str(p)], start_new_session=True)
+    else:
+        open_path(p.parent if p.is_file() else p)
+
+
+def ram() -> tuple[int, int]:
+    """(total, available) memory in bytes; (0, 0) if the system won't say."""
+    try:
+        if IS_WIN:
+            import ctypes
+
+            class MS(ctypes.Structure):
+                _fields_ = [
+                    ("dwLength", ctypes.c_ulong),
+                    ("dwMemoryLoad", ctypes.c_ulong),
+                    ("ullTotalPhys", ctypes.c_ulonglong),
+                    ("ullAvailPhys", ctypes.c_ulonglong),
+                    ("ullTotalPageFile", ctypes.c_ulonglong),
+                    ("ullAvailPageFile", ctypes.c_ulonglong),
+                    ("ullTotalVirtual", ctypes.c_ulonglong),
+                    ("ullAvailVirtual", ctypes.c_ulonglong),
+                    ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+                ]
+
+            m = MS()
+            m.dwLength = ctypes.sizeof(MS)
+            if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(m)):
+                return m.ullTotalPhys, m.ullAvailPhys
+            return 0, 0
+        import psutil
+
+        v = psutil.virtual_memory()
+        return v.total, v.available
+    except Exception:
+        return 0, 0
+
+
+def config_dir(*parts: str) -> Path:
+    """Where desktop programs keep their settings: %APPDATA%, ~/Library/Application Support, ~/.config."""
+    if IS_WIN:
+        base = Path(os.environ.get("APPDATA") or Path.home() / "AppData" / "Roaming")
+    elif IS_MAC:
+        base = Path.home() / "Library" / "Application Support"
+    else:
+        base = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config")
+    return base.joinpath(*parts)
+
+
+def system_dark() -> bool:
+    """Is the system in dark mode (the first screen opens in it before the owner picks)."""
+    try:
+        if IS_WIN:
+            import winreg
+
+            with winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+            ) as k:
+                return winreg.QueryValueEx(k, "AppsUseLightTheme")[0] == 0
+        if IS_MAC:
+            r = subprocess.run(["defaults", "read", "-g", "AppleInterfaceStyle"], capture_output=True, text=True)
+            return r.stdout.strip().lower() == "dark"
+        r = subprocess.run(
+            ["gsettings", "get", "org.gnome.desktop.interface", "color-scheme"], capture_output=True, text=True
+        )
+        return "dark" in r.stdout
+    except Exception:
+        return False
+
+
+def ui_lang() -> str:
+    """ "ru" when the system speaks Russian, else "en"."""
+    try:
+        if IS_WIN:
+            import ctypes
+
+            return "ru" if ctypes.windll.kernel32.GetUserDefaultUILanguage() & 0x3FF == 0x19 else "en"
+        if IS_MAC:
+            r = subprocess.run(["defaults", "read", "-g", "AppleLanguages"], capture_output=True, text=True)
+            first = next((x.strip(' "(),') for x in r.stdout.splitlines() if x.strip(' "(),')), "")
+            return "ru" if first.lower().startswith("ru") else "en"
+        lang = os.environ.get("LC_ALL") or os.environ.get("LC_MESSAGES") or os.environ.get("LANG") or ""
+        return "ru" if lang.lower().startswith("ru") else "en"
+    except Exception:
+        return "en"
+
+
+def message(text: str, error: bool = False, title: str = "Mnema") -> None:
+    """A plain message box before any window exists (a failed start, a missing component)."""
+    try:
+        if IS_WIN:
+            import ctypes
+
+            ctypes.windll.user32.MessageBoxW(None, text, title, 0x10 if error else 0x40)
+        elif IS_MAC:
+            esc = text.replace("\\", "\\\\").replace('"', '\\"')
+            icon = "stop" if error else "note"
+            subprocess.run(
+                ["osascript", "-e", f'display dialog "{esc}" with title "{title}" buttons {{"OK"}} with icon {icon}'],
+                capture_output=True,
+                timeout=600,
+            )
+        elif shutil.which("zenity"):
+            subprocess.run(["zenity", "--error" if error else "--info", "--title", title, "--text", text], timeout=600)
+        elif shutil.which("notify-send"):
+            subprocess.run(["notify-send", title, text], timeout=10)
+        else:
+            print(f"{title}: {text}", file=sys.stderr)
+    except Exception:
+        print(f"{title}: {text}", file=sys.stderr)
+
+
+# ---------------------------------------------------------------- start at login
+
+APP_ID = "app.mnema.desktop"
+_RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
+
+def launch_args(hidden: bool = True) -> list[str]:
+    """The command that starts the program: the built app, or Python with the source tree."""
+    if getattr(sys, "frozen", False):
+        args = [sys.executable]
+    else:
+        py = Path(sys.executable)
+        if IS_WIN and py.with_name("pythonw.exe").exists():
+            py = py.with_name("pythonw.exe")
+        args = [str(py), "-m", "mnema.desktop"]
+    return args + (["--hidden"] if hidden else [])
+
+
+def _mac_agent() -> Path:
+    return Path.home() / "Library" / "LaunchAgents" / f"{APP_ID}.plist"
+
+
+def _linux_entry() -> Path:
+    return Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "autostart" / "mnema.desktop"
+
+
+def autostart_enabled() -> bool:
+    if IS_WIN:
+        import winreg
+
+        try:
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, _RUN_KEY) as k:
+                winreg.QueryValueEx(k, "Mnema")
+                return True
+        except OSError:
+            return False
+    return (_mac_agent() if IS_MAC else _linux_entry()).exists()
+
+
+def set_autostart(on: bool) -> None:
+    args = launch_args(hidden=True)
+    if IS_WIN:
+        import winreg
+
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, _RUN_KEY, 0, winreg.KEY_SET_VALUE) as k:
+            if on:
+                winreg.SetValueEx(k, "Mnema", 0, winreg.REG_SZ, subprocess.list2cmdline(args))
+            else:
+                try:
+                    winreg.DeleteValue(k, "Mnema")
+                except OSError:
+                    pass
+        return
+    f = _mac_agent() if IS_MAC else _linux_entry()
+    if not on:
+        f.unlink(missing_ok=True)
+        return
+    f.parent.mkdir(parents=True, exist_ok=True)
+    if IS_MAC:
+        f.write_bytes(plistlib.dumps({"Label": APP_ID, "ProgramArguments": args, "RunAtLoad": True}))
+    else:
+        cmd = " ".join('"' + a.replace('"', '\\"') + '"' for a in args)
+        f.write_text(
+            "[Desktop Entry]\nType=Application\nName=Mnema\nComment=Your memory for every AI\n"
+            f"Exec={cmd}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n",
+            encoding="utf-8",
+        )
+
+
+# ---------------------------------------------------------------- one copy of the program
+
+_instance = []  # keeps the lock alive for the life of the process
+
+
+def first_instance(home: Path) -> bool:
+    """True for the first running copy; a second launch gets False and only asks the first to show itself."""
+    if IS_WIN:
+        import ctypes
+
+        _instance.append(ctypes.windll.kernel32.CreateMutexW(None, False, "Local\\MnemaDesktopApp"))
+        return ctypes.windll.kernel32.GetLastError() != 183  # ERROR_ALREADY_EXISTS
+    import fcntl
+
+    home.mkdir(parents=True, exist_ok=True)
+    fh = open(home / "app.lock", "w")
+    try:
+        fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        fh.close()
+        return False
+    _instance.append(fh)
+    return True
+
+
+# ---------------------------------------------------------------- a browser for printing pages to PDF
+
+
+def chromium() -> str | None:
+    """Edge or Chrome (or Chromium) on this computer: they print a page to PDF with no window."""
+    if IS_WIN:
+        for base in (
+            os.environ.get("ProgramFiles(x86)"),
+            os.environ.get("ProgramFiles"),
+            os.environ.get("LOCALAPPDATA"),
+        ):
+            for rel in (
+                ("Microsoft", "Edge", "Application", "msedge.exe"),
+                ("Google", "Chrome", "Application", "chrome.exe"),
+            ):
+                if base and Path(base, *rel).exists():
+                    return str(Path(base, *rel))
+        return shutil.which("msedge") or shutil.which("chrome")
+    if IS_MAC:
+        for app in ("Google Chrome", "Microsoft Edge", "Chromium", "Brave Browser"):
+            for root in (Path("/Applications"), Path.home() / "Applications"):
+                p = root / f"{app}.app" / "Contents" / "MacOS" / app
+                if p.exists():
+                    return str(p)
+        return None
+    for name in (
+        "google-chrome",
+        "google-chrome-stable",
+        "chromium",
+        "chromium-browser",
+        "microsoft-edge",
+        "brave-browser",
+    ):
+        if shutil.which(name):
+            return shutil.which(name)
+    return None
+
+
+# ---------------------------------------------------------------- the interface names this system
+
+_WORD = re.compile(r"\bWindows\b")
+
+
+def os_words(text: str) -> str:
+    """The interface is written on Windows: «хранилище Windows», «как в Windows», «вместе с Windows». On macOS and
+    Linux the same texts name that system, in every language (the keys of the translations change the same way)."""
+    if IS_WIN:
+        return text
+    return _WORD.sub("macOS" if IS_MAC else "Linux", text)

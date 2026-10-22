@@ -1,0 +1,19 @@
+# The program on Windows, macOS and Linux. The core (vault, access rules, journal, MCP, CLI) needs only the Python
+# standard library.
+pywebview==6.2.1        # the window: WebView2 on Windows, WebKit on macOS
+PyQt6==6.11.0; sys_platform == "linux"           # Linux: the window on Qt WebEngine
+PyQt6-WebEngine==6.11.0; sys_platform == "linux"
+QtPy==2.4.3; sys_platform == "linux"
+pystray==0.19.5; sys_platform != "linux"        # the tray icon (Linux uses Qt's own)
+pillow==13.0.0          # the tray icon image
+psutil==7.2.2           # memory and processor load on macOS and Linux (the «нагрев» indicator)
+pypdf==6.21.1           # PDF text
+openpyxl==3.1.5         # Excel .xlsx
+xlrd==2.0.2             # Excel .xls
+python-pptx==1.0.2      # PowerPoint
+PySocks==1.7.1          # SOCKS5 proxy bridge
+ddgs==9.16.0            # web search without keys
+faster-whisper==1.2.1   # speech recognition on this computer
+SoundCard==0.4.6        # recording the microphone and the computer's sound
+soundfile==0.14.0
+numpy==2.5.4

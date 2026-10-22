@@ -1,0 +1,88 @@
+name: build
+
+# The program for Windows, macOS and Linux: built from the source on each system, started once with its window,
+# kept as downloadable files. A tag v* also publishes them as a release.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            files: |
+              dist/Mnema-Setup-*.exe*
+              dist/Mnema-*-windows-x64.zip*
+          - os: macos-latest
+            files: dist/Mnema-*-macos-*.dmg*
+          - os: ubuntu-22.04
+            files: |
+              dist/Mnema-*-linux-*.AppImage*
+              dist/Mnema-*-linux-*.tar.gz*
+    runs-on: ${{ matrix.os }}
+    env:
+      MNEMA_NO_DETECT: "1"
+      MNEMA_NO_KEYRING: "1"
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: System libraries (Linux)
+        if: runner.os == 'Linux'
+        run: >
+          sudo apt-get update && sudo apt-get install -y libpulse0 libportaudio2 libfuse2 xvfb
+          libegl1 libgl1 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1
+          libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libnss3 libxcomposite1
+          libxdamage1 libxrandr2 libxtst6 libasound2
+      - name: Install
+        run: python -m pip install -r requirements-dev.txt
+      - name: Third-party binaries (official releases, sha256)
+        run: python tools/fetch_vendor.py
+      - name: Package (tests run in the tests workflow)
+        run: python tools/package.py --skip-tests
+      - name: The window opens (Windows)
+        if: runner.os == 'Windows'
+        run: python tools/qa/gui_smoke.py dist/Mnema/Mnema.exe dist/Mnema/mnema-cli.exe
+      - name: The window opens (macOS)
+        if: runner.os == 'macOS'
+        run: python tools/qa/gui_smoke.py dist/Mnema.app/Contents/MacOS/Mnema dist/Mnema.app/Contents/MacOS/mnema-cli
+      - name: The window opens (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a python tools/qa/gui_smoke.py dist/Mnema/Mnema dist/Mnema/mnema-cli
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mnema-${{ runner.os }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - name: Names without the version, for the README's direct links (releases/latest/download/…)
+        run: |
+          cd out
+          for f in Mnema-*; do
+            case "$f" in *.sha256) continue ;; esac
+            cp "$f" "$(echo "$f" | sed -E 's/-[0-9]+\.[0-9]+\.[0-9]+//')"
+          done
+          ls -l
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: out/*

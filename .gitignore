@@ -1,0 +1,29 @@
+# build output
+app/
+app-new/
+app-old/
+build/
+build-app/
+build-package/
+dist/
+*.egg-info/
+
+# environment
+.venv/
+__pycache__/
+*.pyc
+
+# third-party binaries: fetched by tools/fetch_vendor.py, checked by sha256
+vendor/llama/
+vendor/xray/
+vendor/webview2/
+
+# local
+*.lnk
+
+# QA run output
+tools/qa/*.json
+tools/qa/*.log
+
+# made by tools/package.py from the icon drawing
+packaging/mnema.png

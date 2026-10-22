@@ -1,0 +1,322 @@
+// ---------------------------------------------------------------- navigation
+// ---------------------------------------------------------------- engine: tokens and computer load
+const ENG_MODES = {
+  eco: ["Эконом", "Меньше токенов и нагрузки. Ответы короче, компьютер почти не занят"],
+  balance: ["Баланс", "Разумно по всему. Подходит большинству"],
+  max: ["Максимум", "Вся память в запросе, длинные ответы, все ядра. Дороже и тяжелее"],
+};
+const LEARN_STEPS = [5, 10, 15, 30, 60, 120, 240, 720, 1440];
+function fmtN(n) {
+  return Number(n || 0).toLocaleString(locale());
+}
+function learnL(m) {
+  return m < 60 ? m + " мин" : m < 1440 ? m / 60 + " ч" : "раз в сутки";
+}
+function engineCard(e) {
+  if (!e) return "";
+  const u = e.usage || { cloud: 0, local: 0 },
+    pct = e.month ? Math.min(100, Math.round((u.cloud / e.month) * 100)) : 0;
+  const sl = (k, label, min, max, step, val, shown, hint) =>
+    `<div class="engsl"><div class="engh"><span>${label}</span><b data-ev="${k}">${shown}</b></div><input type="range" data-ek="${k}" min="${min}" max="${max}" step="${step}" value="${val}"><div class="hint">${hint}</div></div>`;
+  const li = Math.max(
+    0,
+    LEARN_STEPS.indexOf(e.learn) < 0 ? LEARN_STEPS.findIndex((x) => x >= e.learn) : LEARN_STEPS.indexOf(e.learn),
+  );
+  return `<div class="card" data-sec="engine" id="engcard"><h2>Движок${hq("engine")}</h2>
+   <div class="presets engmodes">${Object.entries(ENG_MODES)
+     .map(
+       ([k, [t, s]]) =>
+         `<button data-em="${k}" class="${e.mode === k ? "on" : ""}"><b>${t}</b><span>${s}</span></button>`,
+     )
+     .join("")}</div>
+   ${e.mode === "custom" ? `<div class="hint" style="margin-top:8px">${tr("Сейчас своя настройка: ползунки сдвинуты вручную.")}</div>` : ""}
+   <div class="engmeter"><div>${tr("В этом месяце облачные ИИ потратили")} <b>${fmtN(u.cloud)}</b> ${tr("токенов")}${e.month ? ` ${tr("из")} ${fmtN(e.month)}` : ""}. ${tr("На компьютере")} — ${fmtN(u.local)}, ${tr("бесплатно")}.</div>${e.month ? `<div class="engbar ${pct >= 90 ? "hot" : ""}"><i style="width:${pct}%"></i></div>` : ""}</div>
+   <details class="engfine" ${LS.get("engfine", false) ? "open" : ""}><summary>${tr("Тонкая настройка")}</summary>
+    <div class="enggrid">
+     <div class="engcol"><h4>${tr("Токены")}</h4>
+      ${sl("memory", tr("Память в запросе"), 1000, 30000, 500, e.memory, fmtN(e.memory) + " " + tr("знаков"), tr("Сколько памяти уходит облачному ИИ с вопросом. Остальное остаётся на компьютере."))}
+      ${sl("answer", tr("Самый длинный ответ"), 300, 16000, 100, e.answer, fmtN(e.answer) + " " + tr("токенов"), tr("Для ИИ по ключу и локальной модели. Claude по подписке так не ограничить, он и не тратит деньги сверх подписки."))}
+      <div class="engsl"><div class="engh"><span>${tr("Лимит на месяц")}</span></div><div class="row"><input class="inp" type="number" min="0" step="100000" id="engmonth" value="${e.month || ""}" placeholder="${tr("без лимита")}" style="width:160px"><span class="hint">${tr("токенов облачных ИИ. Дошли до лимита — облачные ИИ ждут следующего месяца, локальная модель работает.")}</span></div></div></div>
+     <div class="engcol"><h4>${tr("Компьютер")}</h4>
+      ${sl("threads", tr("Ядра процессора"), 1, e.cores, 1, e.threads, e.threads + " " + tr("из") + " " + e.cores, tr("Сколько ядер берут локальная модель и расшифровка встреч. Меньше — компьютер свободнее, ответ дольше."))}
+      ${sl("ctx", tr("Сколько держит в голове"), 2048, 32768, 2048, e.ctx, fmtN(e.ctx) + " " + tr("токенов"), tr("Длина разговора, которую локальная модель видит целиком. Больше — нужно больше оперативной памяти."))}
+      <div class="engsl"><div class="tg" style="padding:0;border:0"><button class="sw ${e.low ? "on" : ""}" id="englow"></button><div><b>${tr("Не мешать работе")}</b><p>${tr("Локальная модель работает с низким приоритетом: окна и браузер не тормозят.")}</p></div></div></div>
+      ${sl("learn", tr("Обучение в фоне"), 0, LEARN_STEPS.length - 1, 1, li, learnL(e.learn), tr("Как часто Mnema проверяет источники обучения."))}</div>
+    </div></details></div>`;
+}
+function bindEngine() {
+  const c = $("#engcard");
+  if (!c) return;
+  const redraw = (e) => {
+    c.outerHTML = engineCard(e);
+    bindEngine();
+  };
+  const set = async (patch) => {
+    try {
+      redraw(await post("/api/engine", patch));
+    } catch (err) {
+      toast(err.message);
+    }
+  };
+  $("details", c).ontoggle = (ev) => LS.set("engfine", ev.target.open);
+  $$("[data-em]", c).forEach((b) => (b.onclick = () => set({ mode: b.dataset.em })));
+  $$("[data-ek]", c).forEach((r) => {
+    const k = r.dataset.ek,
+      val = () => (k === "learn" ? LEARN_STEPS[+r.value] : +r.value);
+    r.oninput = () => {
+      const v = val(),
+        lab = $(`[data-ev="${k}"]`, c);
+      lab.textContent =
+        k === "learn"
+          ? learnL(v)
+          : k === "threads"
+            ? v + " " + tr("из") + " " + r.max
+            : fmtN(v) + " " + (k === "memory" ? tr("знаков") : tr("токенов"));
+    };
+    r.onchange = () => set({ [k]: val() });
+  });
+  $("#engmonth", c).onchange = (e) => set({ month: parseInt(e.target.value) || 0 });
+  $("#englow", c).onclick = (e) => set({ low: !e.currentTarget.classList.contains("on") });
+}
+// ---------------------------------------------------------------- what left the computer
+const PURPOSE_RU = {
+  "ответ в чате": "ответ в чате",
+  консорциум: "консорциум",
+  обучение: "обучение",
+  "проверка ответа": "проверка ответа",
+  служебное: "служебное",
+  "поиск в интернете": "поиск в интернете",
+  "название разговора": "название разговора",
+  портрет: "портрет",
+};
+const SCOPE_RU = {
+  profile: "обо мне",
+  rules: "правила",
+  projects: "проекты",
+  cards: "карточки",
+  people: "люди",
+  decisions: "события",
+  inbox: "входящие",
+  money: "деньги",
+  health: "здоровье",
+  private: "личное",
+};
+const RED_RU = {
+  card: "номера карт",
+  secret: "ключи и токены",
+  password: "пароли",
+  phone: "телефоны",
+  passport: "паспорта",
+  snils: "СНИЛС",
+  inn: "ИНН",
+  account: "номера счетов",
+};
+function provName(pid) {
+  return (
+    {
+      claude_code: "Claude",
+      anthropic: "Anthropic",
+      openai: "ChatGPT",
+      gemini: "Gemini",
+      openrouter: "OpenRouter",
+      api: "ИИ по ключу",
+      web: "Поисковики",
+    }[pid] || pid
+  );
+}
+function redLine(r) {
+  return Object.entries(r || {})
+    .map(([k, v]) => `${tr(RED_RU[k] || k)}: ${v}`)
+    .join(", ");
+}
+async function outgoingModal(days) {
+  days = days || 7;
+  const d = await api("/api/outgoing?days=" + days);
+  const pop = document.createElement("div");
+  pop.className = "modal outm";
+  document.body.appendChild(pop);
+  pop.onclick = (e) => {
+    if (e.target === pop) pop.remove();
+  };
+  const by = Object.entries(d.by)
+    .map(([p, n]) => `${esc(provName(p))} — ${n}`)
+    .join(", ");
+  const rows = d.events
+    .map(
+      (e) =>
+        `<tr><td>${esc(e.ts.slice(5, 16).replace("T", " "))}</td><td>${esc(provName(e.pid))}</td><td>${esc(tr(PURPOSE_RU[e.purpose] || e.purpose))}</td><td>${fmtN(e.chars)}</td><td>${e.memory_full ? `${fmtN(e.memory_sent)} ${tr("из")} ${fmtN(e.memory_full)}` : "—"}</td><td>${[...(e.hidden_parts || []), ...(e.hidden_tags || [])].map((x) => tr(SCOPE_RU[x] || x)).join(", ") || "—"}</td><td>${redLine(e.redacted) || "—"}</td></tr>`,
+    )
+    .join("");
+  pop.innerHTML = `<div class="card"><h2>${tr("Что ушло наружу")}<span class="hint">${tr("за")} ${days} ${tr("дн.")}</span><button class="mx" id="outx">×</button></h2>
+   <div class="outsum"><div><b>${d.requests}</b><span>${tr("запросов к облачным ИИ")}</span></div><div><b>${fmtN(d.memory_kept)}</b><span>${tr("знаков памяти остались на компьютере")}</span></div><div><b>${fmtN(Object.values(d.redacted).reduce((a, b) => a + b, 0))}</b><span>${tr("секретов скрыто")}</span></div></div>
+   ${by ? `<p class="hint">${tr("Кому")}: ${by}${Object.keys(d.redacted).length ? ` · ${tr("скрыто")}: ${redLine(d.redacted)}` : ""}</p>` : ""}
+   <div class="tg" style="padding:6px 0 10px;border:0"><button class="sw ${d.redact ? "on" : ""}" id="outred"></button><div><b>${tr("Скрывать секреты от облачных ИИ")}</b><p>${tr("Номера карт, пароли и ПИН-коды, ключи, телефоны, паспорта, СНИЛС, ИНН и номера счетов заменяются метками до отправки — и в запросах к поисковикам. В ответе Mnema подставляет настоящие значения на компьютере. Сами значения не пишутся даже в этот отчёт.")}</p></div></div>
+   ${rows ? `<div class="outtbl"><table><tr><th>${tr("Когда")}</th><th>${tr("Кому")}</th><th>${tr("Зачем")}</th><th>${tr("Знаков")}</th><th>${tr("Память")}</th><th>${tr("Не видел")}</th><th>${tr("Скрыто")}</th></tr>${rows}</table></div>` : `<p class="hint">${tr("За эти дни ничего не уходило: работала только локальная модель или ты не писал.")}</p>`}
+   <p class="hint">${tr("Локальная модель в отчёт не попадает: она на этом компьютере и ничего не отправляет.")}</p></div>`;
+  $("#outx", pop).onclick = () => pop.remove();
+  $("#outred", pop).onclick = async (ev) => {
+    const on = !ev.currentTarget.classList.contains("on");
+    await post("/api/agent", { redact: on });
+    ev.currentTarget.classList.toggle("on", on);
+    refreshStatus();
+  };
+}
+// ---------------------------------------------------------------- meetings: this computer or the cloud Whisper
+const SCRIBE_MODES = {
+  auto: "Сам по скорости компьютера",
+  local: "Только на компьютере",
+  partial: "Длинные — в облако",
+  cloud: "Всегда облако",
+};
+const SCRIBE_HINT = {
+  auto: "Замеряет компьютер на первой минуте записи. Успевает — расшифровывает здесь бесплатно. Не успевает — спрашивает, отдать ли облачному Whisper.",
+  local: "Бесплатно и ничего не уходит с компьютера. На слабом компьютере долго.",
+  partial: "Короткие записи — здесь, длинные сразу в облачный Whisper. Каждый раз сообщает, куда отдал.",
+  cloud: "Быстро, запись уходит облачному Whisper и оплачивается по твоему ключу. Нет ключа — расшифровывает здесь.",
+};
+function scribeCard(c) {
+  if (!c) return "";
+  return `<div class="card" data-sec="meetings" id="scrcard"><h2>${tr("Встречи")}${hq("scribe")}</h2>
+   <div class="shd"><b>${tr("Чем расшифровывать")}</b><span class="hint">${tr("бесплатно и медленнее — или быстро за деньги")}</span></div>
+   ${scribePlans(c, c.mode)}
+   ${c.mode !== "cloud" ? `<div class="shd"><b>${tr("Точность на компьютере")}</b><span class="hint">${tr("сейчас")}: ${esc(c.local_model)} · ${tr("модель скачается один раз")}</span></div>${scribeQuality(c.quality)}` : ""}
+   <div class="shd"><b>${tr("Облачный Whisper")}</b>${c.cloud_ready ? `<span class="pill">✓ ${tr("готов")}: ${tr(c.cloud_from)}</span>` : `<span class="hint">${tr("не подключён")}</span>`}</div>
+   <p class="hint" style="margin:0 0 6px">${tr("Подойдёт ключ OpenAI из подключений к ИИ или свой адрес, совместимый с OpenAI.")}</p>
+   <details><summary class="hint" style="cursor:pointer">${tr("Свой адрес и ключ")}</summary><div class="row" style="margin-top:6px"><input class="inp" id="scrbase" placeholder="https://…/v1" value="${esc(c.base || "")}" style="min-width:260px"><input class="inp" id="scrmodel" placeholder="whisper-1" value="${esc(c.model || "")}" style="width:150px"><input class="inp" id="scrkey" type="password" placeholder="${tr("ключ")}" style="width:200px"><button class="btn l sm" id="scrsave">${tr("Сохранить")}</button></div></details>
+   <div class="shd"><b>${tr("Чем подводить итоги")}</b><span class="hint">${tr("на компьютере — бесплатно, облачной моделью — по подписке или ключу")}</span></div>
+   <select class="inp" id="scrsum" style="max-width:420px"><option>${tr("загружаю…")}</option></select><div class="hint" id="scrsumh" style="margin-top:6px"></div></div>`;
+}
+function bindScribeCard() {
+  const c = $("#scrcard");
+  if (!c) return;
+  const set = async (patch) => {
+    try {
+      const d = await post("/api/scribe/settings", patch);
+      c.outerHTML = scribeCard(d);
+      bindScribeCard();
+    } catch (e) {
+      toast(e.message);
+    }
+  };
+  $$("[data-plan]", c).forEach((b) => (b.onclick = () => set({ mode: b.dataset.plan })));
+  $$("[data-sq]", c).forEach((b) => (b.onclick = () => set({ model: b.dataset.sq })));
+  Promise.all([api("/api/models"), api("/api/agent")])
+    .then(([ms, ag]) => {
+      const sel = $("#scrsum", c);
+      if (!sel) return;
+      const cur = (ag.profile || {}).scribe_summary_model || "";
+      const ms2 = ms.providers
+        .filter((p) => p.ready)
+        .flatMap((p) =>
+          p.models
+            .filter((m) => m.id || p.id !== "claude_code")
+            .map((m) => ({
+              v: p.id + ":" + m.id,
+              l:
+                (p.id === "local" ? "💻 " : "☁️ ") +
+                (p.id === "claude_code" ? "" : p.name + " · ") +
+                m.name +
+                (p.id === "local"
+                  ? " · " + tr("бесплатно")
+                  : p.id === "claude_code"
+                    ? " · " + tr("подписка")
+                    : " · " + tr("по ключу")),
+              local: p.id === "local",
+            })),
+        );
+      sel.innerHTML =
+        `<option value="">${tr("Та, что выбрана в чате")}</option>` +
+        ms2.map((m) => `<option value="${esc(m.v)}" ${m.v === cur ? "selected" : ""}>${esc(m.l)}</option>`).join("");
+      const hint = () => {
+        const m = ms2.find((x) => x.v === sel.value);
+        $("#scrsumh", c).textContent = !m
+          ? tr("Итоги подведёт модель, выбранная в чате на момент встречи.")
+          : m.local
+            ? tr("Итоги делаются на компьютере — бесплатно, текст никуда не уходит.")
+            : tr("Текст расшифровки уйдёт этой модели, секреты будут скрыты.");
+      };
+      hint();
+      sel.onchange = async () => {
+        hint();
+        try {
+          await post("/api/agent", { scribe_summary_model: sel.value });
+        } catch (e) {
+          toast(e.message);
+        }
+      };
+    })
+    .catch(() => {});
+  $("#scrsave", c).onclick = () =>
+    set({ base: $("#scrbase", c).value, cloud_model: $("#scrmodel", c).value, key: $("#scrkey", c).value });
+}
+// ---------------------------------------------------------------- free sync
+function syncLast(l) {
+  if (!l || !l.ts) return tr("ещё не синхронизировалось");
+  if (l.error) return tr("не вышло") + ": " + l.error;
+  return `${l.ts.slice(5, 16).replace("T", " ")} · ${tr("отправлено")} ${l.sent || 0}, ${tr("получено")} ${l.got || 0}${(l.conflicts || []).length ? `, ${tr("обе версии сохранены")}: ${l.conflicts.length}` : ""}`;
+}
+function syncCard(d) {
+  if (!d) return "";
+  const on = (k) => d.targets.find((t) => t.kind === k);
+  const cloud = (k, name) => {
+    const t = on(k),
+      path = d.detected[k];
+    return `<div class="syncrow"><div><b>${name}</b><span class="hint" data-noi18n>${esc(t ? t.where : path ? path + "\\Mnema" : "")}</span>${t ? `<span class="hint">${esc(syncLast(t.last))}</span>` : path ? "" : `<span class="hint">${tr("Приложение не найдено на компьютере. Установи его и войди — папка появится сама.")}</span>`}</div>${t ? `<button class="btn g sm" data-sdel="${t.id}">${tr("Отключить")}</button>` : path ? `<button class="btn l sm" data-sadd="${k}">${tr("Включить")}</button>` : `<a class="btn g sm" href="${k === "gdrive" ? "https://www.google.com/drive/download/" : "https://www.dropbox.com/install"}" target="_blank">${tr("Скачать")}</a>`}</div>`;
+  };
+  const others = d.targets.filter((t) => t.kind === "folder" || t.kind === "station");
+  return `<div class="card" data-sec="sync" id="synccard"><h2>${tr("Синхронизация")}${hq("sync")}<span class="hint">${tr("бесплатно")}</span></h2>
+   <p class="hint" style="margin-top:0">${tr("Та же память на всех твоих компьютерах. Заметки и разговоры лежат в облаке обычными файлами. Ключи от ИИ не уезжают: они в хранилище Windows.")}</p>
+   ${cloud("gdrive", "Google Drive")}${cloud("dropbox", "Dropbox")}
+   ${others.map((t) => `<div class="syncrow"><div><b>${esc(tr(t.name))}</b><span class="hint" data-noi18n>${esc(t.where)}</span><span class="hint">${esc(syncLast(t.last))}</span></div><button class="btn g sm" data-sdel="${t.id}">${tr("Отключить")}</button></div>`).join("")}
+   <details style="margin-top:10px"><summary class="hint" style="cursor:pointer">${tr("Своя папка или MCP-станция")}</summary>
+    <div class="row" style="margin-top:8px"><input class="inp" id="sfold" placeholder="D:\\Облако\\Mnema" style="min-width:300px"><button class="btn l sm" id="sfadd">${tr("Добавить папку")}</button></div>
+    <div class="row" style="margin-top:8px"><input class="inp" id="surl" placeholder="https://mnema.example.com" style="min-width:300px"><input class="inp" id="stok" type="password" placeholder="${tr("ключ синхронизации")}" style="width:220px"><button class="btn l sm" id="ssadd">${tr("Подключить станцию")}</button></div>
+    <div class="hint" style="margin-top:6px">${tr("Станция — твой сервер с копией памяти: компьютеры синхронизируются через неё, а любой агент подключается к памяти по MCP со своим ключом. Запуск на сервере")}: <code data-noi18n>mnema station --host 0.0.0.0</code></div></details>
+   <div class="row" style="margin-top:12px"><button class="btn sm" id="snow" ${d.targets.length ? "" : "disabled"}>${tr("Синхронизировать сейчас")}</button><span class="hint">${tr("Сама — каждые")}</span><select class="inp" id="smin" style="width:auto">${[5, 10, 15, 30, 60].map((m) => `<option value="${m}" ${m === d.minutes ? "selected" : ""}>${m} ${tr("мин")}</option>`).join("")}</select></div></div>`;
+}
+function bindSyncCard() {
+  const c = $("#synccard");
+  if (!c) return;
+  const redraw = (d) => {
+    c.outerHTML = syncCard(d);
+    bindSyncCard();
+  };
+  const go = async (path, body, msg) => {
+    try {
+      const d = await post("/api/sync/" + path, body || {});
+      redraw(d);
+      if (msg) toast(msg);
+    } catch (e) {
+      toast(e.message);
+    }
+  };
+  $$("[data-sadd]", c).forEach(
+    (b) => (b.onclick = () => go("add", { kind: b.dataset.sadd }, tr("Синхронизация включена"))),
+  );
+  $$("[data-sdel]", c).forEach((b) => (b.onclick = () => go("remove", { id: b.dataset.sdel })));
+  $("#sfadd", c).onclick = () => {
+    const v = $("#sfold", c).value.trim();
+    if (!v) {
+      toast(tr("Укажи папку для синхронизации"));
+      $("#sfold", c).focus();
+      return;
+    }
+    go("add", { kind: "folder", path: v }, tr("Папка добавлена"));
+  };
+  $("#ssadd", c).onclick = () => {
+    const u = $("#surl", c).value.trim(),
+      k = $("#stok", c).value.trim();
+    if (!u || !k) {
+      toast(tr("Укажи адрес станции и ключ"));
+      $(u ? "#stok" : "#surl", c).focus();
+      return;
+    }
+    go("add", { kind: "station", url: u, token: k }, tr("Станция подключена"));
+  };
+  $("#snow", c).onclick = (e) => {
+    e.currentTarget.disabled = true;
+    e.currentTarget.textContent = tr("синхронизирую…");
+    go("now", {});
+  };
+  $("#smin", c).onchange = (e) => go("minutes", { minutes: +e.target.value });
+}

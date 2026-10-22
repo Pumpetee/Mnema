@@ -1,0 +1,78 @@
+#mnema-box {
+  position: fixed;
+  right: 18px;
+  bottom: 96px;
+  z-index: 2147483647;
+  background: #fff;
+  border: 1px solid #e5e3dc;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(20, 22, 28, 0.14);
+  padding: 10px 12px;
+  font:
+    13px/1.4 "Segoe UI",
+    system-ui,
+    sans-serif;
+  color: #16181d;
+  width: 250px;
+}
+#mnema-box .mn-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+#mnema-box .mn-head b {
+  font-size: 13.5px;
+}
+#mnema-box .mn-st {
+  color: #8a909a;
+  font-size: 12px;
+  margin-left: auto;
+  text-align: right;
+  max-width: 150px;
+}
+#mnema-box .mn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c9c6bd;
+}
+#mnema-box .mn-dot.on {
+  background: #2fae62;
+}
+#mnema-box .mn-dot.off {
+  background: #c2413d;
+}
+#mnema-box .mn-acts {
+  display: grid;
+  gap: 6px;
+}
+#mnema-box button {
+  border: 0;
+  border-radius: 9px;
+  padding: 7px 10px;
+  font:
+    600 12.5px "Segoe UI",
+    system-ui,
+    sans-serif;
+  cursor: pointer;
+  background: #ecebff;
+  color: #5b5bd6;
+  text-align: left;
+}
+#mnema-box button.mn-ins {
+  background: #5b5bd6;
+  color: #fff;
+}
+#mnema-box .mn-toast {
+  display: none;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #1f6b3e;
+}
+#mnema-box .mn-toast.on {
+  display: block;
+}
+#mnema-box .mn-toast.bad {
+  color: #c2413d;
+}

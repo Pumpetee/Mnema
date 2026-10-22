@@ -1,0 +1,45 @@
+// ---------------------------------------------------------------- boot
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.key.toLowerCase() === "n") {
+    e.preventDefault();
+    location.hash = "";
+    go("chat");
+  }
+});
+$("#achbtn").onclick = () => achRefresh().then(() => achGallery());
+applyAch();
+(async () => {
+  try {
+    const a = await api("/api/agent");
+    const pt = a.profile && a.profile.ui_theme;
+    if (pt && !LS.get("theme_set", false)) {
+      setTheme({ mode: pt });
+      LS.set("theme_set", true);
+    }
+    const pl = a.profile && a.profile.lang;
+    if (pl && pl !== I18N.lang) {
+      I18N.lang = pl;
+      LS.set("lang", pl);
+    }
+  } catch (e) {}
+  await loadLang();
+  if (I18N.lang !== "ru") i18nTree(document.body); // the side rail, titles and everything already on the page
+  drawLangBtn();
+  try {
+    APP = await api("/api/app/info");
+  } catch (e) {}
+  const [v, ...argl] = location.hash.slice(1).split("/"),
+    arg = argl.join("/");
+  go(v || "chat", arg);
+  hideSplash();
+  badge();
+  setInterval(badge, 20000);
+  try {
+    const d = await api("/api/local");
+    if (!APP.demo && !d.offer && !d.catalog.some((m) => m.installed) && d.engine) {
+      const c = await post("/api/local/offer", { state: "shown", claim: true }).catch(() => ({}));
+      if (c.claimed) setTimeout(() => welcomeFlow(), 700);
+    }
+  } catch (e) {}
+})();
+setTimeout(sourcesAsk, 1500);

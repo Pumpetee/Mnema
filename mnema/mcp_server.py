@@ -1,0 +1,189 @@
+"""MCP server over stdio: lets Claude (Desktop, Code) and other MCP clients use the memory.
+
+JSON-RPC 2.0, one message per line, UTF-8. Standard library only.
+Run: python -m mnema mcp --client claude [--vault PATH]
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+
+from . import __version__
+from .clients import get_client
+from .journal import UndoError, events, log_event, undo
+from .memory import PermissionDenied, context_for, remember
+from .vault import Vault
+
+PROTOCOLS = ["2025-06-18", "2025-03-26", "2024-11-05"]
+
+INSTRUCTIONS = (
+    "Это память владельца: кто он, его правила, проекты, люди и решения. "
+    "В начале разговора вызови memory_context и опирайся на неё, не переспрашивай известное. "
+    "Когда в разговоре появилось что-то долговечное (решение, договорённость, новый факт о человеке или проекте), "
+    "предложи сохранить и вызови memory_remember. Перед ответом на устаревший факт вызови memory_stale."
+)
+
+TOOLS = [
+    {
+        "name": "memory_context",
+        "description": "Загрузить память владельца (профиль, правила, проекты, решения — что разрешено этому ассистенту). "
+        "Вызывай в начале разговора. Большая память отдаётся частями: part=0, 1, 2…",
+        "inputSchema": {"type": "object", "properties": {"part": {"type": "integer", "minimum": 0, "default": 0}}},
+    },
+    {
+        "name": "memory_search",
+        "description": "Найти в памяти строки по словам. Возвращает файл и строку.",
+        "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]},
+    },
+    {
+        "name": "memory_remember",
+        "description": "Сохранить факт в память. where: inbox (по умолчанию), decisions, rules, project:<имя>, person:<имя>. "
+        "Сохраняй только долговечное и только то, что владелец подтвердил.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"fact": {"type": "string"}, "where": {"type": "string", "default": "inbox"}},
+            "required": ["fact"],
+        },
+    },
+    {
+        "name": "memory_stale",
+        "description": "Факты и проекты, которые давно не обновлялись. Используй, чтобы не опираться на устаревшее.",
+        "inputSchema": {"type": "object", "properties": {"days": {"type": "integer", "default": 30}}},
+    },
+    {
+        "name": "memory_journal",
+        "description": "Последние события памяти: кто что прочитал и записал.",
+        "inputSchema": {"type": "object", "properties": {"limit": {"type": "integer", "default": 20}}},
+    },
+    {
+        "name": "memory_undo",
+        "description": "Откатить запись по id из журнала. Только если владелец попросил.",
+        "inputSchema": {"type": "object", "properties": {"id": {"type": "string"}}, "required": ["id"]},
+    },
+]
+
+
+class Server:
+    def __init__(self, vault: Vault, client_id: str):
+        self.vault = vault
+        self.client_id = client_id
+
+    # -- tools
+    def call(self, name: str, args: dict) -> str:
+        c = get_client(self.vault, self.client_id)
+        if not c.enabled:
+            return "Доступ к памяти для этого ассистента выключен владельцем."
+        if name == "memory_context":
+            part = int(args.get("part", 0) or 0)
+            text, total = context_for(self.vault, self.client_id, part=part)
+            if not text:
+                return f"Частей всего {total}, части {part} нет."
+            if part + 1 < total:
+                text += f"\n\n[Есть ещё части: вызови memory_context с part={part + 1}]"
+            return text
+        if name == "memory_search":
+            hits = self.vault.search(str(args.get("query", "")), scopes=set(c.scopes), deny_tags=set(c.deny_tags))
+            log_event(
+                self.vault, self.client_id, "read", f"поиск: {args.get('query', '')}", sorted({r for r, _ in hits})
+            )
+            return "\n".join(f"{rel}: {line}" for rel, line in hits) or "Ничего не нашлось."
+        if name == "memory_remember":
+            ev = remember(
+                self.vault, str(args.get("fact", "")), str(args.get("where", "inbox") or "inbox"), self.client_id
+            )
+            return f"Сохранено (id {ev['id']}, {ev['paths'][0]}). Откатить: memory_undo id={ev['id']}."
+        if name == "memory_stale":
+            days = int(args.get("days", 30) or 30)
+            items = [
+                s
+                for s in self.vault.stale(max_age_days=days)
+                if c.allows(self.vault.read(s.rel).scope) and not (s.tags & set(c.deny_tags))
+            ]
+            return "\n".join(f"- {s.text} — {s.age_days} дн. ({s.rel})" for s in items) or "Устаревшего нет."
+        if name == "memory_journal":
+            evs = [e for e in events(self.vault, 500) if self._may_see(e, c)][: int(args.get("limit", 20) or 20)]
+            return (
+                "\n".join(f"{e['ts']} · {e['client']} · {e['action']} · {e['summary']} · id {e['id']}" for e in evs)
+                or "Журнал пуст."
+            )
+        if name == "memory_undo":
+            if not c.can_write:
+                raise PermissionDenied(f"{c.name} не может откатывать записи")
+            ev = next((e for e in events(self.vault, 100000) if e["id"] == str(args.get("id", ""))), None)
+            if ev and ev.get("client") != self.client_id:  # only its own writes; the owner's and others' stay
+                raise PermissionDenied(f"{c.name} может откатывать только свои записи")
+            ev = undo(self.vault, str(args.get("id", "")), self.client_id)
+            return f"Откачено: {ev['summary']}"
+        raise KeyError(name)
+
+    def _may_see(self, ev: dict, c) -> bool:
+        """A journal line only about what this assistant may read: no hidden tags, no hidden notes, allowed scopes."""
+        from .vault import line_tags
+
+        deny = set(c.deny_tags)
+        if line_tags(ev.get("summary", "")) & deny:
+            return False
+        for rel in ev.get("paths") or []:
+            try:
+                n = self.vault.read(rel) if rel.endswith(".md") and self.vault.read_raw(rel) is not None else None
+            except (OSError, ValueError):
+                n = None
+            if n is not None and ((n.tags & deny) or not c.allows(n.scope)):
+                return False
+        return True
+
+    # -- protocol
+    def handle(self, msg: dict) -> dict | None:
+        method, mid = msg.get("method"), msg.get("id")
+        if mid is None:  # notification
+            return None
+        try:
+            if method == "initialize":
+                asked = (msg.get("params") or {}).get("protocolVersion")
+                result = {
+                    "protocolVersion": asked if asked in PROTOCOLS else PROTOCOLS[0],
+                    "capabilities": {"tools": {"listChanged": False}},
+                    "serverInfo": {"name": "mnema", "version": __version__},
+                    "instructions": INSTRUCTIONS,
+                }
+            elif method == "ping":
+                result = {}
+            elif method == "tools/list":
+                result = {"tools": TOOLS}
+            elif method == "tools/call":
+                p = msg.get("params") or {}
+                name = p.get("name")
+                if name not in {t["name"] for t in TOOLS}:
+                    return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32602, "message": f"unknown tool {name}"}}
+                try:
+                    text, is_error = self.call(name, p.get("arguments") or {}), False
+                except (PermissionDenied, UndoError, ValueError) as e:
+                    text, is_error = f"Ошибка: {e}", True
+                result = {"content": [{"type": "text", "text": text}], "isError": is_error}
+            else:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": mid,
+                    "error": {"code": -32601, "message": f"method not found: {method}"},
+                }
+            return {"jsonrpc": "2.0", "id": mid, "result": result}
+        except Exception as e:  # never crash the server on one bad request
+            return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32603, "message": str(e)}}
+
+    def serve(self, stdin=None, stdout=None) -> None:
+        stdin = stdin or sys.stdin.buffer
+        stdout = stdout or sys.stdout.buffer
+        for raw in stdin:
+            line = raw.decode("utf-8", "replace").strip()
+            if not line:
+                continue
+            try:
+                msg = json.loads(line)
+            except json.JSONDecodeError:
+                resp = {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "parse error"}}
+            else:
+                resp = self.handle(msg)
+            if resp is not None:
+                stdout.write((json.dumps(resp, ensure_ascii=False) + "\n").encode("utf-8"))
+                stdout.flush()

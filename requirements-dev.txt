@@ -1,0 +1,4 @@
+-r requirements.txt
+pyinstaller==6.22.3     # tools/package.py
+pefile==2024.8.26; sys_platform == "win32"   # tools/package.py: every DLL the package needs is inside it
+ruff==0.17.1            # lint and format (settings in pyproject.toml)

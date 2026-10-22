@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mnema"
+dynamic = ["version"]
+description = "Your memory for every AI: one local Markdown vault, per-AI access rules, a journal with undo."
+readme = "README.md"
+license = { text = "AGPL-3.0-only" }
+authors = [{ name = "Anton Sannikov" }]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+mnema = "mnema.cli:main"
+
+[tool.setuptools]
+packages = ["mnema", "mnema.learn", "mnema.agent", "mnema.chat"]
+
+[tool.setuptools.dynamic]
+version = { attr = "mnema.__version__" }
+
+[tool.setuptools.package-data]
+mnema = ["ui/*.html", "ui/css/*.css", "ui/js/*.js", "ui/i18n/*.json", "knowledge/*.md"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E9", "F"]
+
+[tool.ruff.format]
+quote-style = "preserve"
