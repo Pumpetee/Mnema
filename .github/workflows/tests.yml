@@ -26,6 +26,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libpulse0 libportaudio2
       - name: Install
         run: python -m pip install -r requirements-dev.txt
+      - name: Scan recognisers (official release, sha256)
+        run: python tools/fetch_vendor.py --ocr
       - name: Lint
         run: ruff check mnema tests tools packaging
       - name: Format

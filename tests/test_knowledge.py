@@ -30,7 +30,7 @@ class Knowledge(unittest.TestCase):
         kb = SK.kb_for(q)
         self.assertIn("## Файлы и документы, в том числе PDF", kb)
         self.assertIn("## Действия с файлами", kb)  # making a PDF is an action now, with the owner's word
-        self.assertIn("не склеивает и не режет PDF", kb)
+        self.assertIn("не заполняет формы PDF", kb)
         sp = system_prompt(self.v, "claude_code", query=q)
         self.assertIn("Ты — Mnema", sp)
         self.assertIn("База знаний Mnema", sp)

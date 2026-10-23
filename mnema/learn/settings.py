@@ -84,7 +84,8 @@ DEFAULT_ON = {"mnema_chat"}
 DEFAULT_MODE = {"browser_history": "observe"}
 
 BRAINS = {
-    "auto": "Сама: Claude по подписке, если он есть на компьютере, иначе встроенная модель, иначе только явное",
+    "auto": "Сама: модель, с которой ты говоришь, иначе только явное",
+    "model": "Модель, с которой ты говоришь по умолчанию — любая подключённая",
     "none": "Без модели — только явные сигналы: \"запомни\", поправки, даты статусов",
     "claude_code": "Claude Code, который уже стоит на компьютере",
     "api": "Свой ключ API (Anthropic или совместимый с OpenAI)",
@@ -224,8 +225,8 @@ def merge_from_ui(current: dict, incoming: dict) -> dict:
 
 
 def resolve_brain(s: dict) -> str:
-    """The kind that actually works now. "auto": Claude by subscription if Claude Code is on this computer, else the
-    built-in model if one is downloaded, else explicit signals only."""
+    """The kind that actually works now. "auto": the model the owner talks to (any connected one, none preferred by
+    name); without any — explicit signals only."""
     kind = s["brain"].get("kind", "auto")
     if kind != "auto":
         return kind
@@ -236,15 +237,4 @@ def resolve_brain(s: dict) -> str:
         return os.environ["MNEMA_BRAIN_AUTO"]
     if "unittest" in sys.modules and not getattr(sys, "frozen", False):
         return "none"  # a test run never talks to a live model by accident
-    from .brains import claude_signed_in
-
-    if claude_signed_in():
-        return "claude_code"
-    try:
-        from ..localllm import installed_models
-
-        if installed_models():
-            return "local"
-    except Exception:
-        pass
-    return "none"
+    return "model"

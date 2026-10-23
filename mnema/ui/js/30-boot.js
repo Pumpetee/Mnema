@@ -10,6 +10,14 @@ $("#achbtn").onclick = () => achRefresh().then(() => achGallery());
 applyAch();
 (async () => {
   try {
+    const c = await api("/api/crypto");
+    if (c.on && !c.open) {
+      await loadLang();
+      unlockScreen();
+      return;
+    }
+  } catch (e) {}
+  try {
     const a = await api("/api/agent");
     const pt = a.profile && a.profile.ui_theme;
     if (pt && !LS.get("theme_set", false)) {

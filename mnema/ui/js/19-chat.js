@@ -1221,7 +1221,7 @@ function msgHtml(m, last, i, lastAi) {
       : "";
   return (
     asked +
-    `<div class="msg ai ${m.summary ? "sum" : ""} ${m.speaker ? "cmsg" : ""}" style="${m.speaker ? "--sc:" + spkColor(m.model) : ""}" ${i !== undefined ? `data-i="${i}"` : ""}>${cav}<div>${sumh}${spk}<div class="md">${md(m.text, last)}</div>${m.error ? `<p class="err">${linkSettings(esc(m.error))}</p>` : ""}${needWeb}${m.prompt ? `<div class="byprompt">${ic("book")}по рецепту «${esc(m.prompt)}»</div>` : ""}${srcs}${i !== undefined ? `<div class="acts ${m.useful ? "keep" : ""}"><button data-copy="${i}">${ic("copy")}Копировать</button><button class="${m.useful ? "on" : ""}" data-like="${i}">${ic("like")}Полезно</button><button data-reply="${i}">${ic("reply")}Ответить</button>${m.checked ? '<span class="meta" style="align-self:center;margin-left:6px">перепроверено перед отправкой</span>' : ""}${saved}${hidden}</div>` : ""}</div></div>`
+    `<div class="msg ai ${m.summary ? "sum" : ""} ${m.speaker ? "cmsg" : ""}" style="${m.speaker ? "--sc:" + spkColor(m.model) : ""}" ${i !== undefined ? `data-i="${i}"` : ""}>${cav}<div>${sumh}${spk}<div class="md">${md(m.text, last)}</div>${m.error ? `<p class="err">${linkSettings(esc(m.error))}</p>` : ""}${needWeb}${m.prompt ? `<div class="byprompt">${ic("book")}по рецепту «${esc(m.prompt)}»</div>` : ""}${srcs}${i !== undefined ? `<div class="acts ${m.useful ? "keep" : ""}"><button data-copy="${i}">${ic("copy")}Копировать</button><button data-reply="${i}">${ic("reply")}Ответить</button>${!m.speaker && !m.summary && !(CHAT.chat && CHAT.chat.consortium) ? `<button data-debate="${i}">${ic("users")}Поспорить с другими</button>` : ""}${m.checked ? '<span class="meta" style="align-self:center;margin-left:6px">перепроверено перед отправкой</span>' : ""}${saved}${hidden}</div>` : ""}</div></div>`
   );
 }
 // ---------------- a question from the model as a card
@@ -1531,19 +1531,7 @@ function bindMsg() {
         navigator.clipboard.writeText(CHAT.chat.messages[+b.dataset.copy].text).then(() => toast("Скопировано"));
       }),
   );
-  $$("[data-like]").forEach(
-    (b) =>
-      (b.onclick = async () => {
-        const on = !b.classList.contains("on");
-        try {
-          await post("/api/chat/useful", { chat: CHAT.id, index: +b.dataset.like, on });
-          b.classList.toggle("on", on);
-          b.parentElement.classList.toggle("keep", on);
-        } catch (e) {
-          toast(e.message);
-        }
-      }),
-  );
+  $$("[data-debate]").forEach((b) => (b.onclick = () => debateAnswer(+b.dataset.debate)));
   $$("[data-reply]").forEach((b) => (b.onclick = () => setQuote(CHAT.chat.messages[+b.dataset.reply].text)));
 }
 function setQuote(t) {
@@ -1866,4 +1854,51 @@ function sessExplain() {
     if (e.target === pop) close();
   };
   $$("[data-x]", pop).forEach((b) => (b.onclick = close));
+}
+
+// «Поспорить с другими»: the answer's author defends it, one or two other connected AIs question it, then a verdict
+async function debateAnswer(i) {
+  const msgs = CHAT.chat.messages,
+    m = msgs[i],
+    by = m.model || CHAT.chat.model || CHAT.model;
+  const question =
+    (
+      msgs
+        .slice(0, i)
+        .reverse()
+        .find((x) => x.role === "user") || {}
+    ).text || "";
+  let provs = CHAT.providers;
+  try {
+    provs = (await api("/api/models")).providers;
+  } catch (e) {}
+  const mine = String(by).split(":")[0],
+    others = (provs || [])
+      .filter((p) => p.ready && p.id !== mine && p.models && p.models.length)
+      .map((p) => p.id + ":" + p.models[0].id)
+      .slice(0, 2);
+  if (!others.length) {
+    toast(tr("Чтобы было с кем спорить, подключи ещё один ИИ: Настройки → ИИ и модели"));
+    return;
+  }
+  try {
+    await post("/api/chat/cons", {
+      chat: CHAT.id,
+      action: "start",
+      members: [by, ...others],
+      rounds: 2,
+      format: "debate",
+      summarizer: others[others.length - 1],
+      challenge: { by, answer: m.text, question },
+    });
+    renderChat(await api("/api/chat?id=" + CHAT.id));
+    $("#msgs").insertAdjacentHTML(
+      "beforeend",
+      `<div class="msg ai" id="live"><div class="av"></div><div><div class="md">${TYPING}</div></div></div>`,
+    );
+    scrollEnd();
+    poll();
+  } catch (e) {
+    toast(e.message);
+  }
 }

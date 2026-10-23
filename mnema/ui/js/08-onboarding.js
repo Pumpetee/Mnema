@@ -9,7 +9,7 @@ async function welcomeFlow() {
   ]);
   const name = (ag.profile || {}).owner_name || "",
     ready = ms.providers.filter((p) => p.ready && p.id !== "local"),
-    claude = ready.find((p) => p.id === "claude_code");
+    claude = ready[0]; // any connected cloud AI — none goes first by name
   let pick = lc
     ? lc.catalog.find((m) => m.recommended && m.fit !== "no") ||
       lc.catalog.filter((m) => m.fit === "ok").sort((a, b) => b.size - a.size)[0]
@@ -102,9 +102,7 @@ async function welcomeFlow() {
       pick: true,
       t: tr("С каким ИИ говорить?"),
       p: claude
-        ? tr(
-            "Claude по твоей подписке уже подключён — можно начинать. Бесплатный ИИ на компьютере пригодится как запасной.",
-          )
+        ? tr("Облачный ИИ уже подключён — можно начинать. Бесплатный ИИ на компьютере пригодится как запасной.")
         : tr("Бесплатный ИИ работает прямо на компьютере, без ключей и подписок. Других ИИ можно подключить потом."),
     },
   ];
@@ -120,7 +118,7 @@ async function welcomeFlow() {
       }
       ${
         s.pick
-          ? `<div class="wpick">${claude ? `<div class="wopt ${choice === "claude" ? "on" : ""}" id="wcl"><span class="wic ${choice === "claude" ? "ok" : ""}">${ic(choice === "claude" ? "check" : "chat")}</span><div><b>Claude</b><small>${tr("по подписке · уже подключён")}</small></div></div>` : ""}
+          ? `<div class="wpick">${claude ? `<div class="wopt ${choice === "claude" ? "on" : ""}" id="wcl"><span class="wic ${choice === "claude" ? "ok" : ""}">${ic(choice === "claude" ? "check" : "chat")}</span><div><b data-noi18n>${esc(claude.name)}</b><small>${tr("уже подключён")}</small></div></div>` : ""}
         ${pick ? `<div class="wopt ${choice === "local" ? "on" : ""}" id="wloc"><span class="wic ${choice === "local" ? "ok" : ""}">${ic(choice === "local" ? "check" : "folder")}</span><div><b>${tr("Бесплатный ИИ на компьютере")}</b><small>${esc(pick.name)} · ${fmtSize(pick.size)}${pick.eta ? " · ≈ " + fmtEta(pick.eta) : ""}</small><div class="wbar" hidden><i></i></div></div><button class="btn ${claude ? "l" : ""} sm" id="wdl">${pick.installed ? tr("Уже скачан") : tr("Скачать")}</button></div>` : ""}
         <a href="#" class="wmore" id="wmore">${tr("Другие модели и ключи…")}</a></div>`
           : ""

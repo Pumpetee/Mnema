@@ -4,7 +4,8 @@
     python tools/qa/gui_smoke.py --source        # the same from the source tree
 
 A throw-away home and memory folder; the program starts as the owner would start it (window, tray), must write its
-port, answer on it with its token, serve the interface, keep the tray and log no error. Then it is stopped.
+port, answer on it with its token, serve the interface, keep the tray, read text from a picture (OCR packed whole)
+and log no error. Then it is stopped.
 """
 
 from __future__ import annotations
@@ -57,6 +58,17 @@ try:
         if ping.get("ok") and "<html" in page.lower():
             time.sleep(8)  # the window and the tray settle; a crash shows up in the log
             ok, why = proc.poll() is None, f"version {ping.get('version')}, port {port}"
+            req = urllib.request.Request(f"http://127.0.0.1:{port}/api/app/selftest", headers={"X-Mnema-Token": token})
+            st = json.loads(urllib.request.urlopen(req, timeout=120).read())
+            seen = st.get("ocr", "")
+            if "1427" in seen:
+                why += ", reads scans"
+            else:
+                ok, why = False, why + f", but scan recognition does not work in the build (read: {seen!r})"
+            if st.get("crypt"):
+                why += ", encrypts"
+            else:
+                ok, why = False, why + ", but encryption does not work in the build"
             if ok:  # «Выход», as from the tray: the program must really end, not hang without a window
                 req = urllib.request.Request(f"http://127.0.0.1:{port}/api/app/quit", headers={"X-Mnema-Token": token})
                 urllib.request.urlopen(req, timeout=5).read()

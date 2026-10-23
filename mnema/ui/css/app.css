@@ -16695,3 +16695,60 @@ body.wlc-on .tour {
 .memask .card {
   max-width: 520px;
 }
+
+/* models: cloud and on this computer */
+.m3grp {
+  padding: 8px 10px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+.aigrp {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 14px 0 8px;
+  font-weight: 600;
+}
+.aigrp:first-of-type {
+  margin-top: 4px;
+}
+
+/* encrypted memory: the password screen and the encryption dialogs */
+.modal.unlock {
+  z-index: 200;
+}
+.unlock .card,
+.cryptm .card {
+  max-width: 420px;
+}
+.unlock .card input[type="password"],
+.cryptm .card input[type="password"] {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+.unlockic {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: var(--acc-soft, rgba(127, 127, 255, 0.12));
+}
+.ulrem {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 13px;
+}
+.ulerr {
+  min-height: 18px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--bad, #d14343);
+}

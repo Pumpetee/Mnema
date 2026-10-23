@@ -7,10 +7,14 @@ QtPy==2.4.3; sys_platform == "linux"
 pystray==0.19.5; sys_platform != "linux"        # the tray icon (Linux uses Qt's own)
 pillow==13.0.0          # the tray icon image
 psutil==7.2.2           # memory and processor load on macOS and Linux (the «нагрев» indicator)
-pypdf==6.21.1           # PDF text
+pypdf==6.21.1           # PDF text; merge, cut, turn, split
+pypdfium2==5.14.0       # draws PDF pages, to read scans
+rapidocr==3.10.0        # scans and pictures read on this computer (PaddleOCR models on onnxruntime)
+opencv-python-headless==4.14.0.94  # for rapidocr; the last release with a wheel for Intel Macs
 openpyxl==3.1.5         # Excel .xlsx
 xlrd==2.0.2             # Excel .xls
 python-pptx==1.0.2      # PowerPoint
+cryptography==48.0.1    # Mnema's own encryption of the memory folder; the last release with an Intel Mac wheel
 PySocks==1.7.1          # SOCKS5 proxy bridge
 ddgs==9.16.0            # web search without keys
 faster-whisper==1.2.1   # speech recognition on this computer

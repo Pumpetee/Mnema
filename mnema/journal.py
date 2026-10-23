@@ -43,8 +43,9 @@ def log_event(
         ev.update(extra)
     f = _jfile(vault)
     f.parent.mkdir(parents=True, exist_ok=True)
-    with open(f, "a", encoding="utf-8") as fh:
-        fh.write(json.dumps(ev, ensure_ascii=False) + "\n")
+    from .fsutil import append_text
+
+    append_text(f, json.dumps(ev, ensure_ascii=False) + "\n")
     return ev
 
 
@@ -92,8 +93,9 @@ def journal_line(vault: Vault, client: str, rel: str, summary: str) -> None:
         if f.exists()
         else f"# Журнал — {time.strftime('%d.%m.%Y')}\n\nЧто записано в память и кем. Откатить — в Mnema, «История».\n\n"
     )
-    with open(f, "a", encoding="utf-8") as fh:
-        fh.write(f"{head}- {time.strftime('%H:%M')} · {who} · {rel} — {summary}\n")
+    from .fsutil import append_text
+
+    append_text(f, f"{head}- {time.strftime('%H:%M')} · {who} · {rel} — {summary}\n")
 
 
 def write_with_journal(vault: Vault, client: str, rel: str, new_text: str, summary: str) -> dict:

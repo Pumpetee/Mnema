@@ -301,6 +301,10 @@ def read_text(p: Path) -> str:
 class Vault:
     def __init__(self, root: str | Path):
         self.root = Path(root).expanduser().resolve()
+        if (self.root / SERVICE_DIR / "crypto.json").exists():  # encrypted by Mnema: its key, if it is here
+            from . import crypt
+
+            crypt.attach(self.root)
 
     def lock(self):
         from .locks import vault_lock
@@ -358,8 +362,16 @@ class Vault:
         p.parent.mkdir(parents=True, exist_ok=True)
         tmp = p.with_name(f"{p.name}.{os.getpid()}.{threading.get_ident()}.tmp")
         try:
-            with open(tmp, "w", encoding="utf-8") as fh:
-                fh.write(text)
+            from .fsutil import _crypt_on
+
+            if _crypt_on():  # an encrypted memory folder: the note goes to disk encrypted
+                from . import crypt
+
+                with open(tmp, "wb") as fh:
+                    fh.write(crypt.text_for(p, text))
+            else:
+                with open(tmp, "w", encoding="utf-8") as fh:
+                    fh.write(text)
             for _ in range(20):
                 try:
                     os.replace(tmp, p)

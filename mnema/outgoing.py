@@ -191,8 +191,9 @@ def log(vault: Vault, pid: str, model: str, chars: int, redacted: dict, meta: di
     try:
         with _lock:
             vault.service.mkdir(parents=True, exist_ok=True)
-            with open(_file(vault), "a", encoding="utf-8") as fh:
-                fh.write(json.dumps(ev, ensure_ascii=False) + "\n")
+            from .fsutil import append_text
+
+            append_text(_file(vault), json.dumps(ev, ensure_ascii=False) + "\n")
     except OSError:
         pass
     return ev

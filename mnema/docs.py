@@ -1,8 +1,8 @@
 """Documents read on the computer, free: PDF, Excel (xlsx/xls), Word, PowerPoint, CSV, OpenDocument, HTML, RTF, text.
 
 The model gets text, not files — any model can work with it, and a long document doesn't cost its full size:
-retrieve.best() picks the parts that answer the question. A PDF without a text layer (a scan) is the only case
-that still goes to the model as a file (Claude and Anthropic read scans).
+retrieve.best() picks the parts that answer the question. A PDF without a text layer (a scan) and a picture are
+recognised on the computer too (ocr.py); only if that finds nothing does a scan go to the model as a file.
 """
 
 from __future__ import annotations
@@ -22,7 +22,12 @@ class LockedPdf(ValueError):
     """A PDF under a password: nothing can be read from it."""
 
 
-def _pdf(p: Path) -> tuple[str, dict]:
+def scanned(text: str, pages: int) -> bool:
+    """Almost no text on the pages: a scan (a receipt of one page with a few lines still counts as text)."""
+    return len(re.sub(r"\s|\[стр\. \d+\]", "", text or "")) < 15 * max(1, pages)
+
+
+def _pdf(p: Path, lang: str = "ru") -> tuple[str, dict]:
     from pypdf import PdfReader
 
     r = PdfReader(str(p))
@@ -38,7 +43,14 @@ def _pdf(p: Path) -> tuple[str, dict]:
         t = (pg.extract_text() or "").strip()
         if t:
             pages.append(f"[стр. {i + 1}]\n{t}")
-    return "\n\n".join(pages), {"pages": len(r.pages)}
+    text, info = "\n\n".join(pages), {"pages": len(r.pages)}
+    if scanned(text, len(r.pages)):  # a scan: read the pages as pictures, on this computer
+        from . import ocr
+
+        got, n = ocr.pdf_text(p, lang)
+        if got and not scanned(got, max(1, n) // 3):
+            return got, {**info, "ocr": n}
+    return text, info
 
 
 def _table(rows, name: str) -> str:
@@ -207,12 +219,22 @@ READERS = {
 }
 
 
-def extract(path: Path) -> tuple[str, dict]:
-    """(text, info). Raises if the format is not supported or the needed library is missing."""
+IMAGES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".tif", ".tiff"}
+
+
+def extract(path: Path, lang: str = "ru") -> tuple[str, dict]:
+    """(text, info). Raises if the format is not supported or the needed library is missing. lang: the interface
+    language, it picks the alphabet for recognising scans."""
     ext = path.suffix.lower()
     if ext in (".html", ".htm"):
         title, text = html_text(path.read_text(encoding="utf-8", errors="replace"))
         return text, {"title": title}
+    if ext == ".pdf":
+        return _pdf(path, lang)
+    if ext in IMAGES:
+        from . import ocr
+
+        return ocr.image_text(path, lang), {"ocr": 1}
     fn = READERS.get(ext)
     if not fn:
         raise ValueError("формат не поддерживается")

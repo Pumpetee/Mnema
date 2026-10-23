@@ -68,6 +68,35 @@ class TestConsortium(unittest.TestCase):
         self.assertIn("Доход 100к", self.talk.calls[0]["system"])  # Claude may see money
         self.assertNotIn("Доход 100к", self.talk.calls[1]["system"])  # Gemini may not
 
+    def test_argue_with_one_answer(self):
+        """«Поспорить с другими»: the author defends its answer, the others question it, a verdict at the end."""
+        import time
+
+        r = CH.send(self.v, "Снижать ли цену?", model="openai:gpt-4o", sync=True, learn=False)
+        cid = r["chat"]
+        answer = [m for m in CH.load_chat(self.v, cid)["messages"] if m["role"] == "assistant"][-1]["text"]
+        CO.control(
+            self.v,
+            cid,
+            "start",
+            ["openai:gpt-4o", "gemini:gemini-2.5-pro"],
+            2,
+            extra={
+                "format": "debate",
+                "challenge": {"by": "openai:gpt-4o", "answer": answer, "question": "Снижать ли цену?"},
+            },
+        )
+        end = time.time() + 15
+        while time.time() < end and not CH.state(cid)["done"]:
+            time.sleep(0.05)
+        cfg = CH.load_chat(self.v, cid)["consortium"]
+        self.assertEqual(cfg["challenge"]["by"], "openai:gpt-4o")
+        calls = self.talk.calls[1:]  # the first call was the answer itself
+        self.assertIn("поспорить с ответом", calls[0]["system"])
+        self.assertIn(answer, calls[0]["system"])
+        self.assertIn("ЗА", [c for c in calls if c["pid"] == "openai"][0]["system"])
+        self.assertIn("ПРОТИВ", [c for c in calls if c["pid"] == "gemini"][0]["system"])
+
     def test_needs_two(self):
         with self.assertRaises(ValueError):
             CO.clean({"members": ["claude_code:sonnet"]})

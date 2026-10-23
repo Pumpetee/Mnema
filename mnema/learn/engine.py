@@ -191,8 +191,9 @@ def emit(vault: Vault, stage: str, text: str, **extra) -> dict:
     f = vault.service / "learn" / "live.jsonl"
     try:
         f.parent.mkdir(parents=True, exist_ok=True)
-        with f.open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps(ev, ensure_ascii=False) + "\n")
+        from ..fsutil import append_text
+
+        append_text(f, json.dumps(ev, ensure_ascii=False) + "\n")
         if f.stat().st_size > 400_000:  # keep the file small
             keep = f.read_text(encoding="utf-8").splitlines()[-500:]
             f.write_text("\n".join(keep) + "\n", encoding="utf-8")
@@ -322,8 +323,9 @@ def _run(vault, initial, only, brain, progress) -> dict:
     f.parent.mkdir(parents=True, exist_ok=True)
     (vault.service / "learn" / "last_check").write_text(report["ts"], encoding="utf-8")
     if report["episodes"] or report["errors"] or report["to_forget"] or initial:  # empty checks aren't history
-        with f.open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps(report, ensure_ascii=False) + "\n")
+        from ..fsutil import append_text
+
+        append_text(f, json.dumps(report, ensure_ascii=False) + "\n")
     if report["written"] or report["queued"]:
         log_event(
             vault,

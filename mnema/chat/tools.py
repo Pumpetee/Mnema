@@ -35,8 +35,8 @@ from pathlib import Path
 from ..vault import Vault
 from .. import osapi as OS
 
-TOOLS = ("read_file", "list_files", "find_files", "write_file", "edit_file", "make_document", "remember")
-WRITES = {"write_file", "edit_file", "make_document", "remember"}
+TOOLS = ("read_file", "list_files", "find_files", "write_file", "edit_file", "make_document", "edit_pdf", "remember")
+WRITES = {"write_file", "edit_file", "make_document", "edit_pdf", "remember"}
 TEXT_EXT = {".md", ".txt", ".csv", ".json", ".html", ".htm", ".xml", ".yml", ".yaml", ".log", ".ini", ".tsv"}
 DOC_EXT = {".pdf", ".docx", ".xlsx", ".html", ".md", ".txt", ".csv"}
 MAX_READ = 60_000
@@ -50,6 +50,7 @@ RULE = """=== Действия с файлами ===
 
 ```mnema read_file path="полный путь"
 ```
+(читает и PDF, Word, Excel, PowerPoint; сканы и картинки распознаются на компьютере)
 ```mnema list_files path="полный путь к папке"
 ```
 ```mnema find_files query="слова для поиска"
@@ -57,13 +58,22 @@ RULE = """=== Действия с файлами ===
 ```mnema write_file path="полный путь к файлу .md, .txt, .csv, .json или .html"
 весь текст файла
 ```
-```mnema edit_file path="полный путь"
+```mnema edit_file path="полный путь к текстовому файлу, .docx или .xlsx"
 <<<
 точный кусок, который заменить
 ===
 чем заменить
 >>>
 ```
+(в Word заменяется текст с сохранением оформления; блоков <<< … >>> может быть несколько. В Excel можно и так —
+по строке на ячейку: Лист1!B3 = 1500 или B3 = текст, формула начинается с =)
+```mnema edit_pdf do="merge" files="путь1.pdf; путь2.pdf" path="полный путь к новому .pdf"
+```
+```mnema edit_pdf do="pages" from="исходный.pdf" pages="1-3, 7" path="новый .pdf"
+```
+(do="pages" — оставить эти страницы в этом порядке: так вырезают, удаляют и переставляют страницы;
+do="rotate" — повернуть pages на angle="90", "180" или "270"; do="split" — разрезать: pages="1-3; 4-9", без pages —
+по странице, path — папка. Исходные файлы не меняются, новый файл не затирает существующий)
 ```mnema make_document path="полный путь к .pdf, .docx или .xlsx"
 содержимое в Markdown: заголовки #, списки -, таблицы |…|
 ```
@@ -169,6 +179,12 @@ def what(vault: Vault, call: dict) -> str:
         "write_file": f"{'переписать' if exists else 'создать'} файл {path}",
         "edit_file": f"изменить файл {path}",
         "make_document": f"создать документ {path}",
+        "edit_pdf": {
+            "merge": f"склеить PDF ({call.get('files', '')}) в {path}",
+            "pages": f"взять страницы {call.get('pages', '')} из {call.get('from', '')} в {path}",
+            "rotate": f"повернуть страницы {call.get('pages') or 'все'} из {call.get('from', '')} в {path}",
+            "split": f"разрезать {call.get('from', '')} на части в папку {path}",
+        }.get(call.get("do", ""), f"изменить PDF {call.get('from', '')} → {path}"),
         "remember": f"записать в память ({call.get('where', 'inbox')}): «{call.get('body', '')[:200]}»",
     }[t]
 
@@ -176,13 +192,16 @@ def what(vault: Vault, call: dict) -> str:
 # ---------------------------------------------------------------- doing it
 
 
-def _read_any(p: Path) -> str:
+def _read_any(p: Path, lang: str = "ru") -> str:
     from .. import docs
     from ..vault import read_text
 
     ext = p.suffix.lower()
+    if ext in docs.IMAGES:
+        text, _ = docs.extract(p, lang)
+        return text or "(на картинке не нашлось текста)"
     if ext in docs.SUPPORTED and ext not in TEXT_EXT:
-        text, _ = docs.extract(p)
+        text, _ = docs.extract(p, lang)
         return text
     return read_text(p)
 
@@ -293,7 +312,10 @@ def run(vault: Vault, call: dict, client: str = "owner") -> tuple[str, str, str]
         if not p.is_file():
             raise Refused("такого файла нет")
         rel = in_vault(vault, p)
-        text = _read_note(vault, rel, client) if rel and p.suffix.lower() == ".md" else _read_any(p)
+        from ..agent import profile as P
+
+        lang = P.load(vault).get("lang") or "ru"
+        text = _read_note(vault, rel, client) if rel and p.suffix.lower() == ".md" else _read_any(p, lang)
         cut = len(text) > MAX_READ
         return (text[:MAX_READ] + ("\n…[файл длиннее, показано начало]" if cut else "")), f"Прочитала файл {p}", str(p)
     if t == "write_file":
@@ -310,13 +332,30 @@ def run(vault: Vault, call: dict, client: str = "owner") -> tuple[str, str, str]
             f"{'переписан' if existed else 'создан'} файл {p.name}",
         )
         return f"Готово: {p}", f"{'Переписала' if existed else 'Создала'} файл {p}", str(p)
+    if t == "edit_pdf":
+        return _edit_pdf(vault, client, call, p)
     if t == "edit_file":
         if not p.is_file():
             raise Refused("такого файла нет")
-        m = re.search(r"<<<\n?(.*?)\n?===\n?(.*?)\n?>>>", call.get("body", ""), re.S)
-        if not m:
+        pairs = re.findall(r"<<<\n?(.*?)\n?===\n?(.*?)\n?>>>", call.get("body", ""), re.S)
+        ext = p.suffix.lower()
+        if ext == ".docx":
+            if not pairs:
+                raise Refused("не понятно, что на что заменить: нужен блок <<< … === … >>>")
+            data, n = docx_replace(p.read_bytes(), pairs)
+            if not n:
+                raise Refused("такого текста в документе нет — прочитай файл и возьми текст точно")
+            _write_bytes(vault, client, p, data, f"изменён документ {p.name}")
+            return f"Готово: {p} (замен: {n})", f"Изменила документ {p}", str(p)
+        if ext in (".xlsx", ".xlsm"):
+            data, n = xlsx_edit(p, call.get("body", ""), pairs)
+            if not n:
+                raise Refused("нечего менять: нужны строки вида Лист1!B3 = 1500 или блок <<< … === … >>>")
+            _write_bytes(vault, client, p, data, f"изменена таблица {p.name}")
+            return f"Готово: {p} (изменено ячеек: {n})", f"Изменила таблицу {p}", str(p)
+        if not pairs:
             raise Refused("не понятно, что на что заменить: нужен блок <<< … === … >>>")
-        old, new = m.group(1), m.group(2)
+        old, new = pairs[0]
         from ..vault import read_text
 
         cur = read_text(p)
@@ -556,3 +595,229 @@ def _num(x: str):
     if re.fullmatch(r"-?\d+[.,]\d+", s):
         return float(s.replace(",", "."))
     return x
+
+
+# ---------------------------------------------------------------- PDF: merge, pages, rotate, split (pypdf)
+
+
+def page_list(spec: str, total: int) -> list[int]:
+    """«1-3, 7, 10-» → 0-based indexes in the order given. Empty or «все» → every page."""
+    spec = (spec or "").strip().lower()
+    if spec in ("", "все", "all"):
+        return list(range(total))
+    out = []
+    for part in re.split(r"[,\s]+", spec):
+        if not part:
+            continue
+        m = re.fullmatch(r"(\d+)?\s*[-–]\s*(\d+)?", part)
+        if m:
+            a = int(m.group(1) or 1)
+            b = int(m.group(2) or total)
+            step = 1 if a <= b else -1
+            idx = range(a, b + step, step)
+        elif part.isdigit():
+            idx = [int(part)]
+        else:
+            raise Refused(f"не понятно, какие страницы: «{part}» — пиши так: 1-3, 7")
+        for i in idx:
+            if not 1 <= i <= total:
+                raise Refused(f"в файле {total} стр., страницы {i} нет")
+            out.append(i - 1)
+    return out
+
+
+def _pdf_reader(p: Path):
+    from pypdf import PdfReader
+
+    if p.suffix.lower() != ".pdf" or not p.is_file():
+        raise Refused(f"нет такого PDF: {p}")
+    r = PdfReader(str(p))
+    if r.is_encrypted:
+        try:
+            ok = r.decrypt("")
+        except Exception:
+            ok = 0
+        if not ok:
+            raise Refused(f"PDF «{p.name}» защищён паролем")
+    return r
+
+
+def _pdf_bytes(writer) -> bytes:
+    import io
+
+    buf = io.BytesIO()
+    writer.write(buf)
+    return buf.getvalue()
+
+
+def _edit_pdf(vault: Vault, client: str, call: dict, out: Path) -> tuple[str, str, str]:
+    from pypdf import PdfWriter
+
+    do = (call.get("do") or "").strip().lower()
+    if do == "merge":
+        files = [resolve(vault, f) for f in re.split(r"[;\n]+", call.get("files", "")) if f.strip()]
+        if len(files) < 2:
+            raise Refused("для склейки нужно два PDF или больше: files=\"путь1.pdf; путь2.pdf\"")
+        w = PdfWriter()
+        for f in files:
+            w.append(_pdf_reader(f))
+        made = [(out, _pdf_bytes(w))]
+    elif do in ("pages", "rotate", "split"):
+        src = resolve(vault, call.get("from", ""))
+        r = _pdf_reader(src)
+        total = len(r.pages)
+        if do == "split":
+            groups = [g for g in (call.get("pages") or "").split(";") if g.strip()]
+            parts = [page_list(g, total) for g in groups] if groups else [[i] for i in range(total)]
+            folder = out if not out.suffix else out.parent
+            made = []
+            for idx in parts:
+                w = PdfWriter()
+                for i in idx:
+                    w.add_page(r.pages[i])
+                label = f"{idx[0] + 1}" if len(idx) == 1 else f"{idx[0] + 1}-{idx[-1] + 1}"
+                made.append((folder / f"{src.stem} — стр. {label}.pdf", _pdf_bytes(w)))
+        else:
+            w = PdfWriter()
+            if do == "pages":
+                for i in page_list(call.get("pages", ""), total):
+                    w.add_page(r.pages[i])
+            else:
+                angle = int(re.sub(r"\D", "", call.get("angle") or "90") or 90)
+                if angle % 90:
+                    raise Refused("повернуть можно на 90, 180 или 270")
+                turn = set(page_list(call.get("pages", ""), total))
+                for i, pg in enumerate(r.pages):
+                    w.add_page(pg)
+                    if i in turn:
+                        w.pages[-1].rotate(angle)
+            made = [(out, _pdf_bytes(w))]
+    else:
+        raise Refused("edit_pdf умеет do=\"merge\", \"pages\", \"rotate\" или \"split\"")
+    names = []
+    for target, data in made:
+        if target.suffix.lower() != ".pdf":
+            raise Refused("новый файл должен быть .pdf")
+        resolve(vault, str(target))  # inside the open folders
+        target = _free_name(target)
+        _write_bytes(vault, client, target, data, f"создан PDF {target.name}")
+        names.append(str(target))
+    line = f"Сделала PDF {names[0]}" if len(names) == 1 else f"Сделала {len(names)} PDF в папке {Path(names[0]).parent}"
+    return "Готово:\n" + "\n".join(names), line, names[0]
+
+
+# ---------------------------------------------------------------- Word and Excel: change what is there
+
+
+W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+XML_SPACE = "{http://www.w3.org/XML/1998/namespace}space"
+DOCX_PARTS = re.compile(r"word/(document|header\d*|footer\d*|footnotes|endnotes)\.xml$")
+
+
+def _rezip(data: bytes, changed: dict[str, bytes]) -> bytes:
+    """The same package with some parts replaced; everything else byte for byte."""
+    import io
+
+    src = zipfile.ZipFile(io.BytesIO(data))
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as dst:
+        for info in src.infolist():
+            dst.writestr(info, changed.get(info.filename, src.read(info.filename)))
+    return buf.getvalue()
+
+
+def docx_replace(data: bytes, pairs: list[tuple[str, str]]) -> tuple[bytes, int]:
+    """Replace text in a Word document keeping its formatting: a phrase split over several runs (bold word inside,
+    spell-check marks) is found too; the new text takes the format of where the old one began."""
+    import io
+
+    from lxml import etree
+
+    try:
+        z = zipfile.ZipFile(io.BytesIO(data))
+    except zipfile.BadZipFile:
+        raise Refused("файл .docx повреждён или это не документ Word") from None
+    w = "{%s}" % W_NS
+    path = "./w:r/w:t | ./w:hyperlink/w:r/w:t | ./w:ins/w:r/w:t | ./w:smartTag/w:r/w:t | ./w:sdt/w:sdtContent/w:r/w:t"
+    changed, count = {}, 0
+    for name in z.namelist():
+        if not DOCX_PARTS.match(name):
+            continue
+        root = etree.fromstring(z.read(name))
+        n_here = 0
+        for para in root.iter(w + "p"):
+            ts = para.xpath(path, namespaces={"w": W_NS})
+            if not ts:
+                continue
+            for old, new in pairs:
+                if not old:
+                    continue
+                start = 0
+                while True:
+                    full = "".join(t.text or "" for t in ts)
+                    i = full.find(old, start)
+                    if i < 0:
+                        break
+                    j, pos, first = i + len(old), 0, True
+                    for t in ts:
+                        s = t.text or ""
+                        a, b = pos, pos + len(s)
+                        pos = b
+                        if b <= i or a >= j or (a == b):
+                            continue
+                        lo, hi = max(i, a) - a, min(j, b) - a
+                        t.text = s[:lo] + (new if first else "") + s[hi:]
+                        t.set(XML_SPACE, "preserve")
+                        first = False
+                    start = i + len(new)
+                    n_here += 1
+        if n_here:
+            changed[name] = etree.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
+            count += n_here
+    return (_rezip(data, changed) if changed else data), count
+
+
+CELL_RE = re.compile(r"^\s*(?:(?:'([^']+)'|([^!=\s][^!=]*?))!)?\$?([A-Za-z]{1,3})\$?(\d{1,7})\s*=\s?(.*)$")
+
+
+def xlsx_edit(p: Path, body: str, pairs: list[tuple[str, str]]) -> tuple[bytes, int]:
+    """Set cells («Лист1!B3 = 1500», «B3 = текст», «C7 = =SUM(C1:C6)») and/or replace text in text cells. Formulas,
+    formats and the other sheets stay. A book with charts or pictures is refused: they would be lost on saving."""
+    import io
+
+    from openpyxl import load_workbook
+
+    with zipfile.ZipFile(p) as z:
+        if any(n.startswith(("xl/charts/", "xl/drawings/", "xl/pivotTables/")) for n in z.namelist()):
+            raise Refused(
+                "в этой книге есть графики, картинки или сводные таблицы — при правке они пропадут. "
+                "Попроси владельца поправить её в Excel или сделай новую таблицу через make_document"
+            )
+    wb = load_workbook(p, keep_vba=p.suffix.lower() == ".xlsm")
+    n = 0
+    text_part = re.sub(r"<<<.*?>>>", "", body or "", flags=re.S)
+    for line in text_part.splitlines():
+        if not line.strip():
+            continue
+        m = CELL_RE.match(line)
+        if not m:
+            raise Refused(f"не понятна строка «{line.strip()[:80]}» — пиши так: Лист1!B3 = 1500")
+        sheet = m.group(1) or m.group(2)
+        if sheet and sheet not in wb.sheetnames:
+            raise Refused(f"листа «{sheet}» нет. Листы: {', '.join(wb.sheetnames)}")
+        ws = wb[sheet] if sheet else wb.active
+        raw = m.group(5).rstrip()
+        ws[f"{m.group(3).upper()}{m.group(4)}"] = raw if raw.startswith("=") else _num(raw) if raw else None
+        n += 1
+    for old, new in pairs:
+        if not old:
+            continue
+        for ws in wb.worksheets:
+            for row in ws.iter_rows():
+                for c in row:
+                    if isinstance(c.value, str) and not c.value.startswith("=") and old in c.value:
+                        c.value = c.value.replace(old, new)
+                        n += 1
+    buf = io.BytesIO()
+    wb.save(buf)
+    return buf.getvalue(), n

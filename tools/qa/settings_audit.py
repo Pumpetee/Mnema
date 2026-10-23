@@ -10,7 +10,7 @@ from playwright.sync_api import sync_playwright
 v, port = start()
 base = f"http://127.0.0.1:{port}/"
 SECTIONS = ["ai", "style", "learn", "security", "engine", "meetings", "app"]
-SKIP = {"secefs", "actpick"}  # encryption asks Windows for a password; the folder picker is a dialog
+SKIP = {"secefs", "seccry", "actpick"}  # encryption asks for a password in a dialog; so does the folder picker
 FIND = []
 
 

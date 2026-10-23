@@ -96,6 +96,14 @@ def get(vault: Vault, path: str, q: dict):
         from . import efs
 
         return 200, efs.status(vault)
+    if path == "/api/crypto":
+        from . import crypt
+
+        return 200, crypt.status(vault.root)
+    if path == "/api/crypto/key":  # the console helper (MCP) of this computer asks the running Mnema
+        from . import crypt
+
+        return 200, {"key": crypt.key_b64(vault.root)}
     if path == "/api/scribe/settings":
         return 200, scribe_settings(vault)
     if path == "/api/scribe/status":
@@ -218,12 +226,12 @@ def brain_status(vault: Vault) -> dict:
     b = s["brain"]
     auto = b.get("kind") == "auto"
     kind = S.resolve_brain(s)
-    st = _brain_status(b, kind)
+    st = _brain_status(b, kind, vault)
     if auto:
         st["auto"] = True
         if kind == "none":
             st["message"] = (
-                "Сама выбираю, чем понимать речь, но пока нечем: нет ни Claude Code, ни скачанной модели. "
+                "Сама выбираю, чем понимать речь, но пока нечем: не подключено ни одной модели. "
                 "Понимаю только явное: «запомни», поправки, решения."
             )
         elif st["ok"]:
@@ -233,7 +241,21 @@ def brain_status(vault: Vault) -> dict:
     return st
 
 
-def _brain_status(b: dict, kind: str) -> dict:
+def _brain_status(b: dict, kind: str, vault: Vault | None = None) -> dict:
+    if kind == "model":
+        ref = CH.default_model(vault) if vault else ""
+        ready = {p["id"]: p["ready"] for p in PR.status(vault)} if vault else {}
+        ok = bool(ref) and ready.get(ref.partition(":")[0], False)
+        from .chat.consortium import speaker_name
+
+        return {
+            "kind": kind,
+            "ok": ok,
+            "level": "ok" if ok else "info",
+            "message": f"Понимаю речь через модель, с которой ты говоришь: {speaker_name(ref)}."
+            if ok
+            else "Понимаю только явное: «запомни», поправки, решения. Подключи любую модель — и буду понимать речь.",
+        }
 
     if kind == "none":
         return {
@@ -419,7 +441,7 @@ def post(vault: Vault, path: str, b: dict):
             b.get("members"),
             int(b["rounds"]) if b.get("rounds") else None,
             str(b.get("model", "")),
-            {k: b.get(k) for k in ("format", "roles", "summarizer", "length", "search")},
+            {k: b.get(k) for k in ("format", "roles", "summarizer", "length", "search", "challenge")},
         )
     if path == "/api/vpn":  # a VPN key: Mnema connects through it itself (vpnkey.py)
         from . import vpnkey
@@ -590,6 +612,8 @@ def post(vault: Vault, path: str, b: dict):
         from . import tuning
 
         return 200, {**tuning.save(vault, b), "usage": tuning.month_usage(vault)}
+    if path == "/api/crypto":
+        return crypto_post(vault, b)
     if path == "/api/efs":
         from . import efs
 
@@ -786,3 +810,35 @@ def post(vault: Vault, path: str, b: dict):
         prof = P.import_pack(vault, b)
         return 200, {"profile": prof, "catalog": P.catalog_view(prof)}
     return None
+
+
+def crypto_post(vault: Vault, b: dict):
+    """Mnema's own encryption: on, off, the password at start, a new password, remember on this computer."""
+    from . import crypt
+    from .api import APP_HOOKS
+
+    what, pw = str(b.get("action", "")), str(b.get("password", ""))
+    try:
+        if what == "on":
+            r = crypt.enable(vault.root, pw, bool(b.get("remember", True)))
+        elif what == "off":
+            r = crypt.disable(vault.root, pw)
+        elif what == "unlock":
+            crypt.unlock(vault.root, pw, bool(b.get("remember", False)))
+            hook = APP_HOOKS.get("unlocked")
+            if hook:
+                hook()
+            r = {}
+        elif what == "password":
+            crypt.change_password(vault.root, str(b.get("old", "")), str(b.get("new", "")))
+            r = {}
+        elif what == "remember":
+            crypt.set_remember(vault.root, bool(b.get("on")))
+            r = {}
+        else:
+            return 400, {"error": "такого действия нет"}
+    except crypt.BadPassword:
+        return 403, {"error": "Пароль не подходит"}
+    except ValueError as e:
+        return 400, {"error": str(e)}
+    return 200, {**crypt.status(vault.root), **r}

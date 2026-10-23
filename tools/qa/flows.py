@@ -135,16 +135,9 @@ with sync_playwright() as p:
         users = [m["text"] for m in api(f"/api/chat?id={cid}")["messages"] if m["role"] == "user"]
         check("вопрос кнопками: ответ ушёл сообщением", users[-1].strip() == "Первый", users[-1][:40])
 
-    # 5. answer actions: useful
+    # 5. answer actions: «Поспорить с другими» instead of «Полезно»
     page.hover(".msg.ai >> nth=-1")
-    use = page.locator(".msg.ai >> nth=-1").locator("[data-like]")
-    if use.count():
-        use.first.click()
-        page.wait_for_timeout(500)
-        msgs = [m for m in api(f"/api/chat?id={cid}")["messages"] if m["role"] == "assistant"]
-        check("кнопка «Полезно» сохраняется", msgs[-1].get("useful") is True)
-    else:
-        check("кнопка «Полезно» найдена", False, "нет кнопки")
+    check("под ответом нет «Полезно»", page.locator("[data-like]").count() == 0)
 
     # 6. list menu: rename (prompt), pin, private, delete
     page.hover(f".citem[data-c='{cid}']")

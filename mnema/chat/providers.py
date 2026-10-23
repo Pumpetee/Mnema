@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Iterator
 
 from .. import net
+from .. import tuning as _tuning
 from ..learn import secrets_store
 from ..learn.brains import claude_exe, claude_signed_in
 from ..vault import Vault
@@ -341,7 +342,13 @@ def _stream_raw(
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=cwd,
-            env=net.env({"GIT_CEILING_DIRECTORIES": str(cwd.parent)}),
+            env=net.env(
+                {
+                    "GIT_CEILING_DIRECTORIES": str(cwd.parent),
+                    # the same longest answer as every other model (Настройки → Движок)
+                    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": str(_tuning.get(vault)["answer"]),
+                }
+            ),
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
         p.stdin.write(_flatten(system, messages).encode("utf-8"))
@@ -596,7 +603,9 @@ def _content(pid: str, m: dict):
         ]
         return blocks + [{"type": "text", "text": m["text"]}]
     if any(f["kind"] == "pdf" for f in files):
-        raise RuntimeError("PDF эта модель не читает. Открой его в Claude или Anthropic, или прикрепи текстом")
+        raise RuntimeError(
+            "В этом PDF не нашлось текста: ни текстового слоя, ни читаемого скана. Пришли его картинками страниц или текстом"
+        )
     if pid == "ollama":
         return m["text"]  # images go into the separate "images" field
     return [{"type": "text", "text": m["text"]}] + [

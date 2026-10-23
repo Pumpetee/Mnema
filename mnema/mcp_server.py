@@ -71,6 +71,11 @@ class Server:
 
     # -- tools
     def call(self, name: str, args: dict) -> str:
+        if (self.vault.service / "crypto.json").exists():  # encrypted (maybe after this server started): its key
+            from . import crypt
+
+            if crypt.attach(self.vault.root) == "locked":
+                return "Память зашифрована: открой Mnema и введи пароль — тогда память снова доступна."
         c = get_client(self.vault, self.client_id)
         if not c.enabled:
             return "Доступ к памяти для этого ассистента выключен владельцем."

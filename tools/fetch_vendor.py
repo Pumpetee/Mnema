@@ -3,6 +3,7 @@ this runs on (Windows, macOS, Linux).
 
     python tools/fetch_vendor.py           # fill vendor/ (skips what is already there and matches)
     python tools/fetch_vendor.py --check   # only verify what is in vendor/
+    python tools/fetch_vendor.py --ocr     # only the scan recognisers (the unit tests need them)
 
 Nothing here is built by Mnema; the repository keeps only these pins.
 
@@ -12,6 +13,7 @@ Nothing here is built by Mnema; the repository keeps only these pins.
 |                 | Windows: + Visual C++ runtime (msvcp140, vcruntime140, vcruntime140_1) | this computer's System32 | Microsoft signature |
 | vendor/xray     | Xray-core v26.3.27 (VPN keys)          | github.com/XTLS/Xray-core releases              | sha256 of zip    |
 | vendor/webview2 | Windows: WebView2 bootstrapper         | go.microsoft.com (Microsoft updates it)         | Microsoft signature |
+| vendor/ocr      | PaddleOCR v5 recognisers, Cyrillic and Latin (ONNX, RapidOCR 3.10.0) | modelscope.cn/models/RapidAI/RapidOCR | sha256 |
 """
 
 from __future__ import annotations
@@ -74,6 +76,11 @@ LLAMA_KEEP_WIN = {
     "LICENSE-LLVM-OpenMP",
 }
 VC_RUNTIME = ("msvcp140.dll", "vcruntime140.dll", "vcruntime140_1.dll")
+OCR = "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.10.0/onnx/PP-OCRv5/rec/"
+OCR_PINS = (
+    ("cyrillic_PP-OCRv5_rec_mobile.onnx", "90f761b4bfcce0c8c561c0cb5c887b0971d3ec01c32164bdf7374a35b0982711"),
+    ("latin_PP-OCRv5_rec_mobile.onnx", "b20bd37c168a570f583afbc8cd7925603890efbcdc000a59e22c269d160b5f5a"),
+)
 WEBVIEW2 = ("https://go.microsoft.com/fwlink/p/?LinkId=2124703", "MicrosoftEdgeWebview2Setup.exe")
 
 
@@ -83,8 +90,16 @@ def say(msg: str) -> None:
 
 def download(url: str) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": "mnema-fetch-vendor"})
-    with urllib.request.urlopen(req, timeout=300) as r:
-        return r.read()
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(req, timeout=300) as r:
+                return r.read()
+        except OSError:
+            if attempt == 3:
+                raise
+            import time
+
+            time.sleep(5 * (attempt + 1))
 
 
 def pinned(base: str, name: str, sha: str) -> bytes:
@@ -161,6 +176,8 @@ def fetch() -> None:
         (out / "xray").chmod(0o755)
     say(f"xray: xray{EXE}, LICENSE")
 
+    fetch_ocr()
+
     if IS_WIN:
         url, name = WEBVIEW2
         out = VENDOR / "webview2"
@@ -171,9 +188,21 @@ def fetch() -> None:
         say("webview2: bootstrapper, Microsoft signature valid")
 
 
+def fetch_ocr() -> None:
+    out = VENDOR / "ocr"
+    out.mkdir(parents=True, exist_ok=True)
+    for name, sha in OCR_PINS:
+        f = out / name
+        if f.exists() and hashlib.sha256(f.read_bytes()).hexdigest() == sha:
+            continue
+        f.write_bytes(pinned(OCR, name, sha))
+    say(f"ocr: {len(OCR_PINS)} recognisers")
+
+
 def check() -> bool:
     ok = True
     need = [VENDOR / "llama" / ("llama-server" + EXE), VENDOR / "xray" / ("xray" + EXE)]
+    need += [VENDOR / "ocr" / name for name, _ in OCR_PINS]
     if IS_WIN:
         need += [VENDOR / "llama" / n for n in VC_RUNTIME]
     for f in need:
@@ -197,5 +226,8 @@ def check() -> bool:
 if __name__ == "__main__":
     if "--check" in sys.argv:
         sys.exit(0 if check() else 1)
+    if "--ocr" in sys.argv:
+        fetch_ocr()
+        sys.exit(0)
     fetch()
     sys.exit(0 if check() else 1)

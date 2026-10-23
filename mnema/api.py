@@ -113,6 +113,15 @@ def make_handler(vault: Vault, port: int):
                 elif given != tok:
                     self.send(401, {"error": "нужен токен"})
                     return False
+                if (
+                    not path.startswith(("/api/ping", "/api/app/", "/api/crypto"))
+                    and (vault.service / "crypto.json").exists()
+                ):
+                    from . import crypt
+
+                    if crypt.locked(vault.root):  # encrypted by Mnema and the password not given yet
+                        self.send(423, {"error": "Память зашифрована — введи пароль", "locked": True})
+                        return False
             return True
 
         def ext_denied(self, path: str, q: dict) -> bool:
@@ -141,6 +150,10 @@ def make_handler(vault: Vault, port: int):
                     return self.send(
                         200, {"ok": True, "version": __version__, "learn": api_learn.browser_learning(vault)}
                     )
+                if u.path == "/api/app/selftest":  # the built program checks its own parts (CI)
+                    from . import crypt, ocr
+
+                    return self.send(200, {"ocr": ocr.selftest(), "crypt": crypt.selftest()})
                 if u.path.startswith("/api/app/"):
                     name = u.path.rsplit("/", 1)[-1]
                     hook = APP_HOOKS.get(name) if name in ("show", "info", "switch", "quit") else None

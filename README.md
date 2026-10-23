@@ -6,7 +6,7 @@
 
 Stop explaining yourself again in every new chat. Mnema remembers who you are, what you are working on, what you decided and how you like answers. Every AI you talk to gets that context: Claude, ChatGPT, Gemini, DeepSeek or a free model running on your own computer. The memory is a folder of plain Markdown files. There is no cloud and no account.
 
-**Download:** [Windows](../../releases/latest/download/Mnema-Setup.exe) · [macOS (Apple Silicon)](../../releases/latest/download/Mnema-macos-arm64.dmg) · [Linux (AppImage)](../../releases/latest/download/Mnema-linux-x86_64.AppImage) · [all files](../../releases)
+**Download:** [Windows](../../releases/latest/download/Mnema-Setup.exe) · [macOS (Apple Silicon)](../../releases/latest/download/Mnema-macos-arm64.dmg) · [macOS (Intel)](../../releases/latest/download/Mnema-macos-x64.dmg) · [Linux (AppImage)](../../releases/latest/download/Mnema-linux-x86_64.AppImage) · [all files](../../releases)
 
 [Русская версия](README.ru.md)
 
@@ -38,13 +38,13 @@ Ask Claude, ChatGPT and Gemini at once. They answer, read each other and argue, 
 | Brainstorm | ideas without criticism, then the three best |
 | Red team | they hunt for holes in your plan and how to close them |
 
-You can set the number of rounds and step in between them.
+You can set the number of rounds and step in between them. Under any answer, **Argue with others** puts it on trial: its author defends it, the other AIs look for where it is wrong, and a verdict ends it.
 
 ## Any AI
 
 ![Seven ways to connect a model](docs/img/en/models.png)
 
-- **In Mnema's own chat:** Claude with your subscription (no key needed), Anthropic, OpenAI, Gemini, OpenRouter (hundreds of models with one key), Ollama, or the built-in local model. You can switch models in the middle of a conversation.
+- **In Mnema's own chat:** every model is equal. Cloud: Anthropic, OpenAI, Gemini, OpenRouter (hundreds of models with one key) by key, or Claude Code by subscription. On your computer: the built-in model or Ollama. You can switch models in the middle of a conversation.
 - **In the programs you already use:** Claude Code, Claude Desktop and Cursor connect over MCP. ChatGPT and Gemini in the browser connect through the Chrome extension.
 - **You decide who sees what.** Every AI has its own access: which parts of memory it sees and which topics are cut out. By default, money, health and private topics are hidden from ChatGPT, Gemini, OpenRouter and Cursor.
 
@@ -54,7 +54,7 @@ You can set the number of rounds and step in between them.
 
 ![13 models with size, memory needed and download time for this computer](docs/img/en/local.png)
 
-You can choose from 13 models: Gemma 3, Qwen 3, Llama 3, Phi-4 mini, Mistral Small, YandexGPT and others. Mnema measures your computer and shows which models will run smoothly and how long each takes to download. No keys and no subscription are needed, and your text never leaves the machine. If you also use a cloud AI, the local model is the backup for when there's no internet, you hit a limit, or the text must not go out.
+You can choose from 13 models: Gemma 3, Qwen 3, Llama 3, Phi-4 mini, Mistral Small, YandexGPT and others. Mnema measures your computer and shows which models will run smoothly and how long each takes to download. No keys and no subscription are needed, and your text never leaves the machine. If you also use a cloud AI, the local model is the backup for when there's no internet, you hit a limit, or the text must not go out. When the network drops in the middle of a conversation, Mnema switches to it by itself.
 
 ## Smart Mnema
 
@@ -70,9 +70,12 @@ The «What I understood and why» feed shows each decision with its reason. If y
 
 **It works with your files.** In the chat, any model can:
 
-- read, find and edit files;
+- read, find and edit files, including scans and pictures: their text is recognised on your computer;
 - write notes;
-- make PDF, Word and Excel documents in the memory folder and in the work folders you open for it.
+- make PDF, Word and Excel documents and edit existing Word and Excel files, keeping their formatting;
+- merge, cut, rotate and split PDF.
+
+All of this works in the memory folder and in the work folders you open for it.
 
 There are no questions in the way. Every write goes to the journal and can be undone in Memory → History. If you prefer, one switch makes Mnema ask before each action. It never runs programs.
 
@@ -80,7 +83,7 @@ There are no questions in the way. Every write goes to the journal and can be un
 
 **It saves tokens.** Memory, documents and web pages are read on your computer, and only the parts that matter go to the model. We measured it on a question about a 153,000-character contract. The whole text took 29,643 input tokens. Mnema sent 6,159, almost five times fewer, and only the Mnema version gave the right answer. Under each answer you see how many tokens were saved.
 
-**It is private by default.** Card numbers, passwords, keys and phone numbers are replaced with labels before anything goes to a cloud model. A journal records what was read, what was written and what went out. The interface comes in 10 languages.
+**It is private by default.** Card numbers, passwords, keys and phone numbers are replaced with labels before anything goes to a cloud model. A journal records what was read, what was written and what went out. On any system Mnema can encrypt the memory with your password. The interface comes in 10 languages.
 
 ## Install
 
@@ -89,7 +92,7 @@ Download the file for your system (every version with its number is in [Releases
 | System | File | How |
 |---|---|---|
 | Windows 10 and 11 | [`Mnema-Setup.exe`](../../releases/latest/download/Mnema-Setup.exe) | Run it. No administrator rights needed. A portable `.zip` is there as well. |
-| macOS 11 and newer, Apple Silicon | [`Mnema-macos-arm64.dmg`](../../releases/latest/download/Mnema-macos-arm64.dmg) | Open it and drag Mnema to Applications. |
+| macOS 11 and newer | Apple Silicon: [`Mnema-macos-arm64.dmg`](../../releases/latest/download/Mnema-macos-arm64.dmg), Intel: [`Mnema-macos-x64.dmg`](../../releases/latest/download/Mnema-macos-x64.dmg) | Open it and drag Mnema to Applications. |
 | Linux x86-64 (Ubuntu 22.04 and newer, Fedora, Debian…) | [`Mnema-linux-x86_64.AppImage`](../../releases/latest/download/Mnema-linux-x86_64.AppImage) | `chmod +x Mnema-*.AppImage` and run it. The same program as a folder: `.tar.gz`, run `Mnema` inside. |
 
 The packages are not code-signed yet, so each system warns once:
@@ -149,12 +152,14 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). In short:
 | Learning: sources, brains, decisions | `mnema/learn/` |
 | What leaves the computer | `mnema/outgoing.py` |
 | What differs between Windows, macOS and Linux | `mnema/osapi.py` |
+| Encryption of the memory by password | `mnema/crypt.py` |
+| Text from scans and pictures | `mnema/ocr.py` |
 | Browser extension | `extension/` |
 | Knowledge base the assistant answers from | `mnema/knowledge/mnema.md` |
 
 ## Security
 
-The local API listens on 127.0.0.1 only, checks the Host header and requires a token. The browser extension has its own narrow token. Keys and passwords live in the system's secret store (DPAPI on Windows, the Keychain on macOS, the Secret Service on Linux when there is one), never in the memory folder. Every request to a cloud model is logged with what was sent and what was hidden. Report vulnerabilities privately to the author.
+The local API listens on 127.0.0.1 only, checks the Host header and requires a token. The browser extension has its own narrow token. Keys and passwords live in the system's secret store (DPAPI on Windows, the Keychain on macOS, the Secret Service on Linux when there is one), never in the memory folder. The memory itself can be encrypted with a password (AES-256-GCM, the key protected by scrypt). Every request to a cloud model is logged with what was sent and what was hidden. Report vulnerabilities privately to the author.
 
 ## License
 

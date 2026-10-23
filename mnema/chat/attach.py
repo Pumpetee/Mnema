@@ -80,10 +80,13 @@ def save(vault: Vault, chat_id: str, files: list[dict]) -> list[dict]:
         item = {"name": p.name, "path": str(p), "size": len(raw)}
         from .. import docs
 
+        from ..agent import profile as P
+
+        lang = P.load(vault).get("lang") or "ru"
         text = None
         if ext in docs.SUPPORTED:
             try:
-                text, info = docs.extract(p)  # read on the computer, free
+                text, info = docs.extract(p, lang)  # read on the computer, free (scans recognised too)
                 item["info"] = info
             except docs.LockedPdf:
                 p.unlink(missing_ok=True)
@@ -96,15 +99,21 @@ def save(vault: Vault, chat_id: str, files: list[dict]) -> list[dict]:
         if text is None and ext not in docs.SUPPORTED and (ext in TEXT_EXT or _looks_text(raw)):
             text = raw.decode("utf-8", "replace")
         pages = (item.get("info") or {}).get("pages") or 1
-        letters = len(re.sub(r"\s|\[стр\. \d+\]", "", text or ""))
-        if ext == ".pdf" and (text is None or letters < 15 * pages):  # almost no text on its pages: a scan
-            item.update(kind="pdf", mime="application/pdf")  # a scan without a text layer: only a model can read it
+        if ext == ".pdf" and (text is None or docs.scanned(text, pages)):  # a scan nothing could be read from
+            item.update(kind="pdf", mime="application/pdf")  # goes to the model as a file
         elif text is not None:
             tp = p.with_name(p.name + ".txt")
             tp.write_text(text, encoding="utf-8")
             item.update(kind="text", text=text[:2000], text_path=str(tp), chars=len(text))
         elif ext in IMAGE_MIME:
             item.update(kind="image", mime=IMAGE_MIME[ext])
+            from .. import ocr
+
+            seen = ocr.image_text(p, lang)  # the text on it, for every model — not only those that see pictures
+            if len(re.sub(r"\s", "", seen)) >= 8:
+                tp = p.with_name(p.name + ".txt")
+                tp.write_text(seen, encoding="utf-8")
+                item.update(ocr_path=str(tp), chars=len(seen))
         else:
             item.update(kind="other")
         out.append(item)
@@ -127,6 +136,9 @@ def inline_text(text: str, files: list[dict]) -> str:
             tp = Path(f["text_path"]) if f.get("text_path") else None
             full = tp.read_text(encoding="utf-8", errors="replace") if tp and tp.exists() else f.get("text", "")
             parts.append(f"\n\n[Прикреплённый файл «{f['name']}»]\n```\n{full[:MAX_TEXT]}\n```")
+        elif f.get("kind") == "image" and f.get("ocr_path") and Path(f["ocr_path"]).exists():
+            seen = Path(f["ocr_path"]).read_text(encoding="utf-8", errors="replace")
+            parts.append(f"\n\n[Текст на картинке «{f['name']}», распознан на компьютере]\n```\n{seen[:MAX_TEXT]}\n```")
         elif f.get("kind") == "other":
             parts.append(f"\n\n[Прикреплён файл «{f['name']}» — формат не читается, только имя]")
     return "".join(parts)

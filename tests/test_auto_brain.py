@@ -20,30 +20,26 @@ class AutoBrainTest(unittest.TestCase):
     def test_default_is_auto(self):
         self.assertEqual(S.load(self.v)["brain"]["kind"], "auto")
 
-    def test_auto_prefers_claude_then_local(self):
+    def test_auto_is_the_model_he_talks_to_none_preferred(self):
+        """No model goes first by name: «auto» understands speech with the owner's own default model."""
         s = S.load(self.v)
         with (
             mock.patch.dict(os.environ, {}, clear=False),
             mock.patch("sys.modules", {**__import__("sys").modules}) as mods,
         ):
             mods.pop("unittest", None)
-            with mock.patch("mnema.learn.brains.claude_signed_in", return_value=True):  # installed and signed in
-                self.assertEqual(S.resolve_brain(s), "claude_code")
-            with (  # installed, nobody signed in: not Claude
-                mock.patch("mnema.learn.brains.claude_signed_in", return_value=False),
-                mock.patch("mnema.localllm.installed_models", return_value=[]),
-            ):
-                self.assertEqual(S.resolve_brain(s), "none")
-            with (
-                mock.patch("mnema.learn.brains.claude_exe", return_value=None),
-                mock.patch("mnema.localllm.installed_models", return_value=[{"id": "m", "name": "M"}]),
-            ):
-                self.assertEqual(S.resolve_brain(s), "local")
-            with (
-                mock.patch("mnema.learn.brains.claude_exe", return_value=None),
-                mock.patch("mnema.localllm.installed_models", return_value=[]),
-            ):
-                self.assertEqual(S.resolve_brain(s), "none")
+            with mock.patch("mnema.learn.brains.claude_signed_in", return_value=True):
+                self.assertEqual(S.resolve_brain(s), "model")  # Claude signed in changes nothing
+            self.assertEqual(S.resolve_brain(s), "model")
+
+    def test_model_brain_without_any_model_keeps_explicit_signals(self):
+        from mnema.learn.brains import ModelBrain
+        from mnema.learn.sources import Episode
+
+        b = ModelBrain()
+        b.vault = self.v  # nothing connected in a fresh memory
+        got = b.extract([Episode("mnema_chat", "c#1", "", "Запомни: живу в Казани")], "")
+        self.assertTrue(any("Казани" in str(c) for c in got))
 
     def test_older_default_none_becomes_auto_but_owner_choice_stays(self):
         self.v.service.mkdir(parents=True, exist_ok=True)

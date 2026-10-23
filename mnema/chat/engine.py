@@ -811,6 +811,7 @@ def _generate(
     _gen[chat["id"]] = g
 
     def work():
+        nonlocal pid, mname  # no internet: the built-in model may take over
         try:
             from . import economy as EC
 
@@ -908,8 +909,27 @@ def _generate(
             }
             steps = 0
             while True:
-                for piece in PR.stream(vault, pid, mname, system, msgs, stop=lambda: g["stop"], usage=usage, meta=meta):
-                    g["text"] += piece
+                try:
+                    for piece in PR.stream(
+                        vault, pid, mname, system, msgs, stop=lambda: g["stop"], usage=usage, meta=meta
+                    ):
+                        g["text"] += piece
+                except Exception as e:
+                    # no internet: the built-in model answers instead, if one is on this computer
+                    from .. import errors as E, localllm
+
+                    local = localllm.installed_models() if localllm.engine_ok() else []
+                    if g["text"].strip() or steps or pid in ("local", "ollama") or not local or not E.no_network(e):
+                        raise
+                    pid, mname = "local", local[0]["id"]
+                    g["phase"] = "нет сети — отвечаю моделью на компьютере"
+                    localllm.ensure_server(mname, vault)
+                    system = system_prompt(vault, "local", log=False, query=text, model=mname)
+                    g["text"] = f"_Нет сети — отвечает модель на компьютере ({local[0]['name']})._\n\n"
+                    for piece in PR.stream(
+                        vault, pid, mname, system, msgs, stop=lambda: g["stop"], usage=usage, meta=meta
+                    ):
+                        g["text"] += piece
                 call = TL.parse(strip_thinking(g["text"])) if acts and not g["stop"] else None
                 if not call:
                     break

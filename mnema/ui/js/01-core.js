@@ -9,8 +9,40 @@ async function api(path, opt = {}) {
   try {
     d = await r.json();
   } catch (e) {}
+  if (r.status === 423 && d.locked) unlockScreen(); // encrypted memory, the password not given yet
   if (!r.ok) throw new Error(d.error || "ошибка " + r.status);
   return d;
+}
+
+// the memory folder is encrypted by Mnema: the password before anything else
+function unlockScreen() {
+  if ($(".unlock")) return;
+  hideSplash();
+  const pop = document.createElement("div");
+  pop.className = "modal unlock";
+  pop.innerHTML = `<div class="card"><div class="unlockic">${ic("lock")}</div><h2>${tr("Память зашифрована")}</h2><p class="hint">${tr("Введи пароль, который ты задал при шифровании.")}</p>
+    <input type="password" id="ulpw" autocomplete="current-password" placeholder="${tr("Пароль")}">
+    <label class="ulrem"><input type="checkbox" id="ulrem"> ${tr("Помнить на этом компьютере")}</label>
+    <div class="ulerr" id="ulerr"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="ulgo">${tr("Открыть")}</button></div></div>`;
+  document.body.appendChild(pop);
+  const go = async () => {
+    const pw = $("#ulpw").value;
+    if (!pw) return;
+    $("#ulgo").disabled = true;
+    $("#ulerr").textContent = "";
+    try {
+      await post("/api/crypto", { action: "unlock", password: pw, remember: $("#ulrem").checked });
+      location.reload();
+    } catch (e) {
+      $("#ulerr").textContent = e.message;
+      $("#ulgo").disabled = false;
+      $("#ulpw").select();
+    }
+  };
+  $("#ulgo").onclick = go;
+  $("#ulpw").onkeydown = (e) => e.key === "Enter" && go();
+  setTimeout(() => $("#ulpw").focus(), 50);
 }
 const post = (p, b) => api(p, { method: "POST", body: JSON.stringify(b || {}) });
 const _confirm = window.confirm.bind(window);

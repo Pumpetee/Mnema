@@ -24,10 +24,12 @@ binaries, hidden = [], []
 datas += [(os.path.join(ROOT, "vendor", "llama"), "llama")]
 if WIN:
     datas += [(os.path.join(ROOT, "vendor", "webview2"), "webview2")]  # Microsoft's installer, if the component is missing
+datas += [(os.path.join(ROOT, "vendor", "ocr"), "ocr")]  # the Cyrillic and Latin recognisers for scans
 # local speech recognition for the meeting scribe: models, VAD asset, native libraries
 # + local documents (PDF, Excel, PowerPoint) and free web search (ddgs talks to engines like a browser)
 for pkg in ("faster_whisper", "ctranslate2", "onnxruntime", "av", "soundcard", "soundfile", "tokenizers",
-            "pypdf", "openpyxl", "xlrd", "pptx", "ddgs", "primp", "lxml", "psutil"):
+            "pypdf", "openpyxl", "xlrd", "pptx", "ddgs", "primp", "lxml", "psutil",
+            "rapidocr", "pypdfium2", "pypdfium2_raw", "shapely", "pyclipper", "omegaconf"):
     d, b, h = collect_all(pkg)
     datas += d
     binaries += b
@@ -54,7 +56,8 @@ app = Analysis([os.path.join(SPECPATH, "mnema_app.py")], pathex=[ROOT], datas=da
 cli = Analysis([os.path.join(SPECPATH, "mnema_cli.py")], pathex=[ROOT],
                datas=[(os.path.join(ROOT, "mnema", "ui"), "mnema/ui"), (os.path.join(ROOT, "mnema", "knowledge"), "mnema/knowledge")],
                excludes=["webview", "pystray", "PIL", "clr", "pythonnet", "faster_whisper", "ctranslate2", "onnxruntime",
-                         "av", "soundcard", "soundfile", "tokenizers", "numpy", "PyQt6", "qtpy"])
+                         "av", "soundcard", "soundfile", "tokenizers", "numpy", "PyQt6", "qtpy", "rapidocr", "cv2",
+                         "pypdfium2", "pypdfium2_raw", "shapely", "pyclipper"])
 
 app_pyz = PYZ(app.pure)
 cli_pyz = PYZ(cli.pure)

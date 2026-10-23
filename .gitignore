@@ -17,6 +17,7 @@ __pycache__/
 vendor/llama/
 vendor/xray/
 vendor/webview2/
+vendor/ocr/
 
 # local
 *.lnk

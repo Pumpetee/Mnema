@@ -90,6 +90,13 @@ def clean(cfg: dict | None) -> dict | None:
     for k in ("state", "from"):  # where the discussion stands, what chat it grew from
         if cfg.get(k):
             out[k] = cfg[k]
+    ch = cfg.get("challenge")  # «Поспорить с другими»: one answer, defended by its author, questioned by the rest
+    if isinstance(ch, dict) and ch.get("answer") and ch.get("by") in out["members"]:
+        out["challenge"] = {
+            "by": ch["by"],
+            "answer": str(ch["answer"])[:4000],
+            "question": str(ch.get("question") or "")[:2000],
+        }
     return out
 
 
@@ -237,6 +244,11 @@ def side_of(cfg: dict, ref: str) -> str:
     """Debates: the first, third… speaker argues for, the others against."""
     if cfg.get("format") != "debate" or ref not in cfg["members"]:
         return ""
+    ch = cfg.get("challenge")
+    if ch:  # the author defends the answer, everyone else looks for where it is wrong
+        if ref == ch["by"]:
+            return "ЗА — отстаивай свой ответ там, где он верен, и честно признай, где он ошибся"
+        return "ПРОТИВ — ищи, где этот ответ неверен, неполон или есть вариант лучше"
     if cfg["members"].index(ref) % 2 == 0:
         return "ЗА — отстаивай, что это верно и стоит делать"
     return "ПРОТИВ — отстаивай, что это неверно или делать не стоит"
@@ -263,6 +275,11 @@ def stage_of(r: int, rounds: int, fmt: str = "council") -> str:
     return ("check", "better", "dispute")[(r - 1) % 3]
 
 
+CHALLENGE = (
+    "\nВладелец попросил поспорить с ответом {model}. Вот этот ответ:\n«{answer}»\n"
+    "Разберите его по существу: где он верен, где ошибается или неполон, и что было бы лучше. В конце — итог: "
+    "держится ответ или нет и что владельцу делать."
+)
 JOINED = (
     "\nВладелец подключил вас к разговору, который уже шёл с {model}: ясности там не получилось. Разговор выше — "
     "контекст; отвечайте на последний вопрос владельца, учитывая, где прошлый ответ не помог."
@@ -353,7 +370,10 @@ def run(
         if found["context"]:
             web_note = "\n\n" + CH.WEB_NOTE + "\n" + found["context"]
     joined = ""
-    if chat["consortium"].get("from") and not (chat["consortium"].get("state") or {}).get("spoke"):
+    ch = chat["consortium"].get("challenge")
+    if ch:
+        joined = CHALLENGE.format(model=speaker_name(ch["by"]), answer=ch["answer"])
+    elif chat["consortium"].get("from") and not (chat["consortium"].get("state") or {}).get("spoke"):
         joined = JOINED.format(model=speaker_name(chat["consortium"]["from"]))
 
     def speak(ref: str, r: int, names: dict, rounds: int, final: bool) -> str:
@@ -736,6 +756,7 @@ def control(
         CH.modify_chat(vault, cid, off)
         return {"ok": True}
     if action == "start":  # also in a conversation that is already going
+        question = (((extra or {}).get("challenge") or {}).get("question") or "").strip()
         if not chat.get("consortium"):
             cfg = clean({"members": members or [], "rounds": rounds or 2, **(extra or {})})
             cfg["from"] = chat.get("model") or CH.default_model(vault)
@@ -756,7 +777,7 @@ def control(
                 )
 
             chat = CH.modify_chat(vault, cid, on)
-        return start(vault, chat, last_owner_text(chat) or "Обсудите разговор выше.", False, False, terms)
+        return start(vault, chat, question or last_owner_text(chat) or "Обсудите разговор выше.", False, False, terms)
     if action == "resume":
         return start(vault, chat, last_owner_text(chat), False, False, terms)
     raise ValueError("неизвестное действие")

@@ -20,6 +20,8 @@ jobs:
               dist/Mnema-*-windows-x64.zip*
           - os: macos-latest
             files: dist/Mnema-*-macos-*.dmg*
+          - os: macos-15-intel
+            files: dist/Mnema-*-macos-*.dmg*
           - os: ubuntu-22.04
             files: |
               dist/Mnema-*-linux-*.AppImage*
@@ -59,7 +61,7 @@ jobs:
         run: xvfb-run -a python tools/qa/gui_smoke.py dist/Mnema/Mnema dist/Mnema/mnema-cli
       - uses: actions/upload-artifact@v4
         with:
-          name: mnema-${{ runner.os }}
+          name: mnema-${{ matrix.os }}
           path: ${{ matrix.files }}
           if-no-files-found: error
 

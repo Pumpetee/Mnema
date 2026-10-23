@@ -102,6 +102,17 @@ def human(e: BaseException, who: str = "сервис", model: str = "", vpn: str
     return f"Не получилось получить ответ от {who}. Повтори; если не поможет — выбери другую модель слева вверху."
 
 
+def no_network(e: BaseException) -> bool:
+    """The internet itself is missing: no address resolves, nothing connects, nothing answers in time."""
+    if isinstance(e, urllib.error.HTTPError):
+        return False
+    reason = getattr(e, "reason", e) if isinstance(e, urllib.error.URLError) else e
+    text = str(reason)
+    return isinstance(reason, (socket.gaierror, socket.timeout, TimeoutError, ConnectionRefusedError)) or bool(
+        re.search(r"getaddrinfo|11001|10051|10065|10060|timed out|Network is unreachable", text)
+    )
+
+
 def account_problem(e: BaseException) -> bool:
     """The key, the money or the program itself: asking again in the next round will not help."""
     from .chat.providers import NotSent

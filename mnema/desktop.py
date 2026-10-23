@@ -631,7 +631,12 @@ class App:
         self.server = api.make_server(vault, self.port)
         threading.Thread(target=self.server.serve_forever, daemon=True, name="mnema-api").start()
         self.learner = engine.Learner(vault)
-        self.learner.start()
+        from . import crypt
+
+        if crypt.locked(vault.root):  # encrypted, the password is asked in the window: learning waits for it
+            api.APP_HOOKS["unlocked"] = lambda: None if self.learner.is_alive() else self.learner.start()
+        else:
+            self.learner.start()
         # sync (Google Drive, Dropbox, a folder, a station) is hidden from the settings since 22.10.2026 and doesn't
         # run in the background: the code stays in sync.py, the section can come back
         cfg = load_config()
@@ -772,7 +777,12 @@ class App:
 
     def menu_items(self) -> list:
         """(label, action, enabled, checked) — the same menu for every tray."""
-        has = lambda *_: bool(self.vault)  # noqa: E731
+
+        def has(*_):
+            from . import crypt
+
+            return bool(self.vault) and not crypt.locked(self.vault.root)
+
         return [
             ("Открыть Mnema", lambda *_: self.show(), None, None),
             ("Учиться сейчас", self.learn_now, has, None),

@@ -157,7 +157,7 @@ async function viewSettings(arg) {
   const page = $(".page"),
     keep = !card && page && $("#st") && sec === SETCUR ? page.scrollTop : 0;
   const adv = true;
-  const [ag, ms, ls, br, pst, eng, scr, efs] = await Promise.all([
+  const [ag, ms, ls, br, pst, eng, scr, efs, cry] = await Promise.all([
     api("/api/agent"),
     api("/api/models"),
     api("/api/learn/status"),
@@ -166,6 +166,7 @@ async function viewSettings(arg) {
     api("/api/engine").catch(() => null),
     api("/api/scribe/settings").catch(() => null),
     api("/api/efs").catch(() => null),
+    api("/api/crypto").catch(() => null),
   ]);
   PRM_ST = pst;
   const prof = ag.profile,
@@ -209,12 +210,22 @@ async function viewSettings(arg) {
   {
     $("#st").innerHTML = `
     ${modelHero(ms, allModels, prof.default_model || ms.default_model)}
-    <div class="card" data-sec="ai" id="c-prov"><h2>${tr("Модели")}<span class="hint">${tr("с какими ИИ говорить в Mnema")}</span></h2><div class="aigrid">${ms.providers.map((x, n) => provTile(x, n)).join("")}</div></div>
+    <div class="card" data-sec="ai" id="c-prov"><h2>${tr("Модели")}<span class="hint">${tr("с какими ИИ говорить в Mnema")}</span></h2><div class="aigrp">${tr("Облачные")}<span class="hint">${tr("работают через интернет, по ключу или подписке")}</span></div><div class="aigrid">${ms.providers
+      .filter((x) => !["local", "ollama"].includes(x.id))
+      .sort((a, b) => tr(a.name).localeCompare(tr(b.name)))
+      .map((x, n) => provTile(x, n))
+      .join(
+        "",
+      )}</div><div class="aigrp">${tr("На компьютере")}<span class="hint">${tr("бесплатно, без интернета, ничего не уходит наружу")}</span></div><div class="aigrid">${ms.providers
+      .filter((x) => ["local", "ollama"].includes(x.id))
+      .map((x, n) => provTile(x, n))
+      .join("")}</div></div>
     ${engineCard(eng)}
     ${scribeCard(scr)}
     <div class="card" data-sec="security" id="seccard"><h2>${tr("Защита данных")}</h2>
      <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.redact !== false ? "on" : ""}" id="secred"></button><div><b>${tr("Скрывать секреты от облачных ИИ")}</b><p>${tr("Номера карт, пароли, ключи, телефоны, паспорта и СНИЛС заменяются метками до отправки, в ответ настоящие значения подставляются на компьютере.")}</p></div></div>
      ${efs ? `<div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${efs.on ? "on" : ""}" id="secefs" ${efs.supported ? "" : "disabled"}></button><div><b>${tr("Шифровать папку памяти")}</b><p>${efs.supported ? tr("Средствами Windows: файлы на диске зашифрованы ключом твоей учётной записи, без входа в неё их не прочитать, даже вынув диск. Для тебя и Mnema всё работает как раньше.") : esc(tr(efs.reason))}</p>${efs.on ? `<button class="btn g sm" id="secbk" style="margin-top:6px">${tr("Сохранить ключ восстановления")}</button>` : ""}</div></div>` : ""}
+     ${cry ? `<div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${cry.on ? "on" : ""}" id="seccry"></button><div><b>${tr("Шифровать память паролем")}</b><p>${tr("Mnema сама шифрует заметки, разговоры и журнал, на любой системе. Без пароля их не прочитать, даже скопировав папку. Obsidian и другие редакторы эти файлы не откроют. Забудешь пароль — память не вернуть.")}</p>${cry.on ? `<p class="hint">${tr("Зашифровано файлов")}: ${cry.files}</p><div class="tg" style="padding:6px 0 0;border:0"><button class="sw sm ${cry.remembered ? "on" : ""}" id="seccrem"></button><div><b>${tr("Помнить пароль на этом компьютере")}</b><p>${tr("Mnema открывается без вопроса, ключ хранится в защищённом хранилище системы. Выключи, чтобы пароль спрашивался при каждом запуске.")}</p></div></div><button class="btn g sm" id="seccpw" style="margin-top:6px">${tr("Сменить пароль")}</button>` : ""}</div></div>` : ""}
      <div class="row"><button class="btn l" id="secout">${ic("eye")}${tr("Что ушло наружу")}</button><button class="btn g" id="secacc">${ic("lock")}${tr("Кто из ИИ что видит")}</button></div></div>
     ${themeCard()}
     ${compCard()}
@@ -307,6 +318,20 @@ async function viewSettings(arg) {
         } catch (err) {
           toast(err.message);
           b.disabled = false;
+        }
+      };
+    if ($("#seccry")) $("#seccry").onclick = () => cryptoModal(cry.on ? "off" : "on", again);
+    if ($("#seccpw")) $("#seccpw").onclick = () => cryptoModal("password", again);
+    if ($("#seccrem"))
+      $("#seccrem").onclick = async (e) => {
+        const b = e.currentTarget,
+          on = !b.classList.contains("on");
+        try {
+          await post("/api/crypto", { action: "remember", on });
+          b.classList.toggle("on", on);
+          toast(on ? tr("Пароль запомнен на этом компьютере") : tr("Пароль будет спрашиваться при запуске"));
+        } catch (err) {
+          toast(err.message);
         }
       };
     if ($("#secbk"))
@@ -1354,23 +1379,29 @@ function modelMenu(anchor) {
   const card = (p, models, extra) =>
     `<div class="m2card" style="--pc:${COL[p.id] || "#64748b"}"><div class="m2h"><span class="m2av">${esc((NM[p.id] || p.name).slice(0, 1))}</span><div><b>${tr(NM[p.id] || p.name)}</b><small>${tr(SUB[p.id] || "")}</small></div></div>${models}${extra || ""}</div>`;
   const ready = P.filter((p) => p.ready),
-    order = ["local", "claude_code", "anthropic", "openai", "gemini", "openrouter", "ollama"];
-  const items = ready
-    .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id))
-    .flatMap((p) => {
-      const ms = p.id === "claude_code" ? p.models.filter((x) => x.id) : p.models;
-      return ms.slice(0, p.id === "local" ? 6 : 5).map((x) => ({ ref: p.id + ":" + x.id, name: x.name, p }));
-    });
+    LOCAL = ["local", "ollama"],
+    label = (p) => tr(NM[p.id] || p.name),
+    // cloud first, then this computer; inside each — by name: no model goes first because of who made it
+    byName = (a, b) => LOCAL.includes(a.id) - LOCAL.includes(b.id) || label(a).localeCompare(label(b));
+  const items = ready.sort(byName).flatMap((p) => {
+    const ms = p.id === "claude_code" ? p.models.filter((x) => x.id) : p.models;
+    return ms.slice(0, p.id === "local" ? 6 : 5).map((x) => ({ ref: p.id + ":" + x.id, name: x.name, p }));
+  });
   const more = ready.filter(
     (p) => (p.id === "claude_code" ? p.models.filter((x) => x.id) : p.models).length > (p.id === "local" ? 6 : 5),
   );
-  const cards =
-    items
+  const rowsOf = (list) =>
+    list
       .map(
         ({ ref, name, p }) =>
           `<button data-m="${esc(ref)}" class="m3row ${ref === CHAT.model || (ref === "claude_code:sonnet" && CHAT.model === "claude_code:") ? "cur" : ""}" style="--pc:${COL[p.id] || "#64748b"}"><i></i><span data-noi18n>${esc(name)}</span><em>${tr(SUB[p.id] || p.name)}</em></button>`,
       )
-      .join("") +
+      .join("");
+  const cloudItems = items.filter((x) => !LOCAL.includes(x.p.id)),
+    localItems = items.filter((x) => LOCAL.includes(x.p.id));
+  const cards =
+    (cloudItems.length ? `<div class="m3grp">${tr("Облачные")}</div>` + rowsOf(cloudItems) : "") +
+    (localItems.length ? `<div class="m3grp">${tr("На компьютере")}</div>` + rowsOf(localItems) : "") +
     (ready.some((p) => p.id === "local")
       ? `<button class="m2more" data-p="local">${tr("Другие модели на компьютере")}</button>`
       : "") +
@@ -1379,6 +1410,7 @@ function modelMenu(anchor) {
       .map((p) => `<button class="m2more" data-p="${p.id}">${tr("Все модели")} ${esc(NM[p.id] || p.name)}</button>`)
       .join("");
   const add = P.filter((p) => !p.ready)
+    .sort(byName)
     .map(
       (p) =>
         `<button class="m2add" data-p="${p.id}" style="--pc:${COL[p.id] || "#64748b"}"><span>+</span>${tr(p.id === "local" ? "Скачать бесплатную модель" : p.id === "anthropic" ? "Ключ API Anthropic" : p.id === "claude_code" ? "Подписка Claude" : NM[p.id] || p.name)}</button>`,
@@ -1596,4 +1628,60 @@ function youCard(prof, ag) {
       })
       .join("")}</div></div>
   </div>`;
+}
+
+// Mnema's own encryption: turn on (a new password twice), turn off (the password), change the password
+function cryptoModal(mode, done) {
+  const pop = document.createElement("div");
+  pop.className = "modal cryptm";
+  const T = {
+    on: [
+      "Зашифровать память",
+      "Придумай пароль не короче 8 знаков. Его нельзя восстановить: забудешь — память не вернуть. Obsidian и другие редакторы эти файлы открыть не смогут.",
+      "Зашифровать",
+    ],
+    off: ["Снять шифрование", "Файлы памяти снова станут обычными. Введи пароль.", "Снять"],
+    password: ["Сменить пароль", "Файлы не переписываются — меняется только ключ к ним.", "Сменить"],
+  }[mode];
+  const f = (id, ph, ac) => `<input type="password" id="${id}" placeholder="${tr(ph)}" autocomplete="${ac}">`;
+  pop.innerHTML = `<div class="card"><h2>${tr(T[0])}</h2><p class="hint">${tr(T[1])}</p>
+    ${mode === "on" ? f("cp1", "Пароль", "new-password") + f("cp2", "Ещё раз", "new-password") + `<label class="ulrem"><input type="checkbox" id="cprem" checked> ${tr("Помнить на этом компьютере")}</label>` : ""}
+    ${mode === "off" ? f("cp1", "Пароль", "current-password") : ""}
+    ${mode === "password" ? f("cp0", "Старый пароль", "current-password") + f("cp1", "Новый пароль", "new-password") + f("cp2", "Ещё раз", "new-password") : ""}
+    <div class="ulerr" id="cperr"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn l" data-x>${tr("Отмена")}</button><button class="btn" data-ok>${tr(T[2])}</button></div></div>`;
+  document.body.appendChild(pop);
+  const err = (t) => ($("#cperr", pop).textContent = tr(t));
+  $("[data-x]", pop).onclick = () => pop.remove();
+  $("[data-ok]", pop).onclick = async () => {
+    const v = (id) => ($("#" + id, pop) || {}).value || "";
+    if (mode !== "off" && v("cp1").length < 8) return err("Пароль — не короче 8 знаков");
+    if (mode !== "off" && v("cp1") !== v("cp2")) return err("Пароли не совпадают");
+    const ok = $("[data-ok]", pop);
+    ok.disabled = true;
+    ok.textContent = tr(mode === "password" ? "Меняю…" : mode === "on" ? "Шифрую…" : "Расшифровываю…");
+    try {
+      const body =
+        mode === "on"
+          ? { action: "on", password: v("cp1"), remember: $("#cprem", pop).checked }
+          : mode === "off"
+            ? { action: "off", password: v("cp1") }
+            : { action: "password", old: v("cp0"), new: v("cp1") };
+      const d = await post("/api/crypto", body);
+      pop.remove();
+      toast(
+        mode === "on"
+          ? tr("Память зашифрована") + ` (${d.files})`
+          : mode === "off"
+            ? tr("Шифрование снято")
+            : tr("Пароль сменён"),
+      );
+      done && done();
+    } catch (e) {
+      err(e.message);
+      ok.disabled = false;
+      ok.textContent = tr(T[2]);
+    }
+  };
+  setTimeout(() => ($("#cp0", pop) || $("#cp1", pop)).focus(), 50);
 }

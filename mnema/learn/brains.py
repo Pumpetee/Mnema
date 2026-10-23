@@ -461,6 +461,40 @@ class OllamaBrain(_LLMBrain):
         return (d.get("message") or {}).get("content", "")
 
 
+class ModelBrain(_LLMBrain):
+    """The model the owner talks to by default, whatever it is: a cloud AI by key or subscription, or one on this
+    computer. No model is preferred by name."""
+
+    name = "model"
+
+    def __init__(self):
+        self.vault = None  # set by the learner before the first question
+
+    @property
+    def cloud(self) -> bool:
+        return self._ref().partition(":")[0] not in ("local", "ollama")
+
+    def _ref(self) -> str:
+        from ..chat import engine as CH
+
+        ref = CH.default_model(self.vault) if self.vault else ""
+        if not ref:
+            raise RuntimeError("не подключено ни одной модели")
+        return ref
+
+    def ask(self, prompt: str) -> str:
+        from ..chat import providers as PR
+
+        pid, _, model = self._ref().partition(":")
+        return PR.complete(self.vault, pid, model, "", [{"role": "user", "text": prompt}], meta={"purpose": "обучение"})
+
+    def extract(self, episodes, known):
+        try:
+            return super().extract(episodes, known)
+        except Exception:  # no model or no network: «запомни» and corrections still work
+            return NoModelBrain().extract(episodes, known)
+
+
 def brain_dir() -> Path:
     """Where headless Claude Code runs: an empty folder in TEMP, outside the memory and any repository."""
     return Path(tempfile.gettempdir()) / "mnema-brain"
@@ -472,6 +506,8 @@ def make_brain(settings: dict, brain_cwd: Path | None = None):
 
     b = settings["brain"]
     kind = resolve_brain(settings)
+    if kind == "model":
+        return ModelBrain()
     if kind == "claude_code":
         return ClaudeCodeBrain(brain_cwd, b.get("model", ""))
     if kind == "api":

@@ -162,8 +162,9 @@ def observe_browser(vault: Vault, client: str, url: str, title: str, text: str, 
         "prev": _clip(prev, 700),
         "ts": dt.datetime.now().isoformat(timespec="seconds"),
     }
-    with f.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    from ..fsutil import append_text
+
+    append_text(f, json.dumps(rec, ensure_ascii=False) + "\n")
 
 
 def read_browser(vault: Vault, opts: dict, cursor: dict, days: int | None, limit: int) -> list[Episode]:

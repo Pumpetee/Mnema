@@ -20,8 +20,14 @@ def write_atomic(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(f"{path.name}.{os.getpid()}.{threading.get_ident()}.tmp")
     try:
-        with open(tmp, "w", encoding="utf-8") as fh:
-            fh.write(text)
+        if _crypt_on():  # an encrypted memory folder: the file goes to disk encrypted
+            from . import crypt
+
+            with open(tmp, "wb") as fh:
+                fh.write(crypt.text_for(path, text))
+        else:
+            with open(tmp, "w", encoding="utf-8") as fh:
+                fh.write(text)
         for _ in range(20):
             try:
                 os.replace(tmp, path)
@@ -35,6 +41,23 @@ def write_atomic(path: Path, text: str) -> None:
         except OSError:
             pass
         raise
+
+
+def _crypt_on() -> bool:
+    import sys
+
+    c = sys.modules.get("mnema.crypt")
+    return bool(c and c._roots)
+
+
+def append_text(path: Path, text: str) -> None:
+    """Add lines to a log-like file (journal, learning traces); in an encrypted folder they are encrypted too."""
+    if _crypt_on():
+        from . import crypt
+
+        return crypt.append_text(Path(path), text)
+    with open(path, "a", encoding="utf-8") as fh:
+        fh.write(text)
 
 
 def write_json(path: Path, data, **dump) -> None:
