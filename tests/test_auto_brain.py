@@ -27,8 +27,13 @@ class AutoBrainTest(unittest.TestCase):
             mock.patch("sys.modules", {**__import__("sys").modules}) as mods,
         ):
             mods.pop("unittest", None)
-            with mock.patch("mnema.learn.brains.claude_exe", return_value="C:/x/claude.exe"):
+            with mock.patch("mnema.learn.brains.claude_signed_in", return_value=True):  # installed and signed in
                 self.assertEqual(S.resolve_brain(s), "claude_code")
+            with (  # installed, nobody signed in: not Claude
+                mock.patch("mnema.learn.brains.claude_signed_in", return_value=False),
+                mock.patch("mnema.localllm.installed_models", return_value=[]),
+            ):
+                self.assertEqual(S.resolve_brain(s), "none")
             with (
                 mock.patch("mnema.learn.brains.claude_exe", return_value=None),
                 mock.patch("mnema.localllm.installed_models", return_value=[{"id": "m", "name": "M"}]),

@@ -236,9 +236,9 @@ def resolve_brain(s: dict) -> str:
         return os.environ["MNEMA_BRAIN_AUTO"]
     if "unittest" in sys.modules and not getattr(sys, "frozen", False):
         return "none"  # a test run never talks to a live model by accident
-    from .brains import claude_exe
+    from .brains import claude_signed_in
 
-    if claude_exe():
+    if claude_signed_in():
         return "claude_code"
     try:
         from ..localllm import installed_models

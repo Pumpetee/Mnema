@@ -234,7 +234,6 @@ def brain_status(vault: Vault) -> dict:
 
 
 def _brain_status(b: dict, kind: str) -> dict:
-    from .learn.brains import claude_exe
 
     if kind == "none":
         return {
@@ -244,12 +243,16 @@ def _brain_status(b: dict, kind: str) -> dict:
             "message": "Понимаю только явное: «запомни», поправки, решения. Обычную речь не разбираю.",
         }
     if kind == "claude_code":
-        ok = bool(claude_exe())
+        from .learn.brains import claude_signed_in
+
+        ok = claude_signed_in()
         return {
             "kind": kind,
             "ok": ok,
             "level": "ok" if ok else "bad",
-            "message": "Понимаю речь через Claude по подписке." if ok else "Claude Code не найден на компьютере.",
+            "message": "Понимаю речь через Claude по подписке."
+            if ok
+            else "Claude Code не найден на компьютере или в него не выполнен вход.",
         }
     if kind == "ollama":
         if not b.get("model"):

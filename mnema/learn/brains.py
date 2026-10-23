@@ -13,9 +13,11 @@ Every brain returns candidates in one format:
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import urllib.request
 from pathlib import Path
@@ -304,6 +306,32 @@ def claude_exe() -> str | None:
         if cand.exists():
             return str(cand)
     return shim
+
+
+def claude_signed_in() -> bool:
+    """Claude Code is installed AND someone is signed in to it (a subscription or a Console key). Installed alone is not
+    enough: «Claude по подписке» must never be shown as connected to a person who has no Claude account."""
+    if not claude_exe():
+        return False
+    if os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("CLAUDE_CODE_OAUTH_TOKEN"):
+        return True
+    cfg = Path(os.environ.get("CLAUDE_CONFIG_DIR") or Path.home() / ".claude")
+    if (cfg / ".credentials.json").is_file():
+        return True
+    try:  # the signed-in account Claude Code keeps in ~/.claude.json
+        if (json.loads((Path.home() / ".claude.json").read_text(encoding="utf-8")) or {}).get("oauthAccount"):
+            return True
+    except (OSError, ValueError):
+        pass
+    if sys.platform == "darwin":  # macOS keeps the sign-in in the Keychain
+        try:
+            r = subprocess.run(
+                ["security", "find-generic-password", "-s", "Claude Code-credentials"], capture_output=True, timeout=10
+            )
+            return r.returncode == 0
+        except Exception:
+            return False
+    return False
 
 
 class ClaudeCodeBrain(_LLMBrain):

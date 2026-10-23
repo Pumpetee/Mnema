@@ -19,7 +19,7 @@ from typing import Iterator
 
 from .. import net
 from ..learn import secrets_store
-from ..learn.brains import claude_exe
+from ..learn.brains import claude_exe, claude_signed_in
 from ..vault import Vault
 from ..fsutil import read_json, write_json
 
@@ -127,7 +127,7 @@ def status(vault: Vault) -> list[dict]:
             inst = localllm.installed_models()
             ready, models = bool(inst and localllm.engine_ok()), [{"id": m["id"], "name": m["name"]} for m in inst]
         else:
-            ready = bool(claude_exe()) if pid == "claude_code" else bool(key) if p["key"] else bool(data[pid]["models"])
+            ready = claude_signed_in() if pid == "claude_code" else bool(key) if p["key"] else bool(data[pid]["models"])
             models = (
                 [{"id": m, "name": n} for m, n in CLAUDE_CODE_MODELS]
                 if pid == "claude_code"

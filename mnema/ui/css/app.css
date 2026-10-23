@@ -5770,6 +5770,7 @@ body.drawer-open .trc {
   border: 1px solid var(--line);
   border-radius: 14px;
   animation: bubin 0.4s ease both;
+  cursor: pointer;
 }
 .wopt + .wopt {
   animation-delay: 0.12s;

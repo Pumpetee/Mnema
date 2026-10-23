@@ -19,9 +19,15 @@ async function welcomeFlow() {
   document.body.appendChild(pop);
   document.body.classList.add("wlc-on");
   let i = 0,
-    dl = false;
+    dl = false,
+    choice = claude ? "claude" : "local"; // what the owner talks to first; either card can be picked
   const finish = async () => {
     await post("/api/local/offer", { state: "done" }).catch(() => {});
+    if (choice === "local" && pick && (pick.installed || dl)) {
+      const ref = "local:" + pick.id;
+      await post("/api/agent", { default_model: ref, last_model: ref }).catch(() => {});
+      CHAT.model = ref;
+    }
     pop.classList.add("bye");
     document.body.classList.remove("wlc-on");
     setTimeout(() => pop.remove(), 300);
@@ -100,8 +106,8 @@ async function welcomeFlow() {
       ${s.case ? `<div class="wcase">${tr("Кейс")} ${s.case} ${tr("из")} ${S.filter((x) => x.case).length}</div>` : ""}<h2>${s.case === 1 && name ? esc(name) + ", " + s.t.charAt(0).toLowerCase() + s.t.slice(1) : s.t}</h2><p>${s.p}</p>
       ${
         s.pick
-          ? `<div class="wpick">${claude ? `<div class="wopt on"><span class="wic ok">${ic("check")}</span><div><b>Claude</b><small>${tr("по подписке · уже подключён")}</small></div></div>` : ""}
-        ${pick ? `<div class="wopt ${claude ? "" : "on"}" id="wloc"><span class="wic">${ic("folder")}</span><div><b>${tr("Бесплатный ИИ на компьютере")}</b><small>${esc(pick.name)} · ${fmtSize(pick.size)}${pick.eta ? " · ≈ " + fmtEta(pick.eta) : ""}</small><div class="wbar" hidden><i></i></div></div><button class="btn ${claude ? "l" : ""} sm" id="wdl">${pick.installed ? tr("Уже скачан") : tr("Скачать")}</button></div>` : ""}
+          ? `<div class="wpick">${claude ? `<div class="wopt ${choice === "claude" ? "on" : ""}" id="wcl"><span class="wic ${choice === "claude" ? "ok" : ""}">${ic(choice === "claude" ? "check" : "chat")}</span><div><b>Claude</b><small>${tr("по подписке · уже подключён")}</small></div></div>` : ""}
+        ${pick ? `<div class="wopt ${choice === "local" ? "on" : ""}" id="wloc"><span class="wic ${choice === "local" ? "ok" : ""}">${ic(choice === "local" ? "check" : "folder")}</span><div><b>${tr("Бесплатный ИИ на компьютере")}</b><small>${esc(pick.name)} · ${fmtSize(pick.size)}${pick.eta ? " · ≈ " + fmtEta(pick.eta) : ""}</small><div class="wbar" hidden><i></i></div></div><button class="btn ${claude ? "l" : ""} sm" id="wdl">${pick.installed ? tr("Уже скачан") : tr("Скачать")}</button></div>` : ""}
         <a href="#" class="wmore" id="wmore">${tr("Другие модели и ключи…")}</a></div>`
           : ""
       }</div>
@@ -131,8 +137,23 @@ async function welcomeFlow() {
           if (document.body.contains(pop)) draw();
         });
       };
+    if ($("#wcl", pop))
+      $("#wcl", pop).onclick = () => {
+        choice = "claude";
+        draw();
+      };
+    if ($("#wloc", pop))
+      $("#wloc", pop).onclick = (e) => {
+        if (e.target.closest("#wdl")) return;
+        choice = "local";
+        draw();
+        if (!pick.installed && !dl) $("#wdl", pop).click(); // picking a model not on the computer yet downloads it
+      };
     if ($("#wdl", pop))
       $("#wdl", pop).onclick = async (e) => {
+        choice = "local";
+        $("#wloc", pop).classList.add("on");
+        if ($("#wcl", pop)) $("#wcl", pop).classList.remove("on");
         if (pick.installed) return;
         const b = e.currentTarget;
         b.disabled = true;

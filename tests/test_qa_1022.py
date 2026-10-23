@@ -870,8 +870,9 @@ class FirstRun(unittest.TestCase):
         from mnema.chat import engine as CH, providers as PR
 
         v = _vault()
-        old = PR.claude_exe
+        old, old_in = PR.claude_exe, PR.claude_signed_in
         PR.claude_exe = lambda: None
+        PR.claude_signed_in = lambda: False
         try:
             self.assertEqual(CH.default_model(v), "")
             with self.assertRaises(ValueError) as c:
@@ -880,7 +881,27 @@ class FirstRun(unittest.TestCase):
             r = CH.send(v, "Привет", model="claude_code:", learn=False, sync=True)
             self.assertIn("нет Claude Code", CH.state(r["chat"])["error"])
         finally:
-            PR.claude_exe = old
+            PR.claude_exe, PR.claude_signed_in = old, old_in
+
+    def test_claude_installed_but_not_signed_in_is_not_connected(self):  # a friend's PC: Claude Code, no account
+        from unittest import mock
+
+        from mnema.learn import brains as B
+
+        with tempfile.TemporaryDirectory() as home:
+            env = {"HOME": home, "USERPROFILE": home, "CLAUDE_CONFIG_DIR": str(Path(home) / ".claude")}
+            with (
+                mock.patch.dict(os.environ, env),
+                mock.patch.object(B, "claude_exe", lambda: "claude"),
+                mock.patch.object(B.sys, "platform", "linux"),
+                mock.patch.object(B.Path, "home", lambda: Path(home)),
+            ):
+                os.environ.pop("ANTHROPIC_API_KEY", None)
+                os.environ.pop("CLAUDE_CODE_OAUTH_TOKEN", None)
+                self.assertFalse(B.claude_signed_in())
+                (Path(home) / ".claude").mkdir()
+                (Path(home) / ".claude" / ".credentials.json").write_text("{}", encoding="utf-8")
+                self.assertTrue(B.claude_signed_in())
 
     def test_bad_memory_paths_are_explained(self):  # QA 36, 57
         from mnema import desktop
