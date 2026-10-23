@@ -31,7 +31,7 @@ class SmallLocalTest(unittest.TestCase):
 
     def test_facts_go_next_to_the_question(self):
         a = small.augment(self.v, "Можно мне созвон в 16:00?")
-        self.assertIn("Иван — работает из дома, созвоны только до обеда", a)
+        self.assertIn("Иван — созвоны — после 15:00", a)
         self.assertNotIn("(01.10.2026)", a)
         self.assertEqual(small.augment(self.v, "Сколько будет 15% от 2400?"), "")
         self.assertIn("3 ноября в Казани", small.augment(self.v, "Когда запускаем пилот?"))

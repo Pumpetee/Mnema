@@ -291,7 +291,7 @@ class TestPolicy(Base):
                 "where": "profile:Обо мне",
                 "key": "город",
                 "confidence": 0.9,
-                "contradicts": "Иван, продакт из Санкт-Петербурга, строю свой продукт.",
+                "contradicts": "Иван, предприниматель из Екатеринбурга, строю свой продукт.",
             }
         ],
         "отчёт": [{"text": "Отвечать без вступлений", "kind": "rule", "confidence": 0.9}],
@@ -382,7 +382,7 @@ class TestPolicy(Base):
     def test_contradiction_with_brain_rewrites_keeping_the_rest(self):
         class Reviser:
             def ask(self, prompt):
-                assert "Иван, продакт из Санкт-Петербурга" in prompt
+                assert "Иван, предприниматель из Екатеринбурга" in prompt
                 return "Иван, продакт из Москвы, строю свой продукт."
 
         orig = engine.make_brain
@@ -393,7 +393,7 @@ class TestPolicy(Base):
             engine.make_brain = orig
         me = self.v.read_raw("70 Memory/Profile.md")
         self.assertIn("Иван, продакт из Москвы, строю свой продукт.", me)
-        self.assertNotIn("Санкт-Петербург", me)
+        self.assertNotIn("Екатеринбург", me)
 
     def ask_in_chat(self, text):
         """A message in a conversation in Mnema: learning may ask under it."""
@@ -419,7 +419,7 @@ class TestPolicy(Base):
     def test_in_chat_contradiction_keep_old(self):
         cid, q = self.ask_in_chat("переехал в Москва")
         self.assertEqual(q["kind"], "conflict")
-        self.assertIn("Санкт-Петербурга", q["old"])
+        self.assertIn("Екатеринбурга", q["old"])
         engine.review(self.v, q["item"], "keep_old")
         self.assertNotIn("Москв", self.v.read_raw("70 Memory/Profile.md"))
         self.assertEqual(Ledger(self.v).get(q["item"])["state"], "rejected")

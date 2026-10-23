@@ -89,3 +89,34 @@ function hideSplash() {
     Math.max(0, 1400 - performance.now()),
   );
 }
+
+// ---------------------------------------------------------------- memory on / off
+// Off: the AIs get no memory and Mnema writes nothing — a plain chat; every other function stays. A new memory folder
+// starts off and the tour offers to turn it on.
+const MEM = { on: true, asked: true };
+async function memSet(on, quiet) {
+  await post("/api/agent", { memory_on: !!on, memory_asked: true });
+  MEM.on = !!on;
+  MEM.asked = true;
+  if (!quiet)
+    toast(
+      on
+        ? tr("Память включена: ИИ знают тебя, Mnema учится")
+        : tr("Память выключена: обычный чат, ничего не запоминается"),
+    );
+  document.body.classList.toggle("mem-off", !MEM.on);
+  if (typeof refreshStatus === "function") refreshStatus();
+  const [v, ...a] = location.hash.slice(1).split("/");
+  if (v === "memory" || v === "settings") go(v, a.join("/"));
+  else if (typeof drawChips === "function") drawChips();
+}
+function memOffNote(what) {
+  return `<div class="memoffnote">${ic("eyeoff")}<span>${tr("Память выключена")} — ${tr(what)}</span><button class="btn sm" data-memon>${tr("Включить")}</button></div>`;
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-memon]");
+  if (b) {
+    e.preventDefault();
+    memSet(true);
+  }
+});

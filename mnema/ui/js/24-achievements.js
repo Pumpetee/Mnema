@@ -39,10 +39,15 @@ function drawAchCard() {
   const g = sf ? sf.guarded : [];
   const row = (k, ico, t, sub, bad) =>
     `<button class="srow ${bad ? "bad" : ""}" data-sr="${k}" title="${sub}"><span class="sri">${ic(bad ? "x" : ico)}</span><span><b>${t}</b></span>${ic("chev")}</button>`;
-  lc.innerHTML = `<div class="safehead">${ic("shield")}<b>${tr("Память")}</b><button class="sgear shelp" id="memtut" title="${tr("Как работает память")}"><i>?</i></button><button class="sgear" id="safeset" title="${tr("Настроить защиту")}">${ic("gear")}</button></div>
-    ${row("folder", "folder", tr("Память только у тебя"), (sf && sf.encrypted ? tr("зашифрована · ") : "") + tr("открыть папку"))}
+  lc.innerHTML = `<div class="safehead">${ic("shield")}<b>${tr("Память")}</b><button class="sgear shelp" id="memtut" title="${tr("Как работает память")}"><i>?</i></button><button class="sgear" id="safeset" title="${tr("Настроить защиту")}">${ic("gear")}</button><button class="sw sm ${MEM.on ? "on" : ""}" id="memsw" title="${tr(MEM.on ? "Выключить память" : "Включить память")}"></button></div>
+    ${
+      !MEM.on
+        ? `<div class="memoffrow">${tr("Выключена: ИИ не знают тебя, Mnema ничего не запоминает")}</div>`
+        : `${row("folder", "folder", tr("Память только у тебя"), (sf && sf.encrypted ? tr("зашифрована · ") : "") + tr("открыть папку"))}
     ${sf ? row("access", "lock", g.length ? `${tr("Личное скрыто от")} ${g.length} ${tr("ИИ")}` : tr("Все ИИ видят всю память"), tr("кто что видит"), !g.length) : ""}
-    ${sf ? row("out", "eye", `${tr("Наружу за неделю")}: ${sf.out_requests}${sf.out_redacted ? ` · ${tr("скрыто")} ${sf.out_redacted}` : ""}`, sf.redact ? (sf.out_redacted ? `${tr("секретов скрыто")}: ${sf.out_redacted}` : tr("секреты скрываются")) : tr("секреты уходят как есть"), !sf.redact) : ""}`;
+    ${sf ? row("out", "eye", `${tr("Наружу за неделю")}: ${sf.out_requests}${sf.out_redacted ? ` · ${tr("скрыто")} ${sf.out_redacted}` : ""}`, sf.redact ? (sf.out_redacted ? `${tr("секретов скрыто")}: ${sf.out_redacted}` : tr("секреты скрываются")) : tr("секреты уходят как есть"), !sf.redact) : ""}`
+    }`;
+  $("#memsw", lc).onclick = () => memSet(!MEM.on);
   if ($("#memtut", lc)) $("#memtut", lc).onclick = () => memTour();
   $$("[data-achopen]", lc).forEach((x) => (x.onclick = () => achGallery()));
   if ($("#safeset", lc)) $("#safeset", lc).onclick = () => goSet("security/seccard");

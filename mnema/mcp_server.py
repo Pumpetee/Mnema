@@ -74,6 +74,10 @@ class Server:
         c = get_client(self.vault, self.client_id)
         if not c.enabled:
             return "Доступ к памяти для этого ассистента выключен владельцем."
+        from .agent import profile as P
+
+        if not P.memory_on(self.vault):
+            return P.MEMORY_OFF
         if name == "memory_context":
             part = int(args.get("part", 0) or 0)
             text, total = context_for(self.vault, self.client_id, part=part)

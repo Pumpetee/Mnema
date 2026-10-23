@@ -169,6 +169,10 @@ def make_handler(vault: Vault, port: int):
                     html = osapi.os_words(UI.read_text(encoding="utf-8")).replace("__MNEMA_TOKEN__", tok)
                     return self.send(200, html, "text/html; charset=utf-8")
                 if u.path == "/api/context":
+                    from .agent import profile as P
+
+                    if not P.memory_on(vault):
+                        return self.send(200, {"text": "", "parts": 0, "off": True})
                     part = int(q["part"]) if "part" in q else None
                     text, total = context_for(vault, q.get("client", "claude"), part=part)
                     return self.send(200, {"text": text, "parts": total})
@@ -229,6 +233,10 @@ def make_handler(vault: Vault, port: int):
                 if self.ext_denied(u.path, {k: str(v) for k, v in b.items()} if isinstance(b, dict) else {}):
                     return
                 if u.path == "/api/remember":
+                    from .agent import profile as P
+
+                    if not P.memory_on(vault):
+                        return self.send(409, {"error": P.MEMORY_OFF, "off": True})
                     ev = remember(
                         vault, str(b.get("fact", "")), str(b.get("where", "inbox")), str(b.get("client", "owner"))
                     )

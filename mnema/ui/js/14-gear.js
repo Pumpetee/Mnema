@@ -57,7 +57,8 @@ function gearFill(m) {
     th = themeCfg().mode,
     lg = LANGS.find((x) => x[0] === I18N.lang) || LANGS[0];
   m.innerHTML = `<div class="ghead"><span class="ld ${STATUS.dot || ""}"></span><div><b>${esc(STATUS.label || tr("Mnema учится"))}</b><small>${esc(STATUS.when || "")}</small></div><button class="sw ${s.paused ? "" : "on"}" id="glon" title="${tr(s.paused ? "Включить обучение" : "Поставить на паузу")}"></button></div>
-    <div class="gmodes">${QUICK.filter((q) => q[0] !== "pause")
+    <div class="gline"><span>${tr("Память")}</span><button class="sw ${MEM.on ? "on" : ""}" id="gmem" title="${tr("ИИ знают тебя, Mnema учится")}"></button></div>
+    <div class="gmodes ${MEM.on ? "" : "dimmed"}">${QUICK.filter((q) => q[0] !== "pause")
       .map(
         ([k, t, d]) =>
           `<button data-q="${k}" class="${k === cur ? "cur" : ""}" ${s.paused ? "disabled" : ""}><i></i><span><b>${tr(t)}</b><small>${tr(d)}</small></span></button>`,
@@ -150,6 +151,7 @@ function gearFill(m) {
         })[g]();
       }),
   );
+  if ($("#gmem", m)) $("#gmem", m).onclick = () => memSet(!MEM.on).then(() => gearFill(m));
 }
 const TOUR_STEPS = [
   [
@@ -189,6 +191,24 @@ const TOUR_STEPS = [
     "Открыть настройки",
   ],
 ];
+// with memory off the first steps say so and offer to turn it on
+function tourSteps() {
+  if (MEM.on) return TOUR_STEPS;
+  const t = TOUR_STEPS.slice();
+  t[0] = [
+    "Память выключена",
+    "Сейчас это обычный чат: модель не знает, кто ты, и ничего не запоминается. Включи — и любая модель будет знать тебя, а сменишь модель — память та же.",
+    "memon",
+    "Включить память",
+  ];
+  t[2] = [
+    "Учится сама, когда память включена",
+    "Тогда Mnema замечает факты о тебе, уверенное записывает сама, спорное спрашивает. Сейчас память выключена — ничего не записывается.",
+    "feed",
+    "Показать ленту",
+  ];
+  return t;
+}
 function tourModal() {
   const pop = document.createElement("div");
   pop.className = "modal tourm";
@@ -196,7 +216,12 @@ function tourModal() {
   pop.onclick = (e) => {
     if (e.target === pop) pop.remove();
   };
-  pop.innerHTML = `<div class="tour"><div class="tc"><button class="lmx" data-x>×</button><h3>${tr("Как устроена Mnema")}</h3><div class="sub">${tr("6 шагов, минута чтения")}</div>${TOUR_STEPS.map(([b, t, a, l], i) => `<div class="st"><span class="n">${i + 1}</span><div><b>${esc(tr(b))}</b><p>${esc(tr(t))}</p></div><button data-tour="${a}">${esc(tr(l))}</button></div>`).join("")}</div></div>`;
+  pop.innerHTML = `<div class="tour"><div class="tc"><button class="lmx" data-x>×</button><h3>${tr("Как устроена Mnema")}</h3><div class="sub">${tr("6 шагов, минута чтения")}</div>${tourSteps()
+    .map(
+      ([b, t, a, l], i) =>
+        `<div class="st"><span class="n">${i + 1}</span><div><b>${esc(tr(b))}</b><p>${esc(tr(t))}</p></div><button data-tour="${a}">${esc(tr(l))}</button></div>`,
+    )
+    .join("")}</div></div>`;
   const TA = {
     memory: () => go("memory"),
     folder: () => post("/api/memory/open", {}).catch((e) => toast(e.message)),
@@ -210,6 +235,7 @@ function tourModal() {
       setTimeout(() => $("#fpick").click(), 300);
     },
     settings: () => go("settings"),
+    memon: () => memSet(true),
   };
   $("[data-x]", pop).onclick = () => pop.remove();
   $$("[data-tour]", pop).forEach(

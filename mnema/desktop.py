@@ -571,9 +571,14 @@ class App:
                 if p.exists() and any(p.iterdir()) and not Vault(p).exists() and not (p / ".mnema").exists():
                     p = p / "Mnema"  # never spill memory files into a non-empty folder
                 v = Vault(p)
+                fresh = not v.exists()
                 init_vault(v)
                 self._proxy(v, proxy, password)
                 self._prefs(v, prefs)
+                if fresh:  # a new memory starts switched off: the tour offers to turn it on
+                    from .agent import profile as P
+
+                    P.save(v, {"memory_on": False})
                 self._app.open_vault(v, demo=False, delay=2.4)  # the celebration on the first screen plays first
             except PermissionError:
                 return "Нет прав записывать в эту папку. Выбери другую — например, в «Документах»."

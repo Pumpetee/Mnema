@@ -43,7 +43,7 @@ def fake_stream(vault, pid, model, system, messages, stop=None, usage=None, meta
             "why": "От проекта зависит, какую память я подниму первой",
             "options": [
                 {"label": "Курс испанского", "hint": "продолжим урок"},
-                {"label": "Поиск работы", "hint": "разберём новые вакансии"},
+                {"label": "Ремонт квартиры", "hint": "обсудим смету"},
                 {"label": "Другой", "hint": "назовёшь сам"},
             ],
         }

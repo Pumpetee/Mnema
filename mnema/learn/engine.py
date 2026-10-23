@@ -253,6 +253,10 @@ def safe_brain(settings: dict, report: dict):
 
 def run(vault: Vault, initial: bool = False, only: list[str] | None = None, brain=None, progress=None) -> dict:
     """One learning pass. Safe to call from a timer: a second call while one is running returns at once."""
+    from ..agent import profile as P
+
+    if not P.memory_on(vault):
+        return {"skipped": "память выключена"}
     if not _lock.acquire(blocking=False):
         return {"skipped": "уже учится"}
     try:
@@ -437,8 +441,12 @@ def learn_episodes(vault: Vault, eps: list, source: str, brain=None) -> dict:
     """Learn right now from fresh episodes. From a conversation in Mnema (source "mnema_chat", ref "<chat>#<n>") what
     needs the owner is asked in that conversation: one question at a time, shown under the messages."""
     """Learn right now from fresh episodes (the wrapper chat): no cursors, live feed on."""
+    from ..agent import profile as P
+
     settings = S.load(vault)
     report = new_report()
+    if not P.memory_on(vault):
+        return report
     if settings.get("demo") or settings["paused"] or not S.allowed(settings, source) or not eps:
         return report
     with _lock:

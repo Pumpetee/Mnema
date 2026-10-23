@@ -66,6 +66,7 @@ async function viewChat(id) {
   $("#heat").onclick = (e) => heatMenu(e.currentTarget);
   heatPoll();
   $("#privchip").onclick = async () => {
+    if (!MEM.on) return toast(tr("Память выключена — разговоры и так ничего не учат"));
     await togglePrivate();
     drawChips();
   };
@@ -271,18 +272,30 @@ async function refreshStatus() {
               : br.ok
                 ? ["", ""]
                 : ["info", "только явное"];
-    const lon = !s.demo && !s.paused && !(!ms.chat_learning && !ms.background.length) && br.level !== "bad";
+    if (ls.memory_on !== undefined) {
+      MEM.on = ls.memory_on;
+      document.body.classList.toggle("mem-off", !MEM.on);
+    }
+    const lon = MEM.on && !s.demo && !s.paused && !(!ms.chat_learning && !ms.background.length) && br.level !== "bad";
     STATUS.dot = st[0] === "info" && lon ? "" : st[0];
     STATUS.label = tr(
-      lon
-        ? br.ok
-          ? "Mnema учится"
-          : "Mnema запоминает только сказанное прямо"
-        : s.paused
-          ? "Mnema на паузе"
-          : "Mnema не учится",
+      !MEM.on
+        ? "Память выключена"
+        : lon
+          ? br.ok
+            ? "Mnema учится"
+            : "Mnema запоминает только сказанное прямо"
+          : s.paused
+            ? "Mnema на паузе"
+            : "Mnema не учится",
     );
-    STATUS.when = st[1] && !lon ? tr(st[1]) : ms.updated ? tr("память обновлена") + " " + ago(ms.updated) : "";
+    STATUS.when = !MEM.on
+      ? tr("обычный чат, ничего не запоминается")
+      : st[1] && !lon
+        ? tr(st[1])
+        : ms.updated
+          ? tr("память обновлена") + " " + ago(ms.updated)
+          : "";
     if (STATUS.lon !== undefined && STATUS.lon !== lon) logoGlow(lon);
     STATUS.lon = lon;
     drawGear();
@@ -783,7 +796,11 @@ function drawState() {
 function drawChips() {
   const p = $("#privchip"),
     c = $("#conschip");
-  if (p) p.classList.toggle("on", isPrivate());
+  if (p) {
+    p.classList.toggle("on", MEM.on && isPrivate());
+    p.classList.toggle("dis", !MEM.on);
+    p.title = MEM.on ? tr("Этот разговор не учит память") : tr("Память выключена — разговоры и так ничего не учат");
+  }
   if (c) {
     c.classList.toggle("on", !!CHAT.cons);
     $("span:not(.hq)", c).textContent = CHAT.cons
@@ -945,7 +962,7 @@ async function renderEmpty() {
   const lbl = modelLabel(CHAT.model),
     isLocal = String(CHAT.model).startsWith("local:");
 
-  const TOUR = TOUR_STEPS;
+  const TOUR = tourSteps();
   const tour = LS.get("tour", true)
     ? `<div class="tour"><div class="tc"><h3>Как устроена Mnema</h3><div class="sub">6 шагов, минута чтения</div>${TOUR.map(([b, t, a, l], i) => `<div class="st"><span class="n">${i + 1}</span><div><b>${esc(b)}</b><p>${esc(t)}</p></div><button data-tour="${a}">${esc(l)}</button></div>`).join("")}<div class="foot">${tr("Показывается в каждом новом разговоре.")} <a href="#" id="tourx">${tr("Больше не показывать")}</a> · ${tr("вернуть — в шестерёнке справа вверху")}</div></div></div>`
     : "";
@@ -964,6 +981,7 @@ async function renderEmpty() {
     model: () => modelMenu($("#model")),
     file: () => $("#fpick").click(),
     settings: () => go("settings"),
+    memon: () => memSet(true).then(() => renderEmpty()),
   };
   $$("[data-tour]").forEach(
     (b) =>

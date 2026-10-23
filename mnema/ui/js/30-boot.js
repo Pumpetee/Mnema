@@ -16,6 +16,9 @@ applyAch();
       setTheme({ mode: pt });
       LS.set("theme_set", true);
     }
+    MEM.on = !a.profile || a.profile.memory_on !== false;
+    MEM.asked = !a.profile || a.profile.memory_on !== false || !!a.profile.memory_asked;
+    document.body.classList.toggle("mem-off", !MEM.on);
     const pl = a.profile && a.profile.lang;
     if (pl && pl !== I18N.lang) {
       I18N.lang = pl;
@@ -41,5 +44,8 @@ applyAch();
       if (c.claimed) setTimeout(() => welcomeFlow(), 700);
     }
   } catch (e) {}
+  setTimeout(() => {
+    if (!MEM.asked && !APP.demo && !$(".wlc")) memAsk(); // the tour didn't run (a model already here): ask alone
+  }, 1600);
 })();
 setTimeout(sourcesAsk, 1500);

@@ -108,7 +108,9 @@ def _name(prof: dict, intro: str) -> str:
 def prompt(vault: Vault, query: str, prof: dict, lang_line: str, today: str) -> str:
     """The system part: who he is in one line, how to talk, his rules, how to answer. No pile of facts here —
     a small model retells them on any question; the facts it needs go next to the question (augment)."""
-    intro, _, talk, rules = facts(vault, "", set())
+    from ..agent import profile as P
+
+    intro, _, talk, rules = facts(vault, "", set()) if P.memory_on(vault) else ("", [], [], [])
     name = _name(prof, intro)
     address = "на «вы»" if (prof.get("simple") or {}).get("address") == "vy" else "на «ты»"
     lines = [
@@ -142,6 +144,8 @@ def augment(vault: Vault, query: str) -> str:
     from ..agent import profile as P
 
     prof = P.load(vault)
+    if not P.memory_on(vault):
+        return ""
     intro0 = facts(vault, "", set())[0]
     _, fs, _, _ = facts(vault, query, deny, _name(prof, intro0))
     q = _terms(query)

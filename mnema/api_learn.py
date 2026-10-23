@@ -63,7 +63,10 @@ def get(vault: Vault, path: str, q: dict):
     if path == "/api/learn/status":
         s = S.load(vault)
         st = _state(vault)
+        from .agent import profile as P
+
         return 200, {
+            "memory_on": P.memory_on(vault),
             "settings": S.public(s),
             "sources": S.SOURCES,
             "brains": S.BRAINS,

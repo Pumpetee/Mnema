@@ -53,15 +53,15 @@ P.save(v, {"tool_folders": [str(WORK)]})
 facts = [
     (
         T(
-            "Иван, продакт, строю CRM для автосервисов «Гараж»",
-            "Alex, product lead, building «Garage», a CRM for car services",
+            "Иван, основатель «Гаража» — CRM для автосервисов",
+            "Alex, founder of «Garage», a CRM for car services",
         ),
         "profile:" + T("Кто я", "Who I am"),
     ),
     (T("Живу в Казани, офис в центре", "Lives in Lisbon, office downtown"), "profile:" + T("Кто я", "Who I am")),
-    (T("Отвечай коротко, сначала вывод", "Answer briefly, conclusion first"), "rules"),
-    (T("Цифры только с источником", "Numbers only with a source"), "rules"),
-    (T("Без воды и вступлений", "No filler, no intros"), "rules"),
+    (T("Объясняй на примерах", "Explain with examples"), "rules"),
+    (T("Цены — в рублях", "Prices in dollars"), "rules"),
+    (T("Пиши списками", "Use lists"), "rules"),
     (
         T("Цель — 5 автосервисов в пилоте до декабря", "Goal: 5 car services in the pilot by December"),
         "project:" + T("Гараж", "Garage"),
@@ -94,7 +94,7 @@ facts = [
     ),
     (T("Теннис по четвергам", "Tennis on Thursdays"), "card:" + T("Хобби", "Hobbies")),
     (T("Любит короткие отчёты таблицей", "Likes short reports as a table"), "card:" + T("Работа", "Work")),
-    (T("Встречи — только до обеда", "Meetings only before lunch"), "card:" + T("Работа", "Work")),
+    (T("Созвоны — после 15:00", "Calls after 3 pm"), "card:" + T("Работа", "Work")),
     (T("Конкуренты: YClients, AutoDealer", "Competitors: Tekmetric, Shopmonkey"), "card:" + T("Рынок", "Market")),
     (T("Средний чек СТО — 7 500 ₽", "Average garage ticket — $180"), "card:" + T("Рынок", "Market")),
     (T("Отпуск в феврале, Грузия", "Vacation in February, Georgia"), "card:" + T("Путешествия", "Travel")),
@@ -122,8 +122,8 @@ MORE = {
         ],
     ),
     T("Работа", "Work"): T(
-        ["Отчёты — одной таблицей", "Созвоны не дольше 30 минут", "Созвоны по вторникам"],
-        ["Reports as one table", "Calls no longer than 30 minutes", "Calls on Tuesdays"],
+        ["Отчёты — раз в неделю", "Созвоны не дольше 30 минут", "Планёрка по средам"],
+        ["Weekly reports", "Calls no longer than 30 minutes", "Team sync on Wednesdays"],
     ),
     T("Рынок", "Market"): T(
         ["В городе 1 400 автосервисов", "Половина ведёт запись в тетради"],
@@ -154,8 +154,8 @@ for card, lines in MORE.items():
 # his own portrait, as if written by Mnema after a few weeks
 prof = (v.root / "70 Memory" / "Profile.md").read_text(encoding="utf-8")
 intro = T(
-    "Иван — продакт из Казани. Строит «Гараж», CRM для автосервисов: пилот в пяти СТО, старт продаж 3 ноября. Любит коротко, таблицей и с выводом в начале.",
-    "Alex is a product lead in Lisbon. He is building «Garage», a CRM for car services: a pilot in five garages, sales start on November 3. Likes it short, as a table, conclusion first.",
+    "Иван — основатель стартапа из Казани. Строит «Гараж», CRM для автосервисов: пилот в пяти СТО, старт продаж 3 ноября. Любит списки и примеры.",
+    "Alex is a startup founder in Lisbon. He is building «Garage», a CRM for car services: a pilot in five garages, sales start on November 3. Likes lists and examples.",
 )
 head, _, rest = prof.partition("\n## ")
 title_end = head.find("\n", head.find("# ")) + 1
@@ -178,11 +178,11 @@ ANSWERS = {
         "**Главное на неделе — довести пилот до 5 сервисов к старту продаж 3 ноября.**\n\n"
         "| Что | Кто | Когда |\n|---|---|---|\n| Дожать 2 сервиса, которые думают | Олег | до пятницы |\n"
         "| Договор для СТО «Мотор» | ты | среда |\n| Экран записи в приложении | Марина | четверг |\n\n"
-        "Цена уже решена — 4 900 ₽ за точку в месяц. Встречи ставлю до обеда, как ты любишь.",
+        "Цена уже решена — 4 900 ₽ за точку в месяц. Созвоны ставлю после 15:00, как ты любишь.",
         "**The main thing this week: get the pilot to 5 garages before sales start on November 3.**\n\n"
         "| What | Who | When |\n|---|---|---|\n| Close the 2 garages still thinking | Oleg | by Friday |\n"
         "| Contract for «Motor» | you | Wednesday |\n| Booking screen in the app | Maria | Thursday |\n\n"
-        "Pricing is settled — $59 per location a month. I kept meetings before lunch, as you like.",
+        "Pricing is settled — $59 per location a month. I kept calls after 3 pm, as you like.",
     ),
 }
 CONS = {
@@ -287,7 +287,7 @@ for stage, text, why in [
     ),
     (
         "подтвердилось",
-        T("Встречи — только до обеда", "Meetings only before lunch"),
+        T("Созвоны — после 15:00", "Calls after 3 pm"),
         T("встретилось ещё раз, всего 3", "seen again, 3 times in all"),
     ),
     (

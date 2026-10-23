@@ -511,6 +511,8 @@ def post(vault: Vault, path: str, b: dict):
                 "tools",
                 "tool_folders",
                 "tools_ask",
+                "memory_on",
+                "memory_asked",
             )
         }
         prof = P.save(vault, patch) if patch else P.load(vault)

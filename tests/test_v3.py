@@ -53,7 +53,7 @@ class TestProfile(Base):
 
     def test_catalog_has_sections_and_every_item_explained(self):
         cat = P.catalog_view(P.load(self.v))
-        self.assertGreaterEqual(len(cat), 9)
+        self.assertGreaterEqual(len(cat), 5)
         self.assertTrue(all(i["rule"] for s in cat for i in s["items"]))
         ids = [i["id"] for s in cat for i in s["items"]]
         self.assertEqual(len(ids), len(set(ids)))

@@ -1,5 +1,17 @@
 // ---------------------------------------------------------------- memory
 async function viewMemory(tab) {
+  if (!MEM.on && !MEM.peek) {
+    $("#view").innerHTML =
+      `<div class="page"><div class="wrap"><div class="memoff">${ic("eyeoff")}<h1>${tr("Память выключена")}</h1>
+      <p>${tr("Сейчас Mnema — обычный чат с любым ИИ: ничего о тебе не знает и ничего не запоминает. Консорциум, документы, действия с файлами, встречи и локальные модели работают.")}</p>
+      <p>${tr("С памятью ИИ знают, кто ты, над чем работаешь и как тебе отвечать, а Mnema учится по ходу разговора. Всё хранится у тебя на компьютере обычными файлами.")}</p>
+      <div class="row" style="justify-content:center"><button class="btn" data-memon>${tr("Включить память")}</button><button class="btn g" id="mempeek">${tr("Посмотреть записанное")}</button></div></div></div></div>`;
+    $("#mempeek").onclick = () => {
+      MEM.peek = true;
+      viewMemory(tab);
+    };
+    return;
+  }
   tab = ["portrait", "history", "files"].includes(tab) ? tab : "portrait";
   $("#view").innerHTML =
     `<div class="page"><div class="wrap">${APP.demo ? demoBar() : ""}<h1>Что я о тебе знаю</h1><p class="sub">Всё лежит у тебя на компьютере обычными файлами — <a href="#" id="openf2" style="color:var(--acc)">открыть папку</a>. Нажми «выучено» — покажу, откуда я это знаю.</p>

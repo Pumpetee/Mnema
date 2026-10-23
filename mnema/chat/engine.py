@@ -299,7 +299,8 @@ def system_prompt(
             stats.update(memory_full=len(brief), memory_sent=len(brief))
         return brief
     client = PR.PROVIDERS[pid]["client"]
-    memory, _ = context_for(vault, client, log=log)
+    mem_on = P.memory_on(vault)
+    memory, _ = context_for(vault, client, log=log) if mem_on else ("", 0)
     full = len(memory)
     from .. import tuning
 
@@ -324,8 +325,14 @@ def system_prompt(
         parts.append(
             "Запоминать новое не твоя забота: Mnema делает это сама. Не пиши «сохраню», «запомню» и списки для памяти."
         )
-    parts.append("=== Память о владельце ===\n" + memory)
-    tv = team_vault(vault)
+    if mem_on:
+        parts.append("=== Память о владельце ===\n" + memory)
+    else:
+        parts.append(
+            "=== Память ===\nПамять Mnema выключена владельцем: о нём ты ничего не знаешь и ничего не запоминается. "
+            "Если он просит запомнить, скажи, что память выключена и включается в Настройки → Обучение → «Память»."
+        )
+    tv = team_vault(vault) if mem_on else None
     sent = len(memory)
     if tv:
         team, _ = context_for(tv, client, log=log)
@@ -947,7 +954,9 @@ def _generate(
             if eff.get("second_pass") and g["text"].strip() and not g["stop"]:
                 g["phase"] = "проверяю ответ"
                 prof = P.load(vault)
-                memory, _ = context_for(vault, PR.PROVIDERS[pid]["client"], log=False)
+                memory, _ = (
+                    context_for(vault, PR.PROVIDERS[pid]["client"], log=False) if P.memory_on(vault) else ("", 0)
+                )
                 u2: dict = {}
                 fixed = PR.complete(
                     vault,

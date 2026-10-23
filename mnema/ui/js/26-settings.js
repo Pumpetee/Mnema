@@ -219,7 +219,8 @@ async function viewSettings(arg) {
     ${themeCard()}
     ${compCard()}
     ${youCard(prof, ag)}
-    <div class="card" data-sec="learn" id="c-learn"><div class="set"><b>Насколько сама учится${hq("learn")}</b><div>${seg("autonomy", ag.simple.autonomy.choices, simple.autonomy)}<div class="hint" style="margin-top:6px">${esc(AUTO_HINT[simple.autonomy])}</div></div></div>
+    <div class="card" data-sec="learn" id="c-mem"><div class="tg" style="padding:0;border:0"><button class="sw ${MEM.on ? "on" : ""}" id="memsw2"></button><div><b>${tr("Память")}</b><p>${tr(MEM.on ? "Включена: ИИ знают, кто ты и над чем работаешь, Mnema учится по ходу разговора. Claude Code, Cursor и расширение получают ту же память." : "Выключена: обычный чат. ИИ ничего о тебе не знают, Mnema ничего не запоминает, Claude Code, Cursor и расширение память не получают. Всё остальное работает.")}</p></div></div></div>
+    <div class="card ${MEM.on ? "" : "dimmed"}" data-sec="learn" id="c-learn">${MEM.on ? "" : memOffNote("обучение не идёт")}<div class="set"><b>Насколько сама учится${hq("learn")}</b><div>${seg("autonomy", ag.simple.autonomy.choices, simple.autonomy)}<div class="hint" style="margin-top:6px">${esc(AUTO_HINT[simple.autonomy])}</div></div></div>
     <div class="set"><b>${tr("Что мне можно смотреть")}${hq("outside")}</b><div class="tg" style="padding:0;border:0"><button class="sw ${s.outside !== false ? "on" : ""}" id="outsw"></button><div><b>${tr("Другие программы и браузер")}</b><p>${s.outside === false ? tr("Выключено: учусь только из разговоров в Mnema и работаю с папкой памяти. Чаты Claude Code, заметки, документы, Telegram, браузер и расширение не читаю.") : tr("Можно: читаю только то, что включено ниже. Всё читается на компьютере.")}</p></div></div></div>
     <div class="set srcset"><b>Где учиться<span class="hint">${tr("Нажми на карточку, чтобы включить или выключить")}</span></b><div class="srcgrid ${s.outside === false ? "outoff" : ""}">${Object.entries(
       groups,
@@ -462,7 +463,7 @@ async function viewSettings(arg) {
         ${!["none", "auto"].includes(s.brain.kind) ? `<div class="fld"><span>Модель</span><input id="bmodel" value="${esc(s.brain.model)}" placeholder="${s.brain.kind === "claude_code" ? "по умолчанию" : s.brain.kind === "ollama" ? "например, qwen2.5:14b" : "название модели"}"></div>` : ""}${s.brain.kind === "ollama" || s.brain.kind === "api" ? `<div class="fld"><span>Адрес, если не стандартный</span><input id="bend" value="${esc(s.brain.endpoint)}"></div>` : ""}
         <div class="row" style="margin-top:8px"><button class="btn l" id="btest">Проверить</button><span class="hint" id="bres"></span></div></div></div>
       <div class="row" style="margin-top:10px"><button class="btn" id="lsave">Сохранить</button><button class="btn l" id="lnow">Учиться сейчас</button><button class="btn g" id="lpause">${s.paused ? "Продолжить обучение" : "Пауза обучения"}</button></div></div>
-    <div class="card" data-sec="security" id="c-access"><h2>Кто из ИИ что видит${hq("access")}<span class="accsaved" id="accsaved">${ic("check")}${tr("Сохранено")}</span></h2>
+    <div class="card ${MEM.on ? "" : "dimmed"}" data-sec="security" id="c-access">${MEM.on ? "" : memOffNote("ИИ сейчас ничего не получают")}<h2>Кто из ИИ что видит${hq("access")}<span class="accsaved" id="accsaved">${ic("check")}${tr("Сохранено")}</span></h2>
       <p class="hint" style="margin:-4px 0 12px">${tr("Галочка — эта часть памяти уходит этому ИИ вместе с вопросом. Замок — тема вырезается даже из разрешённых частей. Меняется сразу.")}</p>
       <div class="accwrap" id="accm">${accMatrix(clients)}</div></div>
     <div class="card" data-sec="style" id="promptcard"><h2>Рецепты задач${hq("prompts")}</h2><p class="hint" style="margin:-4px 0 10px">${tr("Делаешь что-то не в первый раз — отчёт по встрече, пост по заметкам, письмо клиенту? Mnema запишет рецепт: как именно ты это делаешь. Дальше просишь коротко — и она делает так же, без уточнений.")}</p>
@@ -601,6 +602,7 @@ async function viewSettings(arg) {
         e.currentTarget.classList.toggle("on", on);
         await save({ tools: on }, on ? "Действия с файлами включены" : "Действия с файлами выключены");
       };
+    if ($("#memsw2")) $("#memsw2").onclick = () => memSet(!MEM.on);
     if ($("#actask-sw"))
       $("#actask-sw").onclick = async (e) => {
         const on = !e.currentTarget.classList.contains("on");

@@ -85,17 +85,19 @@ SMALL_RULE = """Файлы: чтобы прочитать файл, напиши
 
 
 def enabled(vault: Vault) -> bool:
+    """Actions are on and there is a place to act in (with memory off, only the work folders the owner added)."""
     from ..agent import profile as P
 
-    return bool(P.load(vault).get("tools", True))
+    return bool(P.load(vault).get("tools", True)) and bool(roots(vault))
 
 
 def roots(vault: Vault) -> list[tuple[str, Path]]:
     """The memory folder first, then the work folders the owner added."""
     from ..agent import profile as P
 
-    out = [("память", vault.root.resolve())]
-    for f in P.load(vault).get("tool_folders") or []:
+    prof = P.load(vault)
+    out = [("память", vault.root.resolve())] if prof.get("memory_on", True) else []
+    for f in prof.get("tool_folders") or []:
         p = Path(str(f)).expanduser()
         if p.is_dir():
             out.append(("рабочая папка", p.resolve()))
@@ -265,7 +267,11 @@ def run(vault: Vault, call: dict, client: str = "owner") -> tuple[str, str, str]
     """Do an approved action: (result for the model, line for the owner, path or "")."""
     t = call["tool"]
     if t == "remember":
+        from ..agent import profile as P
         from ..memory import remember
+
+        if not P.memory_on(vault):
+            raise Refused(P.MEMORY_OFF)
 
         fact = " ".join(call.get("body", "").split())
         ev = remember(vault, fact, call.get("where") or "inbox", "owner")

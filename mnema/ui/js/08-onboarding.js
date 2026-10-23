@@ -19,10 +19,12 @@ async function welcomeFlow() {
   document.body.appendChild(pop);
   document.body.classList.add("wlc-on");
   let i = 0,
+    memChoice = MEM.on, // a new memory folder starts off; the owner turns it on here
     dl = false,
     choice = claude ? "claude" : "local"; // what the owner talks to first; either card can be picked
   const finish = async () => {
     await post("/api/local/offer", { state: "done" }).catch(() => {});
+    if (!MEM.asked || memChoice !== MEM.on) await memSet(memChoice, true).catch(() => {});
     if (choice === "local" && pick && (pick.installed || dl)) {
       const ref = "local:" + pick.id;
       await post("/api/agent", { default_model: ref, last_model: ref }).catch(() => {});
@@ -90,6 +92,13 @@ async function welcomeFlow() {
       p: tr("Карты, пароли и ключи заменяются метками до отправки. Память — файлы на твоём компьютере."),
     },
     {
+      mem: true,
+      t: tr("Включить память?"),
+      p: tr(
+        "С памятью ИИ знают, кто ты и над чем работаешь, а Mnema учится по ходу разговора. Без неё — обычный чат: ничего не запоминается, всё остальное работает. Поменять можно в любой момент.",
+      ),
+    },
+    {
       pick: true,
       t: tr("С каким ИИ говорить?"),
       p: claude
@@ -102,8 +111,13 @@ async function welcomeFlow() {
   const draw = () => {
     const s = S[i];
     pop.innerHTML = `<div class="card"><button class="wskip" data-skip>${tr("Пропустить")}</button><div class="wslide" key="${i}">
-      ${s.pick ? "" : `<div class="wart">${s.art}</div>`}
+      ${s.pick || s.mem ? "" : `<div class="wart">${s.art}</div>`}
       ${s.case ? `<div class="wcase">${tr("Кейс")} ${s.case} ${tr("из")} ${S.filter((x) => x.case).length}</div>` : ""}<h2>${s.case === 1 && name ? esc(name) + ", " + s.t.charAt(0).toLowerCase() + s.t.slice(1) : s.t}</h2><p>${s.p}</p>
+      ${
+        s.mem
+          ? `<div class="wpick"><div class="wopt ${memChoice ? "on" : ""}" data-mem="1"><span class="wic ${memChoice ? "ok" : ""}">${ic(memChoice ? "check" : "user")}</span><div><b>${tr("Включить память")}</b><small>${tr("ИИ знают тебя, Mnema учится и запоминает")}</small></div></div><div class="wopt ${memChoice ? "" : "on"}" data-mem="0"><span class="wic ${memChoice ? "" : "ok"}">${ic(memChoice ? "eyeoff" : "check")}</span><div><b>${tr("Без памяти")}</b><small>${tr("обычный чат, ничего не запоминается")}</small></div></div></div>`
+          : ""
+      }
       ${
         s.pick
           ? `<div class="wpick">${claude ? `<div class="wopt ${choice === "claude" ? "on" : ""}" id="wcl"><span class="wic ${choice === "claude" ? "ok" : ""}">${ic(choice === "claude" ? "check" : "chat")}</span><div><b>Claude</b><small>${tr("по подписке · уже подключён")}</small></div></div>` : ""}
@@ -137,6 +151,13 @@ async function welcomeFlow() {
           if (document.body.contains(pop)) draw();
         });
       };
+    $$("[data-mem]", pop).forEach(
+      (x) =>
+        (x.onclick = () => {
+          memChoice = x.dataset.mem === "1";
+          draw();
+        }),
+    );
     if ($("#wcl", pop))
       $("#wcl", pop).onclick = () => {
         choice = "claude";
@@ -265,4 +286,23 @@ async function sourcesAsk() {
     } else if (!yes) toast(tr("Хорошо: только наши разговоры и папка памяти"));
   };
   ask();
+}
+
+// a new memory whose tour didn't run: the same choice on its own
+function memAsk() {
+  const pop = document.createElement("div");
+  pop.className = "modal memask";
+  let on = false;
+  const draw = () => {
+    pop.innerHTML = `<div class="card"><h2>${tr("Включить память?")}</h2><p class="hint">${tr("С памятью ИИ знают, кто ты и над чем работаешь, а Mnema учится по ходу разговора. Без неё — обычный чат: ничего не запоминается, всё остальное работает. Поменять можно в любой момент.")}</p>
+      <div class="wpick"><div class="wopt ${on ? "on" : ""}" data-m="1"><span class="wic ${on ? "ok" : ""}">${ic(on ? "check" : "user")}</span><div><b>${tr("Включить память")}</b><small>${tr("ИИ знают тебя, Mnema учится и запоминает")}</small></div></div><div class="wopt ${on ? "" : "on"}" data-m="0"><span class="wic ${on ? "" : "ok"}">${ic(on ? "eyeoff" : "check")}</span><div><b>${tr("Без памяти")}</b><small>${tr("обычный чат, ничего не запоминается")}</small></div></div></div>
+      <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-ok>${tr("Готово")}</button></div></div>`;
+    $$("[data-m]", pop).forEach((x) => (x.onclick = () => ((on = x.dataset.m === "1"), draw())));
+    $("[data-ok]", pop).onclick = async () => {
+      pop.remove();
+      await memSet(on, true).catch((e) => toast(e.message));
+    };
+  };
+  draw();
+  document.body.appendChild(pop);
 }
