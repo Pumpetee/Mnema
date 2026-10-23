@@ -600,7 +600,9 @@ class App:
         save_config(cfg)
         self.start_server(vault)
         # let the JS call that asked for it return first, then navigate
-        threading.Timer(delay, lambda: self.window.load_url(self.url())).start()
+        t = threading.Timer(delay, lambda: self.window.load_url(self.url()))
+        t.daemon = True
+        t.start()
 
     def url(self) -> str:
         return f"http://127.0.0.1:{self.port}/"
@@ -738,7 +740,9 @@ class App:
         self.refresh_tray()
 
     def quit_api(self):  # graceful stop for restarts: the tray icon goes away with the process
-        threading.Timer(0.3, self.quit).start()
+        t = threading.Timer(0.3, self.quit)
+        t.daemon = True
+        t.start()
         return {"ok": True}
 
     def quit(self, *_):
@@ -1078,6 +1082,27 @@ def main(argv: list[str] | None = None) -> None:
         with (HOME / "app.log").open("a", encoding="utf-8") as f:
             f.write(traceback.format_exc() + "\n")
         OS.message(f"Mnema не смогла запуститься. Подробности записаны в файл:\n{HOME / 'app.log'}", error=True)
+    finally:
+        _exit_now()
+
+
+def _exit_now() -> None:
+    """The window is gone: stop what Mnema started (the local model, the VPN engine) and leave. Python would otherwise
+    wait for every helper thread — a library's or a request still running — and the program hangs without a window
+    (seen on macOS: Mnema stays in the Dock and «Завершить» does nothing)."""
+    import atexit
+
+    try:
+        atexit._run_exitfuncs()
+    except Exception:
+        pass
+    try:
+        f = getattr(_crash_log, "file", None)
+        if f:
+            f.flush()
+    except Exception:
+        pass
+    os._exit(0)
 
 
 if __name__ == "__main__":

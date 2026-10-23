@@ -57,6 +57,14 @@ try:
         if ping.get("ok") and "<html" in page.lower():
             time.sleep(8)  # the window and the tray settle; a crash shows up in the log
             ok, why = proc.poll() is None, f"version {ping.get('version')}, port {port}"
+            if ok:  # «Выход», as from the tray: the program must really end, not hang without a window
+                req = urllib.request.Request(f"http://127.0.0.1:{port}/api/app/quit", headers={"X-Mnema-Token": token})
+                urllib.request.urlopen(req, timeout=5).read()
+                try:
+                    proc.wait(timeout=30)
+                    why += ", quits cleanly"
+                except subprocess.TimeoutExpired:
+                    ok, why = False, why + ", but HANGS on quit (still running 30 s after «Выход»)"
             break
 finally:
     log = home / "app.log"
