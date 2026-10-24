@@ -52,6 +52,8 @@ with sync_playwright() as p:
 
     def fresh(view):
         page.evaluate("try{localStorage.clear()}catch(e){}")
+        # every control starts from the memory on: a switch that turned it off must not grey out the rest
+        page.evaluate("post('/api/agent', {memory_on: true, memory_asked: true})")
         page.goto("about:blank")
         page.goto(base + "#" + view)
         page.wait_for_timeout(1400)

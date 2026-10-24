@@ -20,7 +20,7 @@ from .ledger import IN_MEMORY, Ledger, now, said_date, same_meaning, similar
 from .sources import READERS, load_cursors, save_cursors
 
 CARD_FOR_TAG = {"money": "Деньги #money", "health": "Здоровье #health", "private": "Личное #private"}
-AI_CHAT_SOURCES = {"claude_code", "browser", "chatgpt_export"}
+AI_CHAT_SOURCES = {"claude_code", "chatgpt_export"}
 _lock = threading.Lock()
 
 

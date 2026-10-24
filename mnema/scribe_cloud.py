@@ -1,7 +1,7 @@
 """Where a meeting is transcribed: on this computer (free, private, as fast as the processor) or by a cloud Whisper
 (fast, paid by the owner's own key, the audio leaves the computer).
 
-Modes (Настройки → Встречи):
+Modes (Настройки → Записи встреч):
 - auto    — measures this computer on the first minute of the recording. Fits — transcribes here and says how long it
             will take. Too slow — asks: give it to the cloud Whisper or wait. Without a key it says how long and waits.
 - local   — always here.
@@ -135,7 +135,7 @@ def cloud_transcribe(vault: Vault, audio, speaker: str, progress=None) -> list[d
 
     c = creds(vault)
     if not c:
-        raise RuntimeError("нет ключа для облачного Whisper: Настройки → Встречи")
+        raise RuntimeError("нет ключа для облачного Whisper: Настройки → Записи встреч")
     base, key, model = c
     out = []
     step = SR * CHUNK_S

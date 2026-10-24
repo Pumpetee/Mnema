@@ -25,7 +25,7 @@ class Client:
     # Where it may write. Reading and writing are separate: an outside assistant may drop a fact
     # into the inbox for the owner to sort, but must not rewrite rules or decisions.
     write_scopes: list = field(default_factory=lambda: ["inbox"])
-    via: str = ""  # how it connects: mcp, extension, hook, api
+    via: str = ""  # how it connects: mcp, hook, api
     layout: int = 2  # memory layout version the scopes were set for
 
     def __post_init__(self):
@@ -49,36 +49,12 @@ DEFAULT_CLIENTS = [
         write_scopes=["inbox", "decisions", "projects", "cards", "people", "rules"],
         via="mcp",
     ),
-    Client(
-        "chatgpt",
-        "ChatGPT",
-        scopes=["profile", "rules", "projects", "cards", "decisions"],
-        deny_tags=["money", "health", "private"],
-        via="extension",
-    ),
-    Client(
-        "gemini",
-        "Gemini",
-        scopes=["profile", "rules", "cards"],
-        deny_tags=["money", "health", "private"],
-        via="extension",
-    ),
-    Client(
-        "openrouter",
-        "OpenRouter",
-        scopes=["profile", "rules", "projects", "cards", "decisions"],
-        deny_tags=["money", "health", "private"],
-        via="api",
-    ),
-    Client(
-        "cursor",
-        "Cursor",
-        scopes=["rules", "projects"],
-        deny_tags=["money", "health", "private"],
-        can_write=False,
-        write_scopes=[],
-        via="mcp",
-    ),
+    # Nothing is cut out by default: money, health and private are hidden from an AI only when the owner ticks it
+    # (decided 23.10.2026). Every AI may drop new facts into the inbox, the owner sorts them.
+    Client("chatgpt", "ChatGPT", scopes=["profile", "rules", "projects", "cards", "decisions"], via="api"),
+    Client("gemini", "Gemini", scopes=["profile", "rules", "cards"], via="api"),
+    Client("openrouter", "OpenRouter", scopes=["profile", "rules", "projects", "cards", "decisions"], via="api"),
+    Client("cursor", "Cursor", scopes=["rules", "projects"], via="mcp"),
 ]
 
 

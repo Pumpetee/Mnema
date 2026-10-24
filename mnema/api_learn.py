@@ -1,13 +1,13 @@
-"""API for learning: settings, runs with progress, the review queue, the extension's observations."""
+"""API for learning: settings, runs with progress, the review queue."""
 
 from __future__ import annotations
 
 import threading
 
 from .learn import engine, settings as S
-from .learn.brains import BRAIN_MARK, make_brain
+from .learn.brains import make_brain
 from .learn.ledger import Ledger
-from .learn.sources import Episode, observe_browser
+from .learn.sources import Episode
 from .vault import Vault
 
 _progress: dict[str, dict] = {}
@@ -149,31 +149,7 @@ def post(vault: Vault, path: str, b: dict):
         except Exception as e:
             return 200, {"ok": False, "error": str(e)[:300]}
         return 200, {"ok": bool(got), "found": [g["text"] for g in got]}
-    if path == "/api/observe":
-        s = S.load(vault)
-        if not S.allowed(s, "browser") or s["paused"]:
-            return 200, {"ok": True, "learning": False}
-        text = str(b.get("text", ""))
-        if (
-            text.strip()
-            and not text.startswith(BRAIN_MARK)
-            and not text.startswith("Контекст обо мне (из моей памяти Mnema")
-        ):
-            observe_browser(
-                vault,
-                str(b.get("client", "")),
-                str(b.get("url", "")),
-                str(b.get("title", "")),
-                text,
-                str(b.get("prev", "")),
-            )
-        return 200, {"ok": True, "learning": True}
     return None
-
-
-def browser_learning(vault: Vault) -> bool:
-    s = S.load(vault)
-    return bool(S.allowed(s, "browser") and not s["paused"])
 
 
 def on_undo(vault: Vault, event_id: str) -> None:

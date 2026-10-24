@@ -5,6 +5,340 @@ const AUTO_HINT = {
   mixed: "Уверенное записывает сама, личное и спорное спрашивает.",
   quiet: "Пишет всё сама, ты откатываешь лишнее.",
 };
+// «Настройки по умолчанию»: Движок, Записи встреч and Программа; memory, keys, proxy and folders stay
+async function settingsReset() {
+  if (
+    !(await ask(
+      "Вернуть настройки по умолчанию?",
+      "Движок, Записи встреч и Программа станут как после установки. Память, ключи, прокси, VPN и папки останутся как есть.",
+      "Вернуть",
+      false,
+    ))
+  )
+    return;
+  try {
+    await post("/api/settings/reset");
+    if (APP.desktop) APP = await post("/api/app/close_pref", { value: "ask" }).catch(() => APP);
+    LS.set("theme", {});
+    applyTheme();
+    toast(tr("Настройки по умолчанию"));
+    viewSettings(SETCUR);
+  } catch (e) {
+    toast(e.message);
+  }
+}
+// several memories on one computer: the open one, the others to switch to, a new one, delete
+async function drawVaults() {
+  const box = $("#vaultsw");
+  if (!box || !APP.desktop) return;
+  let d;
+  try {
+    d = await api("/api/app/vaults");
+  } catch (e) {
+    return;
+  }
+  if (!d || !d.list) return;
+  box.innerHTML = `<div class="vswh">${tr("Память")}</div>${d.list
+    .map(
+      (v, k) =>
+        `<div class="mvrow ${v.path === d.current ? "cur" : ""} ${v.exists ? "" : "gone"}" title="${esc(v.path)}"><button class="vname" data-vo="${k}">${ic(v.path === d.current ? "check" : "mem")}<span data-noi18n>${esc(v.name)}</span></button><button class="vmore kebab" data-vm="${k}" title="${tr("Ещё")}">${ic("dots")}</button></div>`,
+    )
+    .join("")}<button class="vnew" id="vnew">${ic("plus")}<span>${tr("Новая память")}</span></button>`;
+  $$("[data-vo]", box).forEach(
+    (b) =>
+      (b.onclick = async () => {
+        const v = d.list[+b.dataset.vo];
+        if (v.path === d.current) return;
+        if (!v.exists) return toast(tr("Этой папки сейчас нет. Проверь, подключён ли диск."));
+        const r = await post("/api/app/vault_open", { path: v.path }).catch((e) => ({ error: e.message }));
+        if (r.error) toast(r.error);
+        else toast(tr("Открываю") + " " + v.name);
+      }),
+  );
+  $$("[data-vm]", box).forEach(
+    (b) =>
+      (b.onclick = () => {
+        const v = d.list[+b.dataset.vm];
+        const rename = async () => {
+          const name = await askText("Как назвать эту память?", v.name, "Папка на диске сохранит своё имя.");
+          if (name === null) return;
+          const r = await post("/api/app/vault_rename", { path: v.path, name }).catch((e) => ({ error: e.message }));
+          if (r.error) return toast(r.error);
+          drawVaults();
+        };
+        const remove = async () => {
+          const open = v.path === d.current;
+          if (
+            !(await ask(
+              open ? "Удалить открытую память?" : "Удалить эту память?",
+              open
+                ? "Mnema закроет её и уберёт папку в корзину, вернуть можно оттуда."
+                : "Папка уйдёт в корзину, вернуть можно оттуда.",
+            ))
+          )
+            return;
+          // the second check: the name once more, and the button wakes up after 10 seconds
+          if (
+            !(await dlg({
+              title: tr("Точно удалить") + " «" + v.name + "»?",
+              text: "Всё, что Mnema о тебе узнала в этой памяти, — портрет, факты, разговоры и история — уйдёт в корзину вместе с папкой.",
+              ok: "Удалить",
+              danger: true,
+              wait: 10,
+            }))
+          )
+            return;
+          const r = await post("/api/app/vault_forget", { path: v.path, delete: true }).catch((e) => ({
+            error: e.message,
+          }));
+          if (r.error) return toast(r.error);
+          if (r.closing) return toast(tr("Закрываю память и убираю папку в корзину"));
+          toast(tr("Папка памяти в корзине"));
+          drawVaults();
+        };
+        menu(b, [
+          { label: tr("Переименовать"), icon: "edit", run: rename },
+          { label: tr("Удалить"), icon: "trash", danger: true, run: remove },
+        ]);
+      }),
+  );
+  $("#vnew", box).onclick = async () => {
+    if (
+      await ask("Создать новую память?", "Откроется первый экран, текущая память останется в списке.", "Создать", false)
+    )
+      api("/api/app/switch");
+  };
+}
+// Telegram: Mnema learns from the conversations in the chats the owner picked; read only — the client itself refuses anything but reading
+const TG_LOGO = `<svg viewBox="0 0 24 24" class="tglogo"><circle cx="12" cy="12" r="12" fill="#229ED9"/><path d="M5.4 11.7l11.6-4.5c.5-.2 1 .1.8.9l-2 9.3c-.1.6-.5.8-1 .5l-2.9-2.2-1.4 1.4c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.3-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.1-.9z" fill="#fff"/></svg>`;
+async function drawTg() {
+  const box = $("#c-tg");
+  if (!box) return;
+  let r;
+  try {
+    r = await api("/api/telegram");
+  } catch (e) {
+    box.innerHTML = `<h2>Telegram</h2><p class="err">${esc(e.message)}</p>`;
+    return;
+  }
+  const step = r.set ? 4 : r.step === "password" ? 3 : r.step === "code" ? 2 : 1;
+  const st = (n, title, body) =>
+    `<li class="${n < step ? "done" : n === step ? "on" : ""}"><i>${n < step ? ic("check") : n}</i><div><b>${tr(title)}</b>${n === step ? body : ""}</div></li>`;
+  const body = r.set
+    ? `<div class="tgok"><span class="tgava">${esc((r.who || "?").slice(0, 1).toUpperCase())}</span><div><b>${esc(r.who || "")}</b><small>${tr("Подключено · новые сообщения читаются в каждом цикле обучения")}</small></div><button class="btn g sm" id="tgrforget">${tr("Отключить")}</button></div>`
+    : `<ol class="tgsteps">
+        ${st(
+          1,
+          "Ключи приложения",
+          `<p class="hint">${tr("Открой my.telegram.org, войди по своему номеру, выбери «API development tools», создай приложение с любым названием и скопируй api_id и api_hash. Это бесплатно и занимает минуту.")}</p>
+           <div class="row"><a class="btn l sm" href="https://my.telegram.org/apps" target="_blank">${tr("Открыть my.telegram.org")}</a></div>
+           <div class="tgfields"><input class="inp" id="tgaid" placeholder="api_id" value="${esc(r.api_id || "")}"><input class="inp" id="tgahash" type="password" placeholder="api_hash"><input class="inp" id="tgphone" placeholder="${tr("+7 номер телефона")}" value="${esc(r.phone || "")}"><button class="btn" id="tgrgo">${tr("Получить код")}</button></div>`,
+        )}
+        ${st(
+          2,
+          "Код из Telegram",
+          `<p class="hint">${tr("Telegram прислал код в чат «Telegram» на твоём телефоне.")}</p><div class="tgfields"><input class="inp" id="tgcode" placeholder="${tr("код")}" inputmode="numeric"><button class="btn" id="tgcodego">${tr("Войти")}</button></div>`,
+        )}
+        ${st(
+          3,
+          "Облачный пароль",
+          `<p class="hint">${tr("У тебя включена двухэтапная проверка: введи облачный пароль Telegram.")}</p><div class="tgfields"><input class="inp" id="tgpw" type="password" placeholder="${tr("облачный пароль")}"><button class="btn" id="tgpwgo">${tr("Войти")}</button></div>`,
+        )}
+      </ol>`;
+  const chats = r.chats || [];
+  const chatList = `<div class="tgchats"><div class="tgch"><b>${tr("Чаты для чтения")}</b>${r.set ? `<button class="btn l sm" id="tgadd">${ic("plus")}${tr("Добавить чаты")}</button>` : ""}</div>
+    ${
+      chats.length
+        ? `<div class="tgcl">${chats
+            .map(
+              (c, k) =>
+                `<div class="tgci"><span class="tgava sm">${c.kind === "group" ? ic("users") : c.kind === "self" ? ic("pin") : esc((c.name || "?").slice(0, 1).toUpperCase())}</span><span data-noi18n>${esc(c.name)}</span><button class="kebab" data-tgdel="${k}" title="${tr("Убрать")}">${ic("x")}</button></div>`,
+            )
+            .join("")}</div>`
+        : `<p class="hint">${r.set ? tr("Пока ни одного чата — Mnema ничего не читает. Добавь чаты, по которым она будет тебя узнавать.") : tr("Чаты появятся здесь после входа: ты сам выберешь, какие Mnema читает.")}</p>`
+    }</div>`;
+  box.innerHTML = `<div class="tghead">${TG_LOGO}<div><h2>Telegram</h2><p>${tr("Mnema узнаёт тебя и людей вокруг по твоим перепискам в Telegram")}</p></div><span class="tgro">${ic("lock")}${tr("Только чтение")}</span></div>
+    <div class="tgsafe"><span>${ic("check")}${tr("Читает переписку целиком — твои сообщения и собеседников, только в чатах, которые ты выбрал")}</span><span>${ic("check")}${tr("Ничего не отправляет, не удаляет и не отмечает прочитанным")}</span><span>${ic("check")}${tr("Каналы и ботов пропускает")}</span></div>
+    <p class="tgnote">${tr("Запрет заложен в саму программу: клиент Telegram внутри Mnema умеет только читать, любая другая команда отклоняется до отправки.")}</p>
+    <div class="tglocal">${ic("shield")}<div><b>${tr("Всё хранится только на этом компьютере")}</b><p>${tr("Вход в Telegram зашифрован в защищённом хранилище системы, список чатов и то, что Mnema из них поняла, лежат в папке памяти. Своих серверов у Mnema нет, переписка никуда не копируется. ИИ получает только нужные места, когда ты задаёшь вопрос.")}</p></div></div>
+    ${body}${chatList}`;
+  const rdp = (b) =>
+    post("/api/telegram", b)
+      .then(drawTg)
+      .catch((e) => toast(e.message));
+  const on = (id, f) => $("#" + id, box) && ($("#" + id, box).onclick = f);
+  const filled = (...ids) => {
+    const gap = ids.map((id) => $("#" + id, box)).find((x) => x && !x.value.trim());
+    if (gap) gap.focus();
+    return !gap;
+  };
+  on(
+    "tgrgo",
+    () =>
+      filled("tgaid", "tgahash", "tgphone") &&
+      rdp({ api_id: $("#tgaid").value, api_hash: $("#tgahash").value, phone: $("#tgphone").value }),
+  );
+  on("tgcodego", () => filled("tgcode") && rdp({ code: $("#tgcode").value }));
+  on("tgpwgo", () => filled("tgpw") && rdp({ password: $("#tgpw").value }));
+  on("tgadd", () => tgPick(chats));
+  $$("[data-tgdel]", box).forEach(
+    (b) => (b.onclick = () => rdp({ chats: chats.filter((_, k) => k !== +b.dataset.tgdel) })),
+  );
+  on(
+    "tgrforget",
+    async () =>
+      (await ask("Отключить Telegram?", "Mnema забудет вход и перестанет читать переписку.", "Отключить")) &&
+      rdp({ forget: true }),
+  );
+}
+// the owner's chats to pick from: Mnema reads only the picked ones
+async function tgPick(cur) {
+  const head = `<div class="obshead">${TG_LOGO}<div><h2>${tr("Чаты для чтения")}</h2><p class="hint">${tr("Mnema будет читать переписку целиком — твои сообщения и собеседников — только в отмеченных чатах. Каналы и боты в список не попадают.")}</p></div></div>`;
+  const pop = document.createElement("div");
+  pop.className = "modal obspick tgpick";
+  pop.innerHTML = `<div class="card">${head}<p class="hint">${tr("загружаю…")}</p></div>`;
+  pop.onclick = (e) => e.target === pop && pop.remove();
+  document.body.appendChild(pop);
+  let list;
+  try {
+    list = (await api("/api/telegram/chats")).chats;
+  } catch (e) {
+    pop.remove();
+    return toast(e.message);
+  }
+  const chosen = new Map(cur.map((c) => [c.id, c]));
+  let q = "";
+  const draw = () => {
+    const shown = list.filter((c) => !q || c.name.toLowerCase().includes(q));
+    pop.querySelector(".card").innerHTML = `${head}
+      <input class="inp tgq" placeholder="${tr("Найти чат")}" value="${esc(q)}">
+      <div class="obslist tglist">${shown
+        .map(
+          (c) =>
+            `<button class="obsv ${chosen.has(c.id) ? "on" : ""}" data-id="${esc(c.id)}"><i>${chosen.has(c.id) ? ic("check") : ""}</i><div><b data-noi18n>${esc(c.name)}</b></div><span>${c.kind === "group" ? tr("группа") : c.kind === "self" ? tr("твои заметки") : tr("личный чат")}</span></button>`,
+        )
+        .join("")}${shown.length ? "" : `<p class="hint">${tr("Ничего не нашлось")}</p>`}</div>
+      <div class="row" style="justify-content:space-between;margin-top:14px"><span class="hint">${tr("Выбрано")}: ${chosen.size}</span><div class="row" style="gap:8px"><button class="btn g" data-x>${tr("Отмена")}</button><button class="btn" id="tgok">${tr("Сохранить")}</button></div></div>`;
+    const inp = $(".tgq", pop);
+    inp.oninput = () => {
+      q = inp.value.trim().toLowerCase();
+      draw();
+      const i = $(".tgq", pop);
+      i.focus();
+      i.setSelectionRange(i.value.length, i.value.length);
+    };
+    $$("[data-id]", pop).forEach(
+      (b) =>
+        (b.onclick = () => {
+          const c = list.find((x) => x.id === b.dataset.id);
+          chosen.has(c.id) ? chosen.delete(c.id) : chosen.set(c.id, c);
+          draw();
+        }),
+    );
+    $("[data-x]", pop).onclick = () => pop.remove();
+    $("#tgok", pop).onclick = async () => {
+      try {
+        await post("/api/telegram", { chats: [...chosen.values()].map(({ id, name, kind }) => ({ id, name, kind })) });
+      } catch (e) {
+        return toast(e.message);
+      }
+      pop.remove();
+      toast(
+        chosen.size
+          ? tr("Чаты сохранены: Mnema прочитает их в ближайшем цикле обучения")
+          : tr("Чаты убраны: Mnema ничего не читает"),
+      );
+      drawTg();
+    };
+  };
+  draw();
+}
+// «Подключить Obsidian»: the vaults Obsidian knows on this computer, ticked ones become extra memory folders
+const OBS_LOGO = `<svg viewBox="0 0 24 24" class="obslogo"><path d="M16.2 2.4c-.6-.5-1.5-.5-2.1 0L7.3 7.8c-.4.3-.6.8-.6 1.3l.4 5.6c0 .3.2.7.4.9l4.2 5.6c.5.6 1.4.8 2 .3l3.8-2.6c.5-.3.7-.9.6-1.5l-.4-2.4c-.1-.4 0-.9.3-1.2l1.7-2.1c.4-.5.4-1.2.1-1.7L16.2 2.4z" fill="#7c3aed"/><path d="M11.6 9.2l2.9-4.6 2.4 5.6-2 2.6c-.6-.9-1.7-2.3-3.3-3.6z" fill="#a78bfa"/></svg>`;
+async function obsidianPick(prof) {
+  let d;
+  try {
+    d = await api("/api/obsidian");
+  } catch (e) {
+    return toast(e.message);
+  }
+  const pop = document.createElement("div");
+  pop.className = "modal obspick";
+  const chosen = new Set(d.vaults.filter((v) => v.added).map((v) => v.path));
+  const draw = () => {
+    pop.innerHTML = `<div class="card"><div class="obshead">${OBS_LOGO}<div><h2>${tr("Подключить Obsidian")}</h2><p class="hint">${tr("Mnema будет видеть заметки хранилища вместе со своей памятью: при каждом вопросе найдёт нужные места и отдаст их ИИ. Заметки только читаются, в них ничего не пишется.")}</p></div></div>
+      ${
+        d.vaults.length
+          ? `<div class="obslist">${d.vaults
+              .map(
+                (v, k) =>
+                  `<button class="obsv ${chosen.has(v.path) ? "on" : ""}" data-k="${k}"><i>${chosen.has(v.path) ? ic("check") : ""}</i><div><b data-noi18n>${esc(v.name)}</b><small data-noi18n>${esc(v.path)}</small></div><span>${v.notes} ${tr("заметок")}${v.open ? " · " + tr("открыто сейчас") : ""}</span></button>`,
+              )
+              .join("")}</div>`
+          : `<p class="hint">${tr("Obsidian на этом компьютере не нашёлся. Укажи папку хранилища вручную.")}</p>`
+      }
+      <div class="row" style="justify-content:space-between;margin-top:14px">${window.pywebview ? `<button class="btn g" id="obsother">${tr("Другая папка…")}</button>` : "<span></span>"}<div class="row" style="gap:8px"><button class="btn g" data-x>${tr("Отмена")}</button><button class="btn" id="obsok">${tr("Подключить")}</button></div></div></div>`;
+    $$("[data-k]", pop).forEach(
+      (b) =>
+        (b.onclick = () => {
+          const p = d.vaults[+b.dataset.k].path;
+          chosen.has(p) ? chosen.delete(p) : chosen.add(p);
+          draw();
+        }),
+    );
+    $("[data-x]", pop).onclick = () => pop.remove();
+    if ($("#obsother", pop))
+      $("#obsother", pop).onclick = async () => {
+        const p = await window.pywebview.api.pick("folder");
+        if (p) {
+          d.vaults.push({ path: p, name: p.split(/[\\/]/).pop(), notes: "", open: false });
+          chosen.add(p);
+          draw();
+        }
+      };
+    $("#obsok", pop).onclick = async () => {
+      const known = new Set(d.vaults.map((v) => v.path));
+      const keep = extraFolders(prof).filter((x) => !known.has(x));
+      await post("/api/agent", { extra_folders: [...keep, ...chosen], team_vault: "" }).catch((e) => toast(e.message));
+      pop.remove();
+      toast(chosen.size ? tr("Obsidian подключён: заметки читаются в фоне") : tr("Obsidian отключён"));
+      viewSettings(SETCUR);
+    };
+  };
+  pop.onclick = (e) => e.target === pop && pop.remove();
+  draw();
+  document.body.appendChild(pop);
+}
+// extra memory folders: the list, with a team folder set before 1.4 as the first one
+function extraFolders(prof) {
+  const out = (prof.extra_folders || []).filter(Boolean);
+  if (prof.team_vault && !out.includes(prof.team_vault)) out.unshift(prof.team_vault);
+  return out;
+}
+// what each mode does with three facts heard in a conversation: into memory, waits for the owner, only noticed
+function autoScene(mode) {
+  const facts = [
+    ["Пилот — 3 ноября", "92%"],
+    ["Любит зелёный чай", "55%"],
+    ["💊 Здоровье", "личное"],
+  ];
+  const fate = {
+    observe: ["fade", "fade", "fade"],
+    approve: ["stop", "stop", "stop"],
+    mixed: ["go", "stop", "stop"],
+    quiet: ["go", "go", "go"],
+  }[mode] || ["go", "stop", "stop"];
+  const saved = fate.filter((f) => f === "go").length;
+  const mid =
+    mode === "observe"
+      ? `<b class="asmid">${ic("eye")}</b>`
+      : fate.includes("stop")
+        ? `<b class="asmid q" title="${tr("ждёт тебя")}">?</b>`
+        : "";
+  return `<div class="autosc m-${mode}"><div class="asn">${ic("chat")}<span>${tr("Разговор")}</span></div>
+    <div class="aslane">${mid}${facts.map(([t, p], i) => `<em class="asf ${fate[i]}" style="--i:${i}"><span>${esc(tr(t))}</span><small>${esc(tr(p))}</small></em>`).join("")}</div>
+    <div class="asn mem">${ic("mem")}<span>${tr("Память")}</span>${saved ? `<i class="ascnt">+${saved}</i>` : ""}</div></div>`;
+}
 const BRAIN_HINT = {
   auto: "Сама выбирает лучшее из того, что есть: Claude по подписке, если он стоит на компьютере, иначе встроенную модель.",
   none: "Понимает только явное: «запомни», поправки, решения.",
@@ -187,8 +521,10 @@ async function viewSettings(arg) {
   });
   if (!$("#st"))
     $("#view").innerHTML = `<div class="page"><div class="wrap setwrap">${APP.demo ? demoBar() : ""}<h1>Настройки</h1>
-  <div class="setlay"><nav class="setnav">${SETSECS.map(([k, i, l]) => `<button data-sec="${k}">${ic(i)}<span>${tr(l)}</span></button>`).join("")}</nav><div id="st"></div></div></div></div>`;
+  <div class="setlay"><nav class="setnav">${SETSECS.map(([k, i, l]) => `<button data-sec="${k}">${ic(i)}<span>${tr(l)}</span></button>`).join("")}<div class="setfoot"><div id="vaultsw"></div><button class="setreset" id="setreset">${ic("redo")}<span>${tr("Настройки по умолчанию")}</span></button></div></nav><div id="st"></div></div></div></div>`;
   $$(".setnav [data-sec]").forEach((b) => (b.onclick = () => showSec(b.dataset.sec)));
+  $("#setreset").onclick = settingsReset;
+  drawVaults();
   bindDemo();
   const save = async (patch, msg) => {
     try {
@@ -230,9 +566,10 @@ async function viewSettings(arg) {
     ${themeCard()}
     ${compCard()}
     ${youCard(prof, ag)}
-    <div class="card" data-sec="learn" id="c-mem"><div class="tg" style="padding:0;border:0"><button class="sw ${MEM.on ? "on" : ""}" id="memsw2"></button><div><b>${tr("Память")}</b><p>${tr(MEM.on ? "Включена: ИИ знают, кто ты и над чем работаешь, Mnema учится по ходу разговора. Claude Code, Cursor и расширение получают ту же память." : "Выключена: обычный чат. ИИ ничего о тебе не знают, Mnema ничего не запоминает, Claude Code, Cursor и расширение память не получают. Всё остальное работает.")}</p></div></div></div>
-    <div class="card ${MEM.on ? "" : "dimmed"}" data-sec="learn" id="c-learn">${MEM.on ? "" : memOffNote("обучение не идёт")}<div class="set"><b>Насколько сама учится${hq("learn")}</b><div>${seg("autonomy", ag.simple.autonomy.choices, simple.autonomy)}<div class="hint" style="margin-top:6px">${esc(AUTO_HINT[simple.autonomy])}</div></div></div>
-    <div class="set"><b>${tr("Что мне можно смотреть")}${hq("outside")}</b><div class="tg" style="padding:0;border:0"><button class="sw ${s.outside !== false ? "on" : ""}" id="outsw"></button><div><b>${tr("Другие программы и браузер")}</b><p>${s.outside === false ? tr("Выключено: учусь только из разговоров в Mnema и работаю с папкой памяти. Чаты Claude Code, заметки, документы, Telegram, браузер и расширение не читаю.") : tr("Можно: читаю только то, что включено ниже. Всё читается на компьютере.")}</p></div></div></div>
+    <div class="card" data-sec="learn" id="c-mem"><div class="tg" style="padding:0;border:0"><button class="sw ${MEM.on ? "on" : ""}" id="memsw2"></button><div><b>${tr("Память")}</b><p>${tr(MEM.on ? "Включена: ИИ знают, кто ты и над чем работаешь, Mnema учится по ходу разговора. Claude Code, Claude Desktop и Cursor получают ту же память." : "Выключена: обычный чат. ИИ ничего о тебе не знают, Mnema ничего не запоминает, Claude Code, Claude Desktop и Cursor память не получают. Всё остальное работает.")}</p></div></div></div>
+    <div class="card ${MEM.on ? "" : "dimmed"}" data-sec="learn" id="c-learn">${MEM.on ? "" : memOffNote("обучение не идёт")}<div class="set"><b>Насколько сама учится${hq("learn")}</b><div>${seg("autonomy", ag.simple.autonomy.choices, simple.autonomy)}${autoScene(simple.autonomy)}<div class="hint" style="margin-top:6px">${esc(AUTO_HINT[simple.autonomy])}</div></div></div>
+    <div class="set"><b>${tr("Вопросы от себя")}</b><div class="tg" style="padding:0;border:0"><button class="sw ${prof.self_ask !== false ? "on" : ""}" id="selfasksw"></button><div><b>${tr("Иногда спрашивать о проекте")}</b><p>${tr("Когда разговор про проект — один вопрос карточкой: устаревший статус или нет цели. Не чаще раза в 40–120 минут.")}</p></div></div></div>
+    <div class="set"><b>${tr("Что Mnema можно смотреть")}${hq("outside")}</b><div class="tg" style="padding:0;border:0"><button class="sw ${s.outside !== false ? "on" : ""}" id="outsw"></button><div><b>${tr("Другие программы и браузер")}</b><p>${s.outside === false ? tr("Выключено: учусь только на разговорах в Mnema. Чаты Claude Code, заметки, документы, Telegram и историю браузера не читаю.") : tr("Можно: читаю только то, что включено ниже. Всё читается на компьютере.")}</p></div></div></div>
     <div class="set srcset"><b>Где учиться<span class="hint">${tr("Нажми на карточку, чтобы включить или выключить")}</span></b><div class="srcgrid ${s.outside === false ? "outoff" : ""}">${Object.entries(
       groups,
     )
@@ -241,7 +578,7 @@ async function viewSettings(arg) {
         const on = s.sources[k].enabled,
           v = SRC_LOOK[k] || ["📘", "#6d5ff5", "#4fb6ff", "Читает новое"];
         const o = s.sources[k].options || {},
-          where = o.path ? String(o.path).replace(/^~/, "~") : "",
+          where = o.path ? String(o.path) : "",
           needs = !on && ["mail", "calendar"].includes(k);
         const lock = s.outside === false && !["mnema_chat", "corrections"].includes(k);
         return `<div class="srct ${on && !lock ? "on" : ""} ${lock ? "locked" : ""}" data-tile="${k}" style="--c1:${v[1]};--c2:${v[2]};--d:${n * 0.06}s">
@@ -303,11 +640,12 @@ async function viewSettings(arg) {
           on = !b.classList.contains("on");
         if (
           on &&
-          !confirm(
-            tr(
-              "Ключ шифрования живёт в твоей учётной записи Windows. Если переустановить Windows без сохранённого ключа восстановления, файлы памяти не открыть. После включения сохрани ключ восстановления. Включить?",
-            ),
-          )
+          !(await ask(
+            "Включить шифрование?",
+            "Ключ шифрования живёт в твоей учётной записи Windows. Если переустановить Windows без сохранённого ключа восстановления, файлы памяти не открыть. После включения сохрани ключ восстановления.",
+            "Включить",
+            false,
+          ))
         )
           return;
         b.disabled = true;
@@ -390,7 +728,7 @@ async function viewSettings(arg) {
       $("#outsw").onclick = async () => {
         await saveL(
           { outside: s.outside === false, found_asked: true },
-          s.outside === false ? tr("Можно смотреть то, что включено") : tr("Только разговоры в Mnema и папка памяти"),
+          s.outside === false ? tr("Можно смотреть то, что включено") : tr("Только разговоры в Mnema"),
         );
         again();
       };
@@ -464,13 +802,12 @@ async function viewSettings(arg) {
     bindProv();
   }
   {
-    const [clients, et] = await Promise.all([api("/api/clients"), api("/api/ext_token")]);
+    const clients = await api("/api/clients");
     $("#st").insertAdjacentHTML(
       "beforeend",
       `
     <div class="card" data-sec="style" id="c-packs"><h2>Наборы <span class="hint">поделиться настройками без личных данных</span></h2><div class="row"><button class="btn l" id="exp">Скачать мой набор</button><label class="btn l" style="cursor:pointer">Загрузить набор<input type="file" id="imp" accept=".json" hidden></label></div></div>
     ${ag.catalog.map((sec, si) => `<div class="card adv-sec" data-sec="style" ${si ? "" : 'id="c-rules"'}><details><summary><h2>${esc(sec.title)} <span class="cnt">${sec.items.filter((i) => i.on).length} из ${sec.items.length}</span></h2></summary>${sec.items.map((i) => `<div class="tg"><button class="sw ${i.on ? "on" : ""}" data-tog="${i.id}" data-on="${i.on ? 1 : 0}"></button><div><b>${esc(i.title)}</b><p>${esc(i.rule)}</p></div></div>`).join("")}</details></div>`).join("")}
-    <div class="card" data-sec="style" id="c-custom"><h2>Своими словами <span class="hint">добавится к правилам</span></h2><div class="fld"><textarea id="custom" placeholder="Например: про деньги всегда сначала спрашивай">${esc(prof.custom || "")}</textarea></div><div class="row" style="margin-top:8px"><button class="btn" id="csave">Сохранить</button></div></div>
     <div class="card" data-sec="learn" id="c-sources"><h2>Обучение по источникам${hq("learn")}</h2>${
       Object.entries(ls.sources)
         .filter(([k]) => s.sources[k].enabled)
@@ -491,43 +828,36 @@ async function viewSettings(arg) {
     <div class="card ${MEM.on ? "" : "dimmed"}" data-sec="security" id="c-access">${MEM.on ? "" : memOffNote("ИИ сейчас ничего не получают")}<h2>Кто из ИИ что видит${hq("access")}<span class="accsaved" id="accsaved">${ic("check")}${tr("Сохранено")}</span></h2>
       <p class="hint" style="margin:-4px 0 12px">${tr("Галочка — эта часть памяти уходит этому ИИ вместе с вопросом. Замок — тема вырезается даже из разрешённых частей. Меняется сразу.")}</p>
       <div class="accwrap" id="accm">${accMatrix(clients)}</div></div>
-    <div class="card" data-sec="style" id="promptcard"><h2>Рецепты задач${hq("prompts")}</h2><p class="hint" style="margin:-4px 0 10px">${tr("Делаешь что-то не в первый раз — отчёт по встрече, пост по заметкам, письмо клиенту? Mnema запишет рецепт: как именно ты это делаешь. Дальше просишь коротко — и она делает так же, без уточнений.")}</p>
+    <div class="card" data-sec="style" id="promptcard"><h2>${tr("Повторяющиеся задачи")}${hq("prompts")}</h2><p class="hint" style="margin:-4px 0 10px">${tr("Делаешь что-то не в первый раз — отчёт по встрече, пост по заметкам, письмо клиенту? Mnema запишет рецепт: как именно ты это делаешь. Дальше просишь коротко — и она делает так же, без уточнений.")}</p>
       <div class="set"><b>${tr("Предлагать записать рецепт")}</b><div>${seg("pmode", { off: "никогда", second: "когда задача повторилась", every: "на каждую задачу" }, PRM_ST.mode)}</div></div>
       <div class="tg" style="padding:12px 0"><button class="sw ${PRM_ST.auto ? "on" : ""}" id="pauto"></button><div><b>${tr("Узнавать задачу и готовить по рецепту")}</b><p>${tr("Попросил знакомое — Mnema сама берёт рецепт, в ответе пометка «по рецепту». Выключено — рецепты лежат, но сама их не берёт.")}</p></div></div>
       <div class="set"><b>${tr("Мои рецепты")}</b><div>${PRM_ST.prompts.length ? `<div class="plist">${PRM_ST.prompts.map((x) => `<div class="pi"><div><b>${esc(x.name)}</b><span>${esc(x.when || "")} · использован ${x.uses} раз</span></div><button class="btn g sm" data-popen="${esc(x.file)}">Открыть</button><button class="btn g sm" data-pdel="${esc(x.file)}">Удалить</button></div>`).join("")}</div>` : '<span class="hint">пока нет — Mnema предложит первый, когда задача повторится</span>'}</div></div></div>
     <div class="card" data-sec="app" id="netcard"><h2>${tr("VPN и прокси")}</h2>
-      <p class="hint" style="margin:-4px 0 12px">${tr("Если ИИ недоступны напрямую. По ключу Mnema подключается сама — приложение VPN для этого не нужно держать открытым. Через VPN идут только запросы Mnema, остальной компьютер он не трогает.")}</p>
-      <div class="vkrow"><select class="inp" id="vksvc">${VK_SVCS.map((x) => `<option ${x === (prof.vpn_service || "Hiddify") ? "selected" : ""}>${esc(x)}</option>`).join("")}</select>
+      <p class="hint" style="margin:-4px 0 12px">${tr("Когда ИИ недоступны напрямую. По ключу Mnema подключается сама, держать приложение VPN открытым не нужно. Через VPN идут только запросы Mnema, остальной компьютер работает как раньше.")}</p>
+      <div class="vkrow"><select class="inp" id="vksvc">${VK_SVCS.map((x) => `<option value="${esc(x)}" ${x === (prof.vpn_service || "Hiddify") ? "selected" : ""}>${esc(tr(x))}</option>`).join("")}</select>
         <button class="btn" id="vkimp">${ic("copy")}${tr("Импортировать ключ")}</button><button class="btn g" id="vkman">${ic("edit")}${tr("Ввести ключ вручную")}</button></div>
       <div class="hint vkhint" id="vkhint"></div>
       <div class="vkbox" id="vkbox" hidden><textarea class="inp" id="vkkey" rows="3" placeholder="vless://…  vmess://…  trojan://…  ss://…  ${tr("или ссылка подписки")} https://…"></textarea><div class="row" style="margin-top:8px;gap:8px"><button class="btn" id="vkgo">${tr("Подключиться")}</button><span class="hint" id="vkmsg"></span></div></div>
       <div class="vkstat" id="vkstat"></div>
       <details class="vkold"><summary>${tr("Или через уже запущенный VPN (Hiddify, Happ…) или свой прокси")}</summary>${proxyForm(prof.vpn_key_on ? "" : prof.proxy || "", ag.proxy_password_set, ag.proxy_system)}</details>
       <div class="hint" style="margin-top:10px">${tr("Сейчас запросы идут")}: <b>${esc(ag.proxy_used || tr("напрямую"))}</b></div></div>
-    <div class="card" data-sec="engine" id="c-economy"><h2>Экономия токенов${hq("economy")}</h2><div class="set"><b>Экономить на компьютере</b><div><div class="row" style="gap:10px"><button class="sw ${prof.economy !== false ? "on" : ""}" id="ecosw" title="Экономия токенов"></button></div></div></div>
-      <div class="set"><b>Поиск в интернете${hq("web")}</b><div><div class="fld"><span>Ключ Brave Search, если хочешь стабильнее (необязательно)</span><input id="bravek" type="password" placeholder="${ag.brave_set ? "ключ сохранён" : "пусто — бесплатные поисковики"}"></div><div class="row" style="margin-top:8px"><button class="btn" id="bsave">Сохранить ключ</button>${ag.brave_set ? '<button class="btn g" id="bdel">Убрать ключ</button>' : ""}</div></div></div></div>
     <div class="card" data-sec="app" id="c-acts"><h2>${tr("Действия с файлами")}</h2>
       <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.tools !== false ? "on" : ""}" id="actsw"></button><div><b>${tr("Модель может читать и создавать файлы")}</b><p>${tr("Читать, искать, создавать и править файлы, делать PDF, Word и Excel, записывать в память. Программы не запускаются, в интернет ничего не уходит. Любую запись можно откатить: «Память» → «История».")}</p></div></div>
       <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.tools_ask ? "on" : ""}" id="actask-sw"></button><div><b>${tr("Спрашивать разрешение на каждое действие")}</b><p>${tr("Выключено: Mnema делает сразу. Каждая запись всё равно в журнале и откатывается в «Память» → «История».")}</p></div></div>
       <div class="set"><b>${tr("Где можно")}</b><div><div class="actfolders"><div class="actf"><span>${tr("Папка памяти")}</span><code data-noi18n>${esc(ACH.folder || "")}</code></div>${(prof.tool_folders || []).map((f, k) => `<div class="actf"><span>${tr("Рабочая папка")}</span><code data-noi18n>${esc(f)}</code><button class="btn g sm" data-actdel="${k}">${tr("Убрать")}</button></div>`).join("")}</div>
       <div class="row" style="margin-top:8px"><input id="actnew" class="inp" style="min-width:320px" placeholder="${tr("папка, где можно работать")}">${window.pywebview ? `<button class="btn l" id="actpick">${tr("Выбрать…")}</button>` : ""}<button class="btn" id="actadd">${tr("Добавить")}</button></div></div></div></div>
-    <div class="card" data-sec="app" id="c-team"><h2>Общая память команды${hq("team")}</h2><div class="row"><input id="team" class="inp" style="min-width:380px" value="${esc(prof.team_vault || "")}" placeholder="папка общей памяти">${window.pywebview ? '<button class="btn l" id="tpick">Выбрать…</button>' : ""}<button class="btn" id="tsave">Сохранить</button></div></div>
-    <div class="card" data-sec="ai" id="c-ext"><h2>Расширение для ChatGPT и Gemini${hq("extension")}</h2>
-      <ol class="extsteps"><li>${tr("Нажми «Открыть папку расширения» — Mnema положит его на компьютер и откроет папку.")}</li>
-      <li>${tr("В Chrome, Edge или Яндекс Браузере открой страницу расширений (chrome://extensions), включи «Режим разработчика».")}</li>
-      <li>${tr("Нажми «Загрузить распакованное» и выбери эту папку. В настройках расширения вставь токен ниже.")}</li></ol>
-      <div class="row" style="margin:6px 0 10px"><button class="btn sm" id="extopen">${tr("Открыть папку расширения")}</button></div>
-      <code class="tok">${esc(et.token)}</code>${APP.port && APP.port != 7461 ? `<p class="hint">Порт приложения: <b>${APP.port}</b> — укажи его в настройках расширения.</p>` : ""}</div>`,
+    <div class="card" data-sec="app" id="c-team"><h2>${tr("Дополнительные папки памяти")}${hq("team")}</h2>
+      <div class="row" style="margin:-2px 0 12px"><button class="btn obsbtn" id="obsconnect">${OBS_LOGO}${tr("Подключить Obsidian")}</button></div>
+      <div class="actfolders" id="xfolders">${extraFolders(prof)
+        .map(
+          (f, k) =>
+            `<div class="actf"><span>${tr("Папка")}</span><code data-noi18n>${esc(f)}</code><button class="btn g sm" data-xdel="${k}">${tr("Убрать")}</button></div>`,
+        )
+        .join("")}</div>
+      <div class="row" style="margin-top:8px"><input id="team" class="inp" style="min-width:320px" placeholder="${tr("папка с заметками или другой памятью")}">${window.pywebview ? `<button class="btn l" id="tpick">${tr("Выбрать…")}</button>` : ""}<button class="btn" id="tsave">${tr("Добавить")}</button></div></div>
+    <div class="card tgc" data-sec="learn" id="c-tg"><h2>Telegram</h2><p class="hint">${tr("загружаю…")}</p></div>
+`,
     );
-    if ($("#extopen"))
-      $("#extopen").onclick = async () => {
-        try {
-          const r = await post("/api/extension/open", {});
-          toast(tr("Папка расширения") + ": " + r.folder, 6000);
-        } catch (e) {
-          toast(e.message, 6000);
-        }
-      };
     $("#exp").onclick = async () => {
       const p = await api("/api/agent/pack");
       const a = document.createElement("a");
@@ -557,7 +887,6 @@ async function viewSettings(arg) {
           $(".cnt", sec).textContent = `${$$(".sw.on", sec).length} из ${$$(".sw", sec).length}`;
         }),
     );
-    $("#csave").onclick = () => save({ custom: $("#custom").value }, "Сохранено");
     $$("#st .adv-only [data-seg],#c-sources [data-seg],#promptcard [data-seg]").forEach((sg) =>
       $$("button", sg).forEach(
         (b) =>
@@ -614,12 +943,40 @@ async function viewSettings(arg) {
       if (v) saveL({ never: [...s.never, v] }, "Добавлено").then(again);
     };
     bindAcc(clients);
+    drawTg();
     if ($("#tpick"))
       $("#tpick").onclick = async () => {
         const p = await window.pywebview.api.pick("folder");
         if (p) $("#team").value = p;
       };
-    $("#tsave").onclick = () => save({ team_vault: $("#team").value.trim() }, "Сохранено");
+    $("#tsave").onclick = async () => {
+      const v = $("#team").value.trim();
+      if (!v) return toast(tr("Укажи папку"));
+      await save(
+        { extra_folders: [...extraFolders(prof).filter((x) => x !== v), v], team_vault: "" },
+        "Папка добавлена",
+      );
+      viewSettings(SETCUR);
+    };
+    $("#obsconnect").onclick = () => obsidianPick(prof);
+    api("/api/obsidian") // an Obsidian vault in the list wears its logo
+      .then((d) =>
+        $$("#xfolders .actf").forEach((row, k) => {
+          const f = d.folders[k];
+          if (f && f.obsidian) row.querySelector("span").innerHTML = OBS_LOGO + "Obsidian";
+        }),
+      )
+      .catch(() => {});
+    $$("[data-xdel]").forEach(
+      (b) =>
+        (b.onclick = async () => {
+          await save(
+            { extra_folders: extraFolders(prof).filter((_, k) => k !== +b.dataset.xdel), team_vault: "" },
+            "Папка убрана",
+          );
+          viewSettings(SETCUR);
+        }),
+    );
     const actFolders = prof.tool_folders || [];
     if ($("#actsw"))
       $("#actsw").onclick = async (e) => {
@@ -628,6 +985,12 @@ async function viewSettings(arg) {
         await save({ tools: on }, on ? "Действия с файлами включены" : "Действия с файлами выключены");
       };
     if ($("#memsw2")) $("#memsw2").onclick = () => memSet(!MEM.on);
+    if ($("#selfasksw"))
+      $("#selfasksw").onclick = async (e) => {
+        const on = !e.currentTarget.classList.contains("on");
+        e.currentTarget.classList.toggle("on", on);
+        await save({ self_ask: on }, on ? "Буду иногда спрашивать о проектах" : "Сама больше не спрашиваю");
+      };
     if ($("#actask-sw"))
       $("#actask-sw").onclick = async (e) => {
         const on = !e.currentTarget.classList.contains("on");
@@ -663,7 +1026,8 @@ async function viewSettings(arg) {
     $$("[data-pdel]").forEach(
       (b) =>
         (b.onclick = async () => {
-          if (!confirm("Удалить рецепт?")) return;
+          if (!(await ask("Удалить повторяющуюся задачу?", "Mnema забудет рецепт и перестанет делать задачу по нему.")))
+            return;
           await post("/api/prompts/delete", { file: b.dataset.pdel });
           again();
         }),
@@ -676,25 +1040,6 @@ async function viewSettings(arg) {
         const cur = $("#netcard .hint b:last-of-type");
       }
     });
-    $("#ecosw").onclick = async (e) => {
-      const on = !e.currentTarget.classList.contains("on");
-      e.currentTarget.classList.toggle("on", on);
-      await save({ economy: on }, on ? "Экономлю токены" : "Отправляю модели всё целиком");
-    };
-    $("#bsave").onclick = async () => {
-      const k = $("#bravek").value.trim();
-      if (!k) {
-        toast("Вставь ключ");
-        return;
-      }
-      await save({ brave_key: k }, "Ключ сохранён на этом компьютере");
-      again();
-    };
-    if ($("#bdel"))
-      $("#bdel").onclick = async () => {
-        await save({ brave_key: "" }, "Ключ убран");
-        again();
-      };
   }
   decorateToggles($("#st"));
   showSec(sec, card);
@@ -732,7 +1077,6 @@ const AI_LOOK = {
   "claude-code": [">_", "#d97757", "#f4a582"],
   "claude-desktop": ["C", "#c2410c", "#fb923c"],
   cursor: ["⌘", "#1f2937", "#6b7280"],
-  extension: ["🧩", "#10a37f", "#4285f4"],
 };
 const aiLook = (k, name) => AI_LOOK[k] || [(name || "?").slice(0, 1), "#64748b", "#94a3b8"];
 const aiMedal = (k, name, cls = "") => {
@@ -743,7 +1087,6 @@ const OUT_AI = [
   ["claude-code", "Claude Code", "память в каждой сессии через MCP"],
   ["claude-desktop", "Claude Desktop", "память в приложении Claude через MCP"],
   ["cursor", "Cursor", "правила и проекты в редакторе через MCP"],
-  ["extension", "ChatGPT и Gemini", "в браузере, через расширение Mnema для Chrome"],
 ];
 // the AI that answers by default: a hero with its medal, the choice right there
 function modelHero(ms, allModels, cur) {
@@ -774,12 +1117,9 @@ function provTile(p, n = 0) {
     ${p.id === "local" || p.id === "claude_code" ? "" : `<div class="more" hidden>${p.needs_key ? `<input class="inp" type="password" placeholder="${tr("ключ")}" value="${esc(p.key)}" data-k>` : `<input class="inp" placeholder="http://127.0.0.1:11434" value="${esc(p.endpoint)}" data-e>`}<button class="btn sm" data-pk>${tr("Сохранить и найти модели")}</button><button class="btn g sm" data-less>${tr("Отмена")}</button></div>`}</div>`;
 }
 function outTile(k, name, note, on, n = 0) {
-  const act =
-    k === "extension"
-      ? `<button class="btn g sm" data-ext>${tr("Показать токен")}</button>`
-      : `<button class="btn g sm" data-con="${k}">${tr(on ? "Обновить" : "Подключить")}</button>`;
+  const act = `<button class="btn g sm" data-con="${k}">${tr(on ? "Обновить" : "Подключить")}</button>`;
   const [, c1, c2] = aiLook(k, name);
-  return `<div class="aitile out ${on ? "on" : ""}" data-out="${k}" style="--c1:${c1};--c2:${c2};--d:${n * 0.05}s">${aiStatus(on, k === "extension" ? tr("по токену") : on === null ? "…" : tr(on ? "подключено" : "не подключено"))}
+  return `<div class="aitile out ${on ? "on" : ""}" data-out="${k}" style="--c1:${c1};--c2:${c2};--d:${n * 0.05}s">${aiStatus(on, on === null ? "…" : tr(on ? "подключено" : "не подключено"))}
     <span class="aipipe"><span class="aim">M</span><i></i>${aiMedal(k, name)}</span><b>${esc(name)}</b><small>${esc(tr(note))}</small>
     <div class="aift">${act}</div></div>`;
 }
@@ -803,15 +1143,12 @@ function bindTiles(fetch = true) {
       }),
   );
   $$(".aitile [data-lm]").forEach((b) => (b.onclick = () => localModal()));
-  $$(".aitile [data-ext]").forEach((b) => (b.onclick = () => goSet("ai/c-ext")));
   if (fetch)
     api("/api/connect")
       .then((st) => {
         const g = $("#conngrid");
         if (!g) return;
-        g.innerHTML = OUT_AI.map(([k, n, note], i) => outTile(k, n, note, k === "extension" ? false : !!st[k], i)).join(
-          "",
-        );
+        g.innerHTML = OUT_AI.map(([k, n, note], i) => outTile(k, n, note, !!st[k], i)).join("");
         bindTiles(false);
       })
       .catch(() => {});
@@ -912,7 +1249,7 @@ const CONS_FORMATS = {
     first: "own",
     middle: ["check", "better", "dispute"],
     last: "final",
-    art: "⟲",
+    art: "🏛️",
   },
   debate: {
     n: "Дебаты",
@@ -920,7 +1257,7 @@ const CONS_FORMATS = {
     first: "pos",
     middle: ["rebut"],
     last: "verdict",
-    art: "⇄",
+    art: "⚖️",
   },
   brainstorm: {
     n: "Мозговой штурм",
@@ -928,7 +1265,7 @@ const CONS_FORMATS = {
     first: "ideas",
     middle: ["grow"],
     last: "best",
-    art: "✦",
+    art: "💡",
   },
   redteam: {
     n: "Красная команда",
@@ -936,7 +1273,15 @@ const CONS_FORMATS = {
     first: "attack",
     middle: ["fix", "attack"],
     last: "risks",
-    art: "⚑",
+    art: "🎯",
+  },
+  roast: {
+    n: "Прожарка",
+    d: "жёстко и по делу разбирают идею, резюме или текст, в конце оценка из 10",
+    first: "roast",
+    middle: ["roast2"],
+    last: "score",
+    art: "🔥",
   },
 };
 const CONS_ROLES = {
@@ -964,6 +1309,9 @@ const CONS_STAGE = {
   attack: ["Атака", "ищут, что сломается в твоём плане"],
   fix: ["Как закрыть", "как закрыть самые опасные дыры"],
   risks: ["Риски и что делать", "список: риск, опасность, действие"],
+  roast: ["Прожарка", "три самых слабых места, жёстко и по делу"],
+  roast2: ["Добивка", "что пропустили, кого зря задели"],
+  score: ["Оценка", "оценка из 10 и три правки"],
   own: ["Свой ответ", "каждый отвечает на вопрос сам, прямо и по делу"],
   check: ["Проверка", "ищут слабые места в ответах друг друга"],
   better: ["Улучшение", "собирают лучший ответ из сильного у всех"],
@@ -1017,7 +1365,7 @@ function consScheme(sel, fmt, summ) {
     .join("");
   return `<div class="cschem f-${fmt}"><svg viewBox="0 0 172 172">${arcs}</svg><div class="cschem-table"><span>${CONS_FORMATS[fmt].art}</span></div>${seats}</div>`;
 }
-async function consortModal(full = false) {
+async function consortModal(full = false, preset = "") {
   await refreshProviders();
   const cur = CHAT.cons,
     edit = !!(CHAT.id && cur);
@@ -1035,7 +1383,7 @@ async function consortModal(full = false) {
   let sel = cur ? [...cur.members] : join && CHAT.model && CHAT.model !== "consortium" ? [CHAT.model] : [],
     rounds = cur ? cur.rounds : 2;
   const def = LS.get("cons_def", {});
-  let fmt = (cur && cur.format) || def.format || "council",
+  let fmt = preset || (cur && cur.format) || def.format || "council",
     roles = { ...(def.roles || {}), ...((cur && cur.roles) || {}) },
     summ = (cur && cur.summarizer) || "",
     len = (cur && cur.length) || def.length || "normal",
@@ -1053,7 +1401,7 @@ async function consortModal(full = false) {
     if (summ && !sel.includes(summ)) summ = "";
     pop.innerHTML = adv
       ? `<div class="card cm2 ${adv ? "adv" : "simple"}"><div class="cmhead"><div class="cmic">${ic("users")}</div><div><h2>${join ? tr("Подключить консорциум к этому разговору") : tr("Консорциум — совет из нескольких ИИ")}${hq("consortium")}</h2>
-      <p>${join ? tr("ИИ прочитают разговор выше и разберут твой последний вопрос, где прошлый ответ не помог.") : tr("Задаёшь вопрос — несколько ИИ разбирают его по кругам: каждый отвечает, проверяет других и вместе они приходят к одному ответу. Помогает, когда вопрос спорный или от ответа много зависит.")}</p></div><button class="lmx" id="cmx2">×</button></div>
+      <p>${join ? tr("ИИ прочитают разговор выше и разберут твой последний вопрос, где прошлый ответ не помог.") : tr("Задаёшь вопрос — несколько ИИ разбирают его по кругам: каждый отвечает, проверяет других, и вместе они приходят к одному ответу. Помогает, когда вопрос спорный или от ответа много зависит.")}</p></div><button class="lmx" id="cmx2">×</button></div>
      <div class="cmsec"><b>1. ${tr("Кто в совете")}</b>${hq("cons_members")}<span class="hint">${tr("от 2 до 4 · по порядку выступлений")}</span></div>
      <div class="cmgrid">${ready
        .map((p) =>
@@ -1124,7 +1472,7 @@ async function consortModal(full = false) {
      <div class="cmfoot"><button class="btn g cmadvb" id="cmsimple">← ${tr("Проще")}</button><span class="hint">${n >= 2 ? `${tr("Выступлений")}: ${n} × ${rounds} = <b>${n * rounds}</b> · ${tr("вмешаться и поставить на паузу можно в любой момент")}` : tr("Выбери хотя бы двух участников")}</span>
        <div class="row" style="gap:8px">${edit ? `<button class="btn g" id="cmoff">${tr("Выйти из консорциума")}</button>` : ""}<button class="btn g" id="cmx">${tr("Отмена")}</button><button class="btn" id="cmgo" ${n < 2 ? "disabled" : ""}>${edit ? tr("Сохранить") : join ? tr("Обсудить этот разговор") : tr("Собрать совет")}</button></div></div></div>`
       : `<div class="card cm2 ${adv ? "adv" : "simple"}"><div class="cmhead"><div class="cmic">${ic("users")}</div><div><h2>${join ? tr("Подключить консорциум к этому разговору") : tr("Консорциум — совет из нескольких ИИ")}${hq("consortium")}</h2>
-      <p>${join ? tr("ИИ прочитают разговор выше и разберут твой последний вопрос, где прошлый ответ не помог.") : tr("Задаёшь вопрос — несколько ИИ разбирают его по кругам: каждый отвечает, проверяет других и вместе они приходят к одному ответу. Помогает, когда вопрос спорный или от ответа много зависит.")}</p></div><button class="lmx" id="cmx2">×</button></div>
+      <p>${join ? tr("ИИ прочитают разговор выше и разберут твой последний вопрос, где прошлый ответ не помог.") : tr("Задаёшь вопрос — несколько ИИ разбирают его по кругам: каждый отвечает, проверяет других, и вместе они приходят к одному ответу. Помогает, когда вопрос спорный или от ответа много зависит.")}</p></div><button class="lmx" id="cmx2">×</button></div>
      <div class="cmsec"><b>1. ${tr("Кто в совете")}</b>${hq("cons_members")}<span class="hint">${tr("от 2 до 4 · по порядку выступлений")}</span></div>
      <div class="cmgrid">${ready
        .map((p) =>
@@ -1470,7 +1818,7 @@ async function connectModal(pid) {
     const list = models || p.models;
     pop.innerHTML = `<div class="card"><h2>${esc(p.name)} <span class="hint">${p.ready ? "подключено" : "не подключено"}</span></h2>
     <div class="how">${esc(how.t)}${how.u ? ` <a href="#" id="openu" style="color:var(--acc)">Открыть сайт</a>` : ""}</div>
-    ${pid === "claude_code" ? "" : p.needs_key ? `<div class="fld"><span>Ключ API хранится в Windows, не в папке памяти</span><input id="pkey" type="password" placeholder="${p.key ? "сохранён " + esc(p.key) : "вставь ключ"}"></div>` : `<div class="fld"><span>Адрес</span><input id="pend" value="${esc(p.endpoint)}" placeholder="http://127.0.0.1:11434"></div>`}
+    ${pid === "claude_code" ? "" : p.needs_key ? `<div class="fld"><span>Ключ API хранится в защищённом хранилище системы, не в папке памяти</span><input id="pkey" type="password" placeholder="${p.key ? "сохранён " + esc(p.key) : "вставь ключ"}"></div>` : `<div class="fld"><span>Адрес</span><input id="pend" value="${esc(p.endpoint)}" placeholder="http://127.0.0.1:11434"></div>`}
     <div class="row" style="margin-top:10px"><button class="btn" id="pgo">${pid === "claude_code" ? "Проверить снова" : "Проверить и найти модели"}</button><span class="hint" id="pmsg">${esc(msg || "")}</span></div>
     ${list.length ? `<div class="fld" style="margin-top:12px"><span>Выбери модель (${list.length})</span><input id="pq" placeholder="поиск"></div><div class="mlist" id="pml">${list.map((x) => `<button data-pm="${esc(x.id || x)}">${esc(x.name || x)}</button>`).join("")}</div>` : ""}
     <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn g sm" id="pclose">Закрыть</button></div></div>`;
@@ -1617,7 +1965,6 @@ function youCard(prof, ag) {
           .map(([k, l]) => `<button data-v="${k}" class="${(prof.gender || "") === k ? "on" : ""}">${l}</button>`)
           .join("")}</div></div>
       </div>
-      <div class="ypv" id="ypv">${youPreview(prof, ag)}</div>
     </div>
     <div class="ychar"><div class="ylab">${tr("Характер")}${hq("presets")}</div><div class="yprs">${Object.entries(
       ag.presets,
@@ -1627,6 +1974,7 @@ function youCard(prof, ag) {
         return `<button data-pr="${k}" class="ypr ${pr === k ? "on" : ""}" style="--c1:${c1};--c2:${c2};--d:${n * 0.06}s"><span class="medal2"><span>${em}</span><i class="spark"></i><i class="spark"></i><i class="spark"></i></span><span class="yprt"><b>${esc(p.name)}</b><span>${esc(p.note)}</span><span class="ylvl">${tr("Проверки")}<i>${[1, 2, 3].map((x) => `<em class="${x <= lvl ? "f" : ""}"></em>`).join("")}</i></span></span>${pr === k ? `<span class="yok">${ic("check")}</span>` : ""}</button>`;
       })
       .join("")}</div></div>
+    <div class="ypv" id="ypv">${youPreview(prof, ag)}</div>
   </div>`;
 }
 

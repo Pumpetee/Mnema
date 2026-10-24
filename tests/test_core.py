@@ -13,6 +13,7 @@ from mnema.clients import get_client, load_clients, save_clients  # noqa: E402
 from mnema.journal import UndoError, events, undo  # noqa: E402
 from mnema.memory import PermissionDenied, context_for, init_vault, remember, split_chunks  # noqa: E402
 from mnema.vault import Vault, dump_frontmatter, parse_frontmatter  # noqa: E402
+from hidden_topics import lock_cloud  # noqa: E402
 
 TODAY = dt.date(2026, 10, 18)
 
@@ -141,6 +142,7 @@ class TestVault(Base):
 
 class TestContext(Base):
     def test_chatgpt_sees_projects_not_money_or_people(self):
+        lock_cloud(self.v)
         text, parts = context_for(self.v, "chatgpt", today=TODAY)
         self.assertIn("Сайт", text)
         self.assertNotIn("100к", text)
@@ -150,6 +152,7 @@ class TestContext(Base):
         self.assertEqual(parts, 1)
 
     def test_gemini_now_layer_has_no_projects(self):
+        lock_cloud(self.v)
         text, _ = context_for(self.v, "gemini", today=TODAY)
         self.assertIn("Иван", text)
         self.assertNotIn("показать макет", text)
@@ -174,6 +177,7 @@ class TestContext(Base):
         self.assertEqual((text, parts), ("", 0))
 
     def test_read_is_journaled(self):
+        lock_cloud(self.v)
         context_for(self.v, "chatgpt", today=TODAY)
         ev = events(self.v)[0]
         self.assertEqual((ev["client"], ev["action"]), ("chatgpt", "read"))

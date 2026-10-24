@@ -8,7 +8,8 @@ inside the package; what Windows itself must provide is checked against what a c
 
 Windows  → dist/Mnema-Setup-<version>.exe (installer) and dist/Mnema-<version>-windows-x64.zip (portable)
 macOS    → dist/Mnema-<version>-macos-<arm64|x64>.dmg — Mnema.app, drag it to Applications
-Linux    → dist/Mnema-<version>-linux-<x86_64|aarch64>.AppImage (one file) and the same as a .tar.gz folder
+Linux    → dist/Mnema-<version>-<x86_64|aarch64>.AppImage (one file, with its .zsync for updates) and the same as a
+           .tar.gz folder (Mnema-<version>-linux-<arch>.tar.gz)
 
 Every package is started once after the build: its own CLI makes a memory folder and serves it, and the local model
 engine inside answers --version. Each file gets a .sha256 beside it.
@@ -19,9 +20,11 @@ from __future__ import annotations
 import hashlib
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
+import time
 import zipfile
 from pathlib import Path
 
@@ -320,6 +323,7 @@ def build_macos(skip_tests: bool) -> Path:
     return dmg
 
 
+APP_ID = "io.github.pumpetee.mnema"  # the AppStream id: the catalogs know Mnema by it
 DESKTOP = """[Desktop Entry]
 Type=Application
 Name=Mnema
@@ -387,13 +391,30 @@ def build_linux(skip_tests: bool) -> Path:
         '#!/bin/sh\nHERE="$(dirname "$(readlink -f "$0")")"\nexec "$HERE/usr/lib/mnema/Mnema" "$@"\n', encoding="utf-8"
     )
     (appdir / "AppRun").chmod(0o755)
-    (appdir / "mnema.desktop").write_text(DESKTOP, encoding="utf-8")
+    share = appdir / "usr" / "share"
+    for d in (appdir, share / "applications"):
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"{APP_ID}.desktop").write_text(DESKTOP, encoding="utf-8")
     shutil.copy2(ROOT / "packaging" / "mnema.png", appdir / "mnema.png")
-    img = out / f"Mnema-{version()}-linux-{arch}.AppImage"
+    icons = share / "icons" / "hicolor" / "512x512" / "apps"
+    icons.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / "packaging" / "mnema.png", icons / "mnema.png")
+    # the name, the description and the screenshots of the main window the catalogs show; this release's date
+    meta = (ROOT / "packaging" / f"{APP_ID}.metainfo.xml").read_text(encoding="utf-8")
+    meta = re.sub(
+        r'<release version="[^"]*" date="[^"]*"/>',
+        f'<release version="{version()}" date="{time.strftime("%Y-%m-%d")}"/>',
+        meta,
+    )
+    (share / "metainfo").mkdir(parents=True, exist_ok=True)
+    (share / "metainfo" / f"{APP_ID}.metainfo.xml").write_text(meta, encoding="utf-8")
+    img = out / f"Mnema-{version()}-{arch}.AppImage"  # AppImages are Linux only: the name doesn't say it again
     img.unlink(missing_ok=True)
     say("AppImage")
+    # update information: AppImageUpdate and the like find the newest release on GitHub through the .zsync beside it
+    update = f"gh-releases-zsync|Pumpetee|Mnema|latest|Mnema-*-{arch}.AppImage.zsync"
     r = subprocess.run(
-        [str(tool), "--appimage-extract-and-run", str(appdir), str(img)],
+        [str(tool), "--appimage-extract-and-run", "-u", update, str(appdir), str(img)],
         capture_output=True,
         text=True,
         env=dict(os.environ, ARCH=arch),
@@ -402,6 +423,8 @@ def build_linux(skip_tests: bool) -> Path:
         print(r.stdout[-3000:], r.stderr[-3000:])
         raise SystemExit("AppImage не собрался")
     shutil.rmtree(appdir, ignore_errors=True)
+    if not img.with_name(img.name + ".zsync").exists():
+        say("AppImage без .zsync: обновление через AppImageUpdate не заработает")
     sha_file(img)
     return img
 

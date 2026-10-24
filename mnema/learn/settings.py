@@ -38,7 +38,6 @@ SOURCES = {
         "group": "Разговоры с ИИ",
         "options": {"path": "~/.claude/projects"},
     },
-    "browser": {"name": "ChatGPT и Gemini (через расширение)", "group": "Разговоры с ИИ", "options": {}},
     "chatgpt_export": {
         "name": "Выгрузка ChatGPT (conversations.json)",
         "group": "Разговоры с ИИ",
@@ -55,6 +54,12 @@ SOURCES = {
         "name": "Почта (отправленные письма)",
         "group": "Почта и Telegram",
         "options": {"host": "", "user": "", "password": "", "folder": "", "days": 30},
+    },
+    "telegram_api": {
+        "name": "Telegram (переписка через API)",
+        "group": "Почта и Telegram",
+        "options": {},
+        "note": "Переписка в чатах, которые ты выбрал: твои сообщения и собеседников. Только чтение. Вход и чаты — Настройки → Обучение → Telegram.",
     },
     "telegram": {
         "name": "Telegram (выгрузка из Telegram Desktop)",
@@ -180,7 +185,8 @@ def load(vault: Vault) -> dict:
 
 
 def _drop_gone(s: dict) -> None:
-    """Sources that no longer exist (the web search «Мир вокруг», removed 21.10.2026) leave old settings."""
+    """Sources that no longer exist (the web search «Мир вокруг», removed 21.10.2026; the browser extension for ChatGPT
+    and Gemini, removed 24.10.2026) leave old settings."""
     s["sources"] = {k: v for k, v in s["sources"].items() if k in SOURCES}
     s["found"] = {k: v for k, v in (s.get("found") or {}).items() if k in SOURCES}
 

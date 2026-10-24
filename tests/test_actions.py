@@ -15,6 +15,7 @@ from mnema.chat import engine as CH, providers as PR, tools as TL  # noqa: E402
 from mnema.journal import events, undo  # noqa: E402
 from mnema.memory import init_vault, remember  # noqa: E402
 from mnema.vault import Vault  # noqa: E402
+from hidden_topics import lock_cloud  # noqa: E402
 
 
 def _vault(folder: Path | None = None) -> Vault:
@@ -140,6 +141,7 @@ class ActionsTest(unittest.TestCase):
 
     def test_a_hidden_note_is_read_under_the_rules_of_the_ai(self):
         v = _vault()
+        lock_cloud(v)
         remember(v, "MONEYREAD долг 900 тысяч", "card:Деньги #money")
         remember(v, "OPENREAD теннис", "card:Деньги")
         p = v.root / "70 Memory" / "Cards" / "Деньги.md"

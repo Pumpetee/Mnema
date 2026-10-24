@@ -46,7 +46,20 @@ if not RU:  # the starting lines of a fresh memory, as an English speaker would 
         ).replace("Стиль: коротко и по делу.", "Style: short and to the point.")
         if t2 != t:
             f.write_text(t2, encoding="utf-8")
-P.save(v, {"lang": LANG, "owner_name": T("Иван", "Alex"), "gender": "m", "tools_ask": False})
+P.save(
+    v,
+    {
+        "lang": LANG,
+        "owner_name": T("Иван", "Alex"),
+        "gender": "m",
+        "tools_ask": False,
+        "memory_on": True,
+        "memory_asked": True,
+    },
+)
+import random  # noqa: E402
+
+random.seed(7)  # the quiz shows the same facts every time
 WORK = DEMO / T("Документы", "Documents")
 WORK.mkdir(parents=True, exist_ok=True)
 P.save(v, {"tool_folders": [str(WORK)]})
@@ -170,6 +183,7 @@ for pid, models in (
 ):
     PR.save(v, pid, models=models, key="sk-demo-0000000000000000")
 localllm.installed_models = lambda: [m for m in localllm.CATALOG if m["id"] == "gemma-3-4b"]
+PR.claude_signed_in = lambda: True  # the subscription is shown connected, whatever this computer has
 localllm.engine_ok = lambda: True
 P.save(v, {"last_model": "anthropic:claude-sonnet-4-5"})
 
@@ -200,6 +214,51 @@ CONS = {
     ),
 }
 
+# «С памятью и без»: the same AI as a plain chat and through Mnema
+COMPARE_PLAIN = {
+    "anthropic": T(
+        "Я не знаю, кто вы, и не вижу ваших дел. Расскажите о себе — и я помогу составить план на неделю.",
+        "I don't know who you are or what you're working on. Tell me about yourself and I'll help plan your week.",
+    ),
+    "openai": T(
+        "У меня нет информации о вас. Обычно стоит начать с приоритетов: что важно и срочно.",
+        "I have no information about you. A good start is to list what is important and urgent.",
+    ),
+    "gemini": T(
+        "Я ничего о вас не знаю. Напишите, чем занимаетесь, и я подскажу, с чего начать неделю.",
+        "I don't know anything about you. Tell me what you do and I'll suggest where to start the week.",
+    ),
+}
+COMPARE_MINE = {
+    "anthropic": T(
+        "Ты Иван, строишь «Гараж». Главное на неделе — довести пилот до 5 СТО к 3 ноября: дожать двух сомневающихся вместе с Олегом.",
+        "You're Alex, building «Garage». This week: get the pilot to 5 garages by November 3 — close the two hesitant ones with Oleg.",
+    ),
+    "openai": T(
+        "Пилот до старта продаж 3 ноября. Списком, как ты любишь:\n- два СТО — с Олегом до пятницы\n- договор с «Мотором» — среда\n- экран записи — Марина, четверг",
+        "The pilot before sales start on November 3. As a list, the way you like:\n- two garages — with Oleg by Friday\n- the «Motor» contract — Wednesday\n- booking screen — Maria, Thursday",
+    ),
+    "gemini": T(
+        "Цена решена — 4 900 ₽ за точку. Неделя про пилот: 3 СТО подписали, 2 думают. Созвоны ставь после 15:00.",
+        "Pricing is settled — $59 per location. The week is about the pilot: 3 garages signed, 2 thinking. Book calls after 3 pm.",
+    ),
+}
+# «Прожарка»: three AIs take the landing page apart, the last one gives the score
+ROAST = {
+    "anthropic": T(
+        "Первый экран продаёт «AI-платформу», а владельцу СТО нужны деньги. «Минус 30% неявок» должно стоять первым, остальное — потом.",
+        "The first screen sells an «AI platform», but a garage owner wants money. «30% fewer no-shows» goes first, the rest later.",
+    ),
+    "openai": T(
+        "Три тарифа для пилота из пяти сервисов — перебор. Один тариф, одна кнопка «Попробовать месяц бесплатно».",
+        "Three pricing tiers for a five-garage pilot is overkill. One plan, one button: «Try a month free».",
+    ),
+    "gemini": T(
+        "4/10\nИдея сильная, но лендинг продаёт фичи, а не результат.\n- Первый экран: «минус 30% неявок», а не «AI-платформа»\n- Один тариф вместо трёх\n- Отзыв СТО «Мотор» вместо стоковых фото",
+        "4/10\nStrong idea, but the page sells features, not results.\n- First screen: «30% fewer no-shows», not «AI platform»\n- One plan instead of three\n- A quote from «Motor» instead of stock photos",
+    ),
+}
+
 # other conversations in the list: every AI the owner talks to
 OTHER = [
     (
@@ -224,7 +283,8 @@ OTHER = [
     ),
 ]
 TITLES = [(q, t) for _, q, t in OTHER] + [
-    (T("Снижать ли цену", "lower the price"), T("Цена для пилота", "Pilot pricing"))
+    (T("Снижать ли цену", "lower the price"), T("Цена для пилота", "Pilot pricing")),
+    (T("Прожарьте", "Roast my"), T("Прожарка лендинга", "Landing page roast")),
 ]
 
 
@@ -236,7 +296,12 @@ def stream(vault, pid, model, system, messages, stop=None, usage=None, meta=None
         said = " ".join(m.get("text", "") for m in messages)
         yield next((t for k, t in TITLES if k in said), T("План недели", "Week plan"))
         return
-    if (meta or {}).get("purpose") == "консорциум":
+    purpose = (meta or {}).get("purpose")
+    if purpose == "сравнение с памятью и без":
+        text = (COMPARE_MINE if "Память о владельце" in system else COMPARE_PLAIN).get(pid, "…")
+    elif purpose == "консорциум" and "прожарк" in system.lower():
+        text = ROAST.get(pid, "…")
+    elif purpose == "консорциум":
         text = CONS.get(pid, "…")
     elif last.startswith("[Результат действия"):
         text = T(
@@ -426,6 +491,137 @@ with sync_playwright() as p:
     page.wait_for_timeout(2500)
     clean(page)
     shot(page, "consortium")
+
+    def close_modals():
+        page.evaluate("document.querySelectorAll('.modal').forEach(e => e.remove())")
+
+    # 9. «С памятью и без»: the same question, a plain chat and Mnema side by side
+    page.goto(base + "#chat")
+    page.wait_for_timeout(1500)
+    clean(page)
+    PR.claude_signed_in = lambda: False  # the comparison shows three different AIs, not Claude twice
+    page.evaluate("compareView()")
+    page.wait_for_timeout(500)
+    page.click("#cmpgo")
+    page.wait_for_selector(".cmpgrid", timeout=90000)
+    page.wait_for_timeout(600)
+    shot(page, "compare")
+    close_modals()
+    PR.claude_signed_in = lambda: True
+
+    # 10. the quiz: facts from the memory, one by one
+    page.goto(base + "#memory")
+    page.wait_for_timeout(3000)
+    page.evaluate("quizView()")
+    page.wait_for_timeout(1200)
+    page.click(".quizpop [data-v='yes']")
+    page.wait_for_timeout(600)
+    page.click(".quizpop [data-v='yes']")
+    page.wait_for_timeout(600)
+    shot(page, "quiz")
+    close_modals()
+
+    # 11. the interview: a few questions on the first day
+    page.evaluate("interviewView()")
+    page.wait_for_timeout(1200)
+    page.fill(
+        "#inta",
+        T("Иван, основатель «Гаража» — CRM для автосервисов", "Alex, founder of «Garage», a CRM for car services"),
+    )
+    page.click("#intnext")
+    page.wait_for_timeout(600)
+    page.fill("#inta", T("Казань", "Lisbon"))
+    page.click("#intnext")
+    page.wait_for_timeout(600)
+    page.fill("#inta", T("пилот в пяти СТО, найм дизайнера", "the pilot in five garages, hiring a designer"))
+    page.wait_for_timeout(300)
+    shot(page, "interview")
+    close_modals()
+
+    # 12. the roast and its card
+    r = CH.send(
+        v,
+        T(
+            "Прожарьте мой лендинг: «Гараж — AI-платформа для автосервисов», три тарифа, стоковые фото механиков.",
+            "Roast my landing page: «Garage — an AI platform for car services», three pricing tiers, stock photos of mechanics.",
+        ),
+        consortium={
+            "members": ["anthropic:claude-sonnet-4-5", "openai:gpt-4o", "gemini:gemini-2.5-pro"],
+            "rounds": 1,
+            "format": "roast",
+        },
+        learn=False,
+    )
+    wait_done(r["chat"])
+    page.goto(base + "#chat")
+    page.wait_for_timeout(1500)
+    page.locator(".citem", has_text=T("Прожарка лендинга", "Landing page roast")).first.click()
+    page.wait_for_timeout(2500)
+    clean(page)
+    page.locator("[data-share]").last.click()
+    page.wait_for_timeout(1200)
+    shot(page, "roast")
+    close_modals()
+
+    # 13. Telegram: read only, the chats you pick
+    tg = {
+        "set": True,
+        "who": T("Иван", "Alex"),
+        "api_id": "1234567",
+        "phone": "+7",
+        "step": None,
+        "chats": [
+            {"id": "1", "name": T("Олег", "Oleg"), "kind": "user"},
+            {"id": "2", "name": T("Команда «Гаража»", "«Garage» team"), "kind": "group"},
+            {"id": "3", "name": T("Марина", "Maria"), "kind": "user"},
+            {"id": "4", "name": T("Избранное", "Saved Messages"), "kind": "self"},
+        ],
+    }
+    page.route("**/api/telegram", lambda rt: rt.fulfill(json=tg))
+    page.goto(base + "#settings/learn")
+    page.wait_for_timeout(2500)
+    clean(page)
+    card = page.locator("#c-tg")
+    card.scroll_into_view_if_needed()
+    page.wait_for_timeout(400)
+    card.screenshot(path=str(OUT / "telegram.png"))
+    print("saved telegram", flush=True)
+    page.unroute("**/api/telegram")
+
+    # 14. «Подключить Obsidian»: the vaults Obsidian knows, ticked ones become memory
+    home = T("C:\\Users\\ivan\\Documents", "C:\\Users\\alex\\Documents")
+    obs = {
+        "vaults": [
+            {
+                "path": home + "\\" + T("Заметки", "Notes"),
+                "name": T("Заметки", "Notes"),
+                "notes": 1240,
+                "open": True,
+                "ts": 2,
+                "added": False,
+            },
+            {
+                "path": home + "\\" + T("Работа", "Work"),
+                "name": T("Работа", "Work"),
+                "notes": 312,
+                "open": False,
+                "ts": 1,
+                "added": False,
+            },
+        ],
+        "folders": [],
+    }
+    page.route("**/api/obsidian", lambda rt: rt.fulfill(json=obs))
+    page.goto(base + "#settings/app")
+    page.wait_for_timeout(2500)
+    clean(page)
+    page.evaluate("obsidianPick({})")
+    page.wait_for_timeout(800)
+    page.locator(".obspick [data-k='0']").click()
+    page.wait_for_timeout(400)
+    shot(page, "obsidian")
+    close_modals()
+    page.unroute("**/api/obsidian")
 
     # 0. the first picture: the conversation that knows you, filling the window
     week = next(c for c in CH.list_chats(v) if c["title"] == T("План недели", "Week plan"))

@@ -45,7 +45,7 @@ function lmAddPanel(pop, redraw) {
   $("#lmfile", box).onclick = async () => {
     let p = "";
     if (window.pywebview && pywebview.api && pywebview.api.pick) p = await pywebview.api.pick("file");
-    else p = prompt(tr("Путь к файлу .gguf")) || "";
+    else p = (await askText("Путь к файлу .gguf", "", "", "C:\\models\\model.gguf")) || "";
     if (!p) return;
     try {
       const m = await post("/api/local/add_file", { path: p });

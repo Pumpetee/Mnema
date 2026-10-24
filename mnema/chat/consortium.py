@@ -30,7 +30,8 @@ from . import providers as PR
 
 MAX_MEMBERS = 4
 MAX_ROUNDS = 20
-OLD_CHARS = 700
+OLD_CHARS = 1500  # an older message is cut to this many characters…
+KEEP_FULL = 16  # …the last ones go whole
 
 
 def _pretty(mid: str) -> str:
@@ -90,7 +91,7 @@ def clean(cfg: dict | None) -> dict | None:
     for k in ("state", "from"):  # where the discussion stands, what chat it grew from
         if cfg.get(k):
             out[k] = cfg[k]
-    ch = cfg.get("challenge")  # «Поспорить с другими»: one answer, defended by its author, questioned by the rest
+    ch = cfg.get("challenge")  # «Поспорить с разными ИИ»: one answer, defended by its author, questioned by the rest
     if isinstance(ch, dict) and ch.get("answer") and ch.get("by") in out["members"]:
         out["challenge"] = {
             "by": ch["by"],
@@ -204,6 +205,19 @@ STAGES.update(
             "Круг «Как закрыть». Для самых опасных дыр, найденных другими, предложи, как их закрыть или проверить "
             "до запуска.",
         ),
+        "roast": (
+            "Прожарка",
+            "Круг «Прожарка». Разнеси то, что принёс владелец (идею, текст, резюме, план, страницу): три самых слабых "
+            "места, жёстко и по делу, без шуток и без оскорблений самого человека. Каждое — одной-двумя фразами.",
+        ),
+        "roast2": (
+            "Добивка",
+            "Круг «Добивка». Добавь то, что другие пропустили, или заступись, если кто-то придрался зря. Без повторов.",
+        ),
+        "score": (
+            "Оценка",
+            "Круг «Оценка». Подведи итог прожарки: насколько всё плохо и что чинить первым.",
+        ),
         "risks": (
             "Риски и что делать",
             "Круг «Риски и что делать». Сведи всё в список: риск, насколько опасен, что сделать. "
@@ -218,6 +232,7 @@ FORMATS = {
     "debate": {"name": "Дебаты", "first": "pos", "middle": ("rebut",), "last": "verdict"},
     "brainstorm": {"name": "Мозговой штурм", "first": "ideas", "middle": ("grow",), "last": "best"},
     "redteam": {"name": "Красная команда", "first": "attack", "middle": ("fix", "attack"), "last": "risks"},
+    "roast": {"name": "Прожарка", "first": "roast", "middle": ("roast2",), "last": "score"},
 }
 ROLES = {
     "": "",
@@ -284,22 +299,50 @@ JOINED = (
     "\nВладелец подключил вас к разговору, который уже шёл с {model}: ясности там не получилось. Разговор выше — "
     "контекст; отвечайте на последний вопрос владельца, учитывая, где прошлый ответ не помог."
 )
+ROAST_FINAL = (
+    "\n\nТЫ ПОДВОДИШЬ ИТОГ ПРОЖАРКИ. Первая строка — только оценка в виде «N/10», где N — честное целое от 1 до 10, "
+    "без других слов. Вторая — вердикт одной фразой. Потом ровно три пункта «- …»: что исправить первым, по одной "
+    "строке. Не больше {fwords} слов."
+)
+ROAST_RE = re.compile(r"^\W*(\d{1,2})\s*/\s*10\b", re.M)
 FINAL = (
     "\n\nТЫ ПОДВОДИШЬ ИТОГ. Начни со слова «Итог:» и сразу дай прямой ответ на вопрос владельца одной-двумя фразами. "
     "Потом коротко: в чём совет сошёлся, в чём разошёлся и что вы советуете сделать. Не больше {fwords} слов."
 )
 
 
-def history(chat: dict, me: str, names: dict[str, str]) -> list[dict]:
-    """The discussion as this participant sees it: its own words are its turns, the owner's and others' — the other side."""
+DOC_PER = 4000  # characters of one attached document each participant gets: the places that answer the question
+
+
+def _owner_packed(m: dict, query: str, body: str) -> str:
+    """The owner's message the way every participant gets it: the fragment he answers, the text of what he attached
+    (documents — the places about the question, pictures — the text read off them), not just the words he typed."""
+    from .attach import inline_text
+    from .economy import doc_text
+    from ..retrieve import best
+
+    if m.get("quote"):
+        body = "[Отвечает на фрагмент]\n" + "\n".join("> " + x for x in m["quote"].splitlines()) + "\n\n" + body
+    files = m.get("files") or []
+    body = inline_text(body, [f for f in files if f.get("kind") != "text"])
+    for f in files:
+        if f.get("kind") == "text":
+            excerpt, cut = best(query or m["text"], doc_text(f), budget=DOC_PER)
+            body += f"\n\n[Документ «{f['name']}»{' — места, относящиеся к вопросу' if cut else ''}]\n{excerpt}"
+    return body
+
+
+def history(chat: dict, me: str, names: dict[str, str], query: str = "") -> list[dict]:
+    """The whole conversation packed for this participant — also what was said before the council met, with the
+    attached files: its own words are its turns, the owner's and others' — the other side."""
     seq = []
     msgs = [m for m in chat["messages"] if m["role"] in ("user", "assistant") and m.get("text") and not m.get("kind")]
     for i, m in enumerate(msgs):
         text = m["text"]
-        if len(msgs) - i > 10 and len(text) > OLD_CHARS:
+        if len(msgs) - i > KEEP_FULL and len(text) > OLD_CHARS:
             text = text[:OLD_CHARS] + " …[сокращено]"
         if m["role"] == "user":
-            seq.append(("user", f"Владелец: {text}"))
+            seq.append(("user", f"Владелец: {_owner_packed(m, query, text)}"))
         elif m.get("model") == me:
             seq.append(("assistant", text))
         else:
@@ -319,6 +362,11 @@ def history(chat: dict, me: str, names: dict[str, str]) -> list[dict]:
         out.insert(0, {"role": "user", "text": "Владелец открыл обсуждение."})
     if out[-1]["role"] != "user":
         out.append({"role": "user", "text": "Продолжай обсуждение."})
+    # pictures and PDFs of the owner's latest message with files go to every participant as they are
+    last = next((m for m in reversed(msgs) if m["role"] == "user" and m.get("files")), None)
+    seen = [f for f in (last or {}).get("files") or [] if f.get("kind") in ("image", "pdf")]
+    if seen:
+        out[-1]["files"] = seen
     return out
 
 
@@ -351,6 +399,7 @@ def run(
 
     cid = chat["id"]
     web_note = ""
+    web_hid: dict = {}  # secrets cut from the shared search query: shown on the first message
     if web and not summary_only:
         from . import economy as EC
 
@@ -367,6 +416,7 @@ def run(
                 found.get("redacted") or {},
                 {"purpose": "поиск в интернете", "chat": cid, "web": True},
             )
+            web_hid.update(found.get("redacted") or {})
         if found["context"]:
             web_note = "\n\n" + CH.WEB_NOTE + "\n" + found["context"]
     joined = ""
@@ -412,7 +462,18 @@ def run(
             for k, v in use.items():
                 if isinstance(v, (int, float)) and not isinstance(v, bool):
                     g["usage"][k] = g["usage"].get(k, 0) + v
+            hid_add(use.get("redacted"))
             return buf
+
+        def hid_add(red: dict | None) -> None:
+            """Secrets cut before this speaker's requests left: the quiet lock under its message counts them."""
+            for k, v in (red or {}).items():
+                hid[k] = hid.get(k, 0) + v
+
+        hid: dict = {}
+        if web_hid:
+            hid_add(web_hid)
+            web_hid.clear()
 
         try:
             stage = STAGES[stage_of(min(r, rounds - 1), rounds, fmt)]
@@ -431,7 +492,7 @@ def run(
                         words=words,
                         role=extra,
                         search=rule,
-                        final=FINAL.format(fwords=fwords) if final else "",
+                        final=(ROAST_FINAL if fmt == "roast" else FINAL).format(fwords=fwords) if final else "",
                     )
                     + web_note
                     + found
@@ -439,7 +500,7 @@ def run(
                 )
 
             system = build(SEARCH_RULE if look else "")
-            msgs = history(CH.load_chat(vault, cid), ref, names)
+            msgs = history(CH.load_chat(vault, cid), ref, names, text)
             if pid == "local":
                 from .. import localllm
 
@@ -452,6 +513,7 @@ def run(
             if queries and not (g["stop"] or g.get("cut")):
                 g.update(phase="ищу в интернете", text="", searching=queries)
                 found = lookup(queries, vault=vault, chat=cid)
+                hid_add(found.get("redacted"))
                 own_sources = found["sources"]
                 g.update(phase="пишу", searching=[])
                 more = (
@@ -490,6 +552,8 @@ def run(
             "stage": "Итог" if final else STAGES[stage_of(min(r, rounds - 1), rounds, fmt)][0],
             "tokens": {k: v for k, v in g["usage"].items() if k not in ("progress", "reasoning", "redacted")},
         }
+        if hid:
+            msg["redacted"] = hid
         if err:
             msg["error"] = err
         if (g["stop"] or g.get("cut")) and answer:
@@ -566,7 +630,9 @@ def run(
         )
         _save_state(vault, cid, status="running", round=r, next=i)
         answer = speak(ref, r, names, rounds, final)
-        if final and not answer and not g["stop"]:
+        if g.get("pause") and not answer:  # stopped before a word: on «Продолжить» the same one speaks
+            continue
+        if final and not answer and not g["stop"] and not g.get("pause"):
             alt = next((m for m in members if m != ref and m not in g.get("dropped", [])), None)
             if alt:  # the one summing up failed: another one does it
                 answer = speak(alt, r, names, rounds, True)
@@ -598,10 +664,12 @@ def lookup(queries: list[str], budget: int = 6000, vault=None, chat: str = "") -
     written to «Что ушло наружу» like any request that leaves the computer."""
     from .. import outgoing as OG, web
 
-    blocks, sources = [], []
+    blocks, sources, hidden = [], [], {}
     for q in queries:
         red = OG.Redactor()
         q = OG.LABEL_RE.sub(" ", red.apply(q)).strip()
+        for k, v in red.summary().items():
+            hidden[k] = hidden.get(k, 0) + v
         if not q:
             continue
         if vault is not None:
@@ -614,7 +682,7 @@ def lookup(queries: list[str], budget: int = 6000, vault=None, chat: str = "") -
         if found["context"]:
             blocks.append(re.sub(r"^\[(\d+)\]", lambda m: f"[{int(m.group(1)) + off}]", found["context"], flags=re.M))
         sources += found["sources"]
-    return {"context": "\n\n".join(blocks), "sources": sources}
+    return {"context": "\n\n".join(blocks), "sources": sources, "redacted": hidden}
 
 
 def wait_stopped(g: dict, timeout: float = 20.0) -> None:
@@ -731,9 +799,9 @@ def control(
             raise ValueError("это не консорциум")
         CH.modify_chat(vault, cid, lambda c: c.update(consortium=_set(c["consortium"], members, rounds, extra)))
         return CH.state(cid) if live else {"ok": True}
-    if action == "pause":
+    if action == "pause":  # «Остановить»: the one speaking stops mid-sentence (what he said stays), the rest wait
         if live and g.get("consortium"):
-            g["pause"] = True
+            g.update(pause=True, cut=True)
         return CH.state(cid)
     if action == "finish":
         if live and g.get("consortium"):

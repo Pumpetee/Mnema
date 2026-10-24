@@ -8,6 +8,7 @@ so code never leaks into the texts.
 
 from __future__ import annotations
 
+import ast
 import json
 import re
 from pathlib import Path
@@ -138,12 +139,12 @@ def from_html(path: Path) -> list[str]:
 
 def from_html_text(html: str) -> list[str]:
     res = []
-    for script in re.findall(r"<script[^>]*>(.*?)</script>", html, re.S):
+    for script in re.findall(r"<script[^>]*>(.*?)</script\s*>", html, re.S | re.I):
         lx = Lexer(script)
         lx.run()
         for s in lx.strings + lx.templates:
             res += pieces(s)
-    body = re.sub(r"<script.*?</script>|<style.*?</style>", "", html, flags=re.S)
+    body = re.sub(r"<script.*?</script\s*>|<style.*?</style\s*>", "", html, flags=re.S | re.I)
     res += pieces(body)
     return res
 
@@ -159,21 +160,51 @@ def from_setup(path: Path) -> list[str]:
 
 
 def from_python(folder: Path) -> list[str]:
+    """Short strings of the Python code, read with ast: "a" "b" written on two lines is one text, an f-string keeps
+    {} where its values go. Docstrings and triple-quoted texts (model prompts) are not UI."""
     res = []
     for f in folder.rglob("*.py"):
         if f.name in SKIP_PY:
             continue
         src = f.read_text(encoding="utf-8")
-        src = re.sub(r'"""(?:.|\n)*?"""', "", src)  # docstrings and long model prompts are not UI
-        for m in re.finditer(r'(f?)"((?:\\.|[^"\\\n])*)"|(f?)\'((?:\\.|[^\'\\\n])*)\'', src):
-            fstr = m.group(1) or m.group(3)
+        try:
+            tree = ast.parse(src)
+        except SyntaxError:
+            continue
+        docs, inner = set(), set()
+        for node in ast.walk(tree):
+            body = getattr(node, "body", None)
+            if (
+                isinstance(body, list)
+                and body
+                and isinstance(body[0], ast.Expr)
+                and isinstance(body[0].value, ast.Constant)
+            ):
+                docs.add(id(body[0].value))
+            if isinstance(node, ast.JoinedStr):
+                inner |= {id(x) for x in node.values}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str) and id(node) not in docs | inner:
+                s = node.value
+            elif isinstance(node, ast.JoinedStr):
+                s = "".join(x.value if isinstance(x, ast.Constant) else "{}" for x in node.values)
+            else:
+                continue
+            if not s or not CYR.search(s) or len(s) > 220:
+                continue
+            seg = ast.get_source_segment(src, node) or ""
+            if '"""' in seg or "'''" in seg:
+                continue
+            res.append(s.strip())
+        # each literal on its own too, the way it is written: "ок", a piece inside an f-string
+        flat = re.sub(r'"""(?:.|\n)*?"""', "", src)
+        for m in re.finditer(r'(f?)"((?:\\.|[^"\\\n])*)"|(f?)\'((?:\\.|[^\'\\\n])*)\'', flat):
             s = m.group(2) if m.group(2) is not None else m.group(4)
             if not s or not CYR.search(s) or len(s) > 220:
                 continue
-            if fstr:
+            if m.group(1) or m.group(3):
                 s = re.sub(r"\{[^{}]*\}", "{}", s)
-            s = s.replace('\\"', '"').replace("'", "'")
-            res.append(s.strip())
+            res.append(s.replace('\\"', '"').strip())
     return res
 
 

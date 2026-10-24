@@ -15,12 +15,12 @@ class Outside(unittest.TestCase):
 
     def test_no_means_only_mnema(self):
         s = S.load(self.v)
-        for k in ("claude_code", "notes", "browser", "corrections"):
+        for k in ("claude_code", "notes", "corrections"):
             s["sources"][k]["enabled"] = True
         s["outside"] = False
         self.assertEqual([k for k in s["sources"] if S.allowed(s, k)], ["mnema_chat", "corrections"])
         s["outside"] = True
-        self.assertTrue(S.allowed(s, "claude_code") and S.allowed(s, "browser"))
+        self.assertTrue(S.allowed(s, "claude_code") and S.allowed(s, "notes"))
 
     def test_first_launch_switches_nothing_outside_on(self):
         s = S.load(self.v)
@@ -29,11 +29,11 @@ class Outside(unittest.TestCase):
             {
                 "mnema_chat": {},
                 "corrections": {},
-                "browser": {},
+                "notes": {"path": "~/Notes"},
                 "claude_code": {"path": "~/.claude/projects"},
             },
         )
-        self.assertEqual(sorted(s["found"]), ["browser", "claude_code"])
+        self.assertEqual(sorted(s["found"]), ["claude_code", "notes"])
         self.assertIsNone(s["outside"])
         self.assertEqual([k for k in s["sources"] if S.allowed(s, k)], ["mnema_chat", "corrections"])
 

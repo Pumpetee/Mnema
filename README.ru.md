@@ -1,18 +1,35 @@
-# Бесплатный интерфейс для ИИ с памятью, локальными агентами и мультизадачами.
+# Хватит объяснять себя в каждом новом чате.
 
-[![tests](https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml) [![build](https://github.com/Pumpetee/Mnema/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Pumpetee/Mnema/actions/workflows/build.yml) ![Windows | macOS | Linux](https://img.shields.io/badge/Windows%20%7C%20macOS%20%7C%20Linux-2ea44f) [![license AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE) ![MCP: Claude, Cursor](https://img.shields.io/badge/MCP-Claude%20%7C%20Cursor-8a2be2) ![13 local models](https://img.shields.io/badge/local%20models-13-orange) ![10 languages](https://img.shields.io/badge/languages-10-informational) ![Python 3.13](https://img.shields.io/badge/python-3.13-3776ab?logo=python&logoColor=white)
+**Одна память для Claude, ChatGPT и Gemini — бесплатно и на твоём компьютере.**
 
-**Mnema** — одна память для любого ИИ, и живёт она на твоём компьютере.
+[![release](https://img.shields.io/github/v/release/Pumpetee/Mnema?label=release&color=8b5cf6)](https://github.com/Pumpetee/Mnema/releases/latest) [![tests](https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml) [![build](https://github.com/Pumpetee/Mnema/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Pumpetee/Mnema/actions/workflows/build.yml) [![CodeQL](https://github.com/Pumpetee/Mnema/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Pumpetee/Mnema/actions/workflows/github-code-scanning/codeql) [![license AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE) [![last commit](https://img.shields.io/github/last-commit/Pumpetee/Mnema?color=0ea5e9)](https://github.com/Pumpetee/Mnema/commits/main)
 
-Больше не нужно объяснять в каждом новом чате, кто ты такой. Mnema помнит, кто ты, над чем работаешь, что решил и как тебе отвечать. Она подставляет это в любой ИИ: Claude, ChatGPT, Gemini, DeepSeek или бесплатную модель на твоём же компьютере. Память — это папка обычных Markdown-файлов. Облака и аккаунта нет.
+![Windows | macOS | Linux](https://img.shields.io/badge/Windows%20%7C%20macOS%20%7C%20Linux-%D0%BE%D0%B4%D0%BD%D0%B0%20%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B0-2ea44f) ![ИИ: Claude, ChatGPT, Gemini, DeepSeek, Ollama](https://img.shields.io/badge/%D0%98%D0%98-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20DeepSeek%20%7C%20Ollama-d97757?logo=anthropic&logoColor=white) ![13 локальных моделей без интернета](https://img.shields.io/badge/%D0%BB%D0%BE%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5%20%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8-13%2C%20%D0%B1%D0%B5%D0%B7%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%BD%D0%B5%D1%82%D0%B0-orange) ![Консорциум: спорят 2–4 ИИ](https://img.shields.io/badge/%D0%BA%D0%BE%D0%BD%D1%81%D0%BE%D1%80%D1%86%D0%B8%D1%83%D0%BC-%D1%81%D0%BF%D0%BE%D1%80%D1%8F%D1%82%202%E2%80%934%20%D0%98%D0%98-8a2be2) ![MCP: Claude, Cursor](https://img.shields.io/badge/MCP-Claude%20%7C%20Cursor-7c3aed) ![Obsidian: подключается, только чтение](https://img.shields.io/badge/Obsidian-%D0%BF%D0%BE%D0%B4%D0%BA%D0%BB%D1%8E%D1%87%D0%B0%D0%B5%D1%82%D1%81%D1%8F%2C%20%D1%82%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE%20%D1%87%D1%82%D0%B5%D0%BD%D0%B8%D0%B5-7c3aed?logo=obsidian&logoColor=white) ![Telegram: только чтение](https://img.shields.io/badge/Telegram-%D1%82%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE%20%D1%87%D1%82%D0%B5%D0%BD%D0%B8%D0%B5-229ED9?logo=telegram&logoColor=white) ![Память: Markdown на твоём компьютере](https://img.shields.io/badge/%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C-Markdown%20%D0%BD%D0%B0%20%D1%82%D0%B2%D0%BE%D1%91%D0%BC%20%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%B5-555555?logo=markdown&logoColor=white) ![Шифрование: AES-256-GCM](https://img.shields.io/badge/%D1%88%D0%B8%D1%84%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-AES--256--GCM-15803d) ![Аккаунт не нужен](https://img.shields.io/badge/%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82-%D0%BD%D0%B5%20%D0%BD%D1%83%D0%B6%D0%B5%D0%BD-brightgreen) ![Бесплатно](https://img.shields.io/badge/%D1%86%D0%B5%D0%BD%D0%B0-%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D0%BE-brightgreen) ![10 языков](https://img.shields.io/badge/%D1%8F%D0%B7%D1%8B%D0%BA%D0%BE%D0%B2-10-informational) ![Python 3.13](https://img.shields.io/badge/python-3.13-3776ab?logo=python&logoColor=white)
 
-**Скачать:** [Windows](../../releases/latest/download/Mnema-Setup.exe) · [macOS (Apple Silicon)](../../releases/latest/download/Mnema-macos-arm64.dmg) · [macOS (Intel)](../../releases/latest/download/Mnema-macos-x64.dmg) · [Linux (AppImage)](../../releases/latest/download/Mnema-linux-x86_64.AppImage) · [все файлы](../../releases)
+Mnema помнит, кто ты, над чем работаешь, что решил и как тебе отвечать. Она подставляет это в любой ИИ: Claude, ChatGPT, Gemini, DeepSeek или бесплатную модель на твоём же компьютере. Память — это папка обычных Markdown-файлов. Облака и аккаунта нет.
+
+**Скачать:** [Windows](../../releases/latest/download/Mnema-Setup.exe) · [macOS (Apple Silicon)](../../releases/latest/download/Mnema-macos-arm64.dmg) · [macOS (Intel)](../../releases/latest/download/Mnema-macos-x64.dmg) · [Linux (AppImage)](../../releases/latest/download/Mnema-x86_64.AppImage) · [все файлы](../../releases)
 
 [English version](README.md)
 
 ![Mnema отвечает из памяти: план недели таблицей, с ценой и правилом про встречи, которые она уже знает](docs/img/ru/hero.png)
 
 Ты спрашиваешь «что главное на неделе?» и получаешь план таблицей. В нём уже есть решённая цена и твоё правило про встречи, потому что Mnema их помнит. Повторять их не пришлось.
+
+## Попробуй за минуту
+
+![С памятью и без: один вопрос, три ИИ, ответы как обычного чата и через Mnema рядом](docs/img/ru/compare.png)
+
+- **С памятью и без.** Один вопрос подключённым ИИ, каждый отвечает дважды: как обычный чат, ничего о тебе не зная, и через Mnema. Разница видна сразу.
+- **Знакомство.** Семь коротких вопросов в первый день: кто ты, что сейчас главное, над чем работаешь, кто рядом и как с тобой говорить. Ответы ложатся в память обычными фактами и ничего не затирают.
+- **Насколько Mnema тебя знает.** Квиз по твоей же памяти: «верно», «уже не так» или «неправда». Каждый ответ чинит память: устаревшее переписывается, ошибочное уходит в архив.
+- **Прожарка.** Отдай несколько ИИ идею, резюме, текст или лендинг: они жёстко и по делу ищут слабые места, в конце оценка из 10 и три правки.
+
+![Квиз: факт из памяти и три ответа](docs/img/ru/quiz.png)
+
+Любой результат можно превратить в карточку: картинку с оценкой или ответом, без личного сверх того, что видно на ней. Её можно скопировать, сохранить или взять вместе с готовым текстом поста. Всё это есть в меню «+» под строкой ввода и на странице «Память».
+
+![Карточка прожарки: 4/10, вердикт и что исправить](docs/img/ru/roast.png)
 
 ## Память: она тебя знает
 
@@ -22,8 +39,12 @@
 - **Карта памяти.** Каждая тема — пузырь. Размер показывает, сколько Mnema знает, пульс — что тема недавно менялась, замок — что её видят не все ИИ.
 - **Обычные файлы, которые принадлежат тебе.** Карточки, правила, люди, решения и события лежат в твоей папке обычным Markdown. Их можно открыть в любом редакторе, синхронизировать как угодно и удалить когда захочешь.
 - **Старое не выдаётся за новое.** У каждого факта есть дата, когда он был сказан. Статусы старше месяца Mnema переспрашивает.
+- **Выключается одним переключателем.** Новая память начинает выключенной: Mnema тогда — обычный чат, который ничего не запоминает, а точка у шестерёнки жёлтая. Один переключатель в панели «Память» включает её, и каждый ИИ начинает тебя знать.
+- **Не одна папка.** Заметки, хранилище Obsidian или папку команды можно добавить как дополнительную память: ИИ уходят только места, нужные для вопроса. Кнопка «Подключить Obsidian» сама находит хранилища на компьютере. Подключённые папки Mnema только читает: запись в них запрещена в самой программе. Несколько памятей на одном компьютере переключаются в настройках, каждую можно переименовать или удалить (удаление спрашивает дважды и ждёт десять секунд).
 
 ![Темы: правила для ИИ, люди, проекты, пилот, работа, рынок, хобби, путешествия, семья, деньги](docs/img/ru/memory-map.png)
+
+![Подключить Obsidian: хранилища на этом компьютере, отмеченные становятся памятью](docs/img/ru/obsidian.png)
 
 ## Консорциум: несколько ИИ, один ответ
 
@@ -37,16 +58,17 @@
 | Дебаты | одни за, другие против, в конце вердикт |
 | Мозговой штурм | идеи без критики, потом три лучшие |
 | Красная команда | ищут дыры в твоём плане и как их закрыть |
+| Прожарка | жёстко и по делу разбирают идею, резюме или текст, в конце оценка из 10 |
 
-Число кругов задаёшь ты сам, а между кругами можно вмешаться. Под любым ответом есть **«Поспорить с другими»**: автор ответа его защищает, другие ИИ ищут, где он неверен, в конце вердикт.
+Число кругов задаёшь ты сам, а между кругами можно вмешаться: «Остановить» обрывает текущего ИИ сразу, сказанное остаётся. Каждый участник получает весь разговор с твоими файлами, а не только последний вопрос. Под любым ответом есть **«Поспорить с разными ИИ»**: ты выбираешь соперников, автор ответа его защищает, остальные ищут, где он неверен, в конце вердикт. Если подключён один ИИ, спорят его модели между собой, например Sonnet с Opus.
 
 ## Любой ИИ
 
 ![Семь способов подключить модель](docs/img/ru/models.png)
 
 - **В чате самой Mnema:** все модели равны. Облачные: Anthropic, OpenAI, Gemini, OpenRouter (сотни моделей по одному ключу) по ключу или Claude Code по подписке. На компьютере: встроенная модель или Ollama. Модель можно сменить посреди разговора.
-- **В программах, где ты уже работаешь:** Claude Code, Claude Desktop и Cursor подключаются по MCP, а ChatGPT и Gemini в браузере — через расширение Chrome.
-- **Ты решаешь, кто что видит.** У каждого ИИ свои права: какие части памяти он видит и какие темы из них вырезаются. По умолчанию деньги, здоровье и личное скрыты от ChatGPT, Gemini, OpenRouter и Cursor.
+- **В программах, где ты уже работаешь:** Claude Code, Claude Desktop и Cursor подключаются по MCP. ChatGPT и Gemini работают в чате Mnema по ключу: всё, чего не умеют сами ИИ, Mnema делает у себя на компьютере, без расширений для браузера.
+- **Ты решаешь, кто что видит.** У каждого ИИ свои права: какие части памяти он видит и какие темы из них вырезаются. Деньги, здоровье и личное можно скрыть от любого из них одним нажатием.
 
 ![Кто из ИИ что видит: переключатель на каждый ИИ, галочка на каждую часть памяти, замок на тему](docs/img/ru/privacy.png)
 
@@ -62,11 +84,15 @@
 
 - в чём уверена на 80% и больше — записывает сразу;
 - в чём не уверена — ждёт, пока ты скажешь это ещё раз;
-- деньги, здоровье и личное — кладёт в скрытую часть.
+- деньги, здоровье и личное — кладёт в отдельные карточки с тегом, их можно скрыть от любого ИИ.
 
 В ленте «Что поняла и почему» видно каждое решение и его причину. Если разрешишь, Mnema учится и из других программ на компьютере.
 
 ![Лента обучения: записала, подтвердилось, жду повтора](docs/img/ru/learning.png)
+
+**Читает Telegram, но ничего туда не пишет.** Ты сам выбираешь чаты, и Mnema узнаёт из переписки тебя и людей вокруг. Запрет на запись заложен в саму программу: клиент Telegram внутри Mnema умеет только читать, любая другая команда отклоняется до отправки. Вход хранится зашифрованным на компьютере, своих серверов у Mnema нет.
+
+![Telegram: только чтение, выбранные чаты, всё хранится на компьютере](docs/img/ru/telegram.png)
 
 **Работает с твоими файлами.** В чате любая модель может:
 
@@ -83,7 +109,15 @@
 
 **Экономит токены.** Память, документы и страницы из сети читаются на компьютере, а модели уходят только нужные куски. Замер: вопрос по договору в 153 000 знаков. Весь текст — это 29 643 входных токена. Mnema отправила 6 159, почти в пять раз меньше, и правильный ответ дал только вариант с Mnema. Под каждым ответом видно, сколько токенов сэкономлено.
 
-**Приватна по умолчанию.** Номера карт, пароли, ключи и телефоны заменяются метками до отправки в облачную модель. В журнале видно, что прочитано, что записано и что ушло наружу. На любой системе Mnema может зашифровать память твоим паролем. Интерфейс на 10 языках.
+**Приватна по умолчанию.** Номера карт, пароли, ключи и телефоны заменяются метками до отправки в облачную модель. В журнале видно, что прочитано, что записано и что ушло наружу. На любой системе Mnema может зашифровать память твоим паролем.
+
+## Языки
+
+Mnema говорит на десяти языках. Интерфейс, подсказки и ответы ИИ идут на выбранном, даже если пишешь на другом. Арабский читается справа налево. Этот README — на русском и [английском](README.md).
+
+| <img src="https://flagcdn.com/w80/gb.png" width="40" alt="английский"><br><b>English</b><br><sub>английский</sub> | <img src="https://flagcdn.com/w80/ru.png" width="40" alt="русский"><br><b>Русский</b><br><sub>русский</sub> | <img src="https://flagcdn.com/w80/cn.png" width="40" alt="китайский"><br><b>中文</b><br><sub>китайский</sub> | <img src="https://flagcdn.com/w80/es.png" width="40" alt="испанский"><br><b>Español</b><br><sub>испанский</sub> | <img src="https://flagcdn.com/w80/in.png" width="40" alt="хинди"><br><b>हिन्दी</b><br><sub>хинди</sub> |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src="https://flagcdn.com/w80/sa.png" width="40" alt="арабский"><br><b>العربية</b><br><sub>арабский</sub> | <img src="https://flagcdn.com/w80/pt.png" width="40" alt="португальский"><br><b>Português</b><br><sub>португальский</sub> | <img src="https://flagcdn.com/w80/fr.png" width="40" alt="французский"><br><b>Français</b><br><sub>французский</sub> | <img src="https://flagcdn.com/w80/de.png" width="40" alt="немецкий"><br><b>Deutsch</b><br><sub>немецкий</sub> | <img src="https://flagcdn.com/w80/jp.png" width="40" alt="японский"><br><b>日本語</b><br><sub>японский</sub> |
 
 ## Установка
 
@@ -93,7 +127,7 @@
 |---|---|---|
 | Windows 10 и 11 | [`Mnema-Setup.exe`](../../releases/latest/download/Mnema-Setup.exe) | Запусти. Права администратора не нужны. Там же переносной `.zip`. |
 | macOS 11 и новее | Apple Silicon: [`Mnema-macos-arm64.dmg`](../../releases/latest/download/Mnema-macos-arm64.dmg), Intel: [`Mnema-macos-x64.dmg`](../../releases/latest/download/Mnema-macos-x64.dmg) | Открой и перетащи Mnema в «Программы». |
-| Linux x86-64 (Ubuntu 22.04 и новее, Fedora, Debian…) | [`Mnema-linux-x86_64.AppImage`](../../releases/latest/download/Mnema-linux-x86_64.AppImage) | `chmod +x Mnema-*.AppImage` и запусти. Та же программа папкой: `.tar.gz`, внутри запусти `Mnema`. |
+| Linux x86-64 (Ubuntu 22.04 и новее, Fedora, Debian…) | [`Mnema-x86_64.AppImage`](../../releases/latest/download/Mnema-x86_64.AppImage) | `chmod +x Mnema-*.AppImage` и запусти. Та же программа папкой: `.tar.gz`, внутри запусти `Mnema`. |
 
 Пакеты пока без цифровой подписи, поэтому каждая система один раз предупредит:
 
@@ -123,7 +157,7 @@ python3 -m venv .venv
 .venv/bin/python tools/fetch_vendor.py           # llama.cpp и Xray для этой системы, с проверкой sha256
 .venv/bin/python -m mnema.desktop                # запустить программу
 .venv/bin/python tools/package.py                # macOS: dist/Mnema-<версия>-macos-arm64.dmg
-                                                 # Linux: dist/Mnema-<версия>-linux-x86_64.AppImage и .tar.gz
+                                                 # Linux: dist/Mnema-<версия>-x86_64.AppImage и .tar.gz
 ```
 
 Каждый push проверяется на Windows, macOS и Linux: собираются три пакета, каждый один раз запускается с окном и остаётся файлами прогона (`.github/workflows`).
@@ -154,12 +188,11 @@ python -m mnema install claude-code      # покажет план; добавь
 | Чем отличаются Windows, macOS и Linux | `mnema/osapi.py` |
 | Шифрование памяти паролем | `mnema/crypt.py` |
 | Текст со сканов и картинок | `mnema/ocr.py` |
-| Расширение для браузера | `extension/` |
 | База знаний, по которой ассистент отвечает о себе | `mnema/knowledge/mnema.md` |
 
 ## Безопасность
 
-Локальный API слушает только 127.0.0.1, проверяет заголовок Host и требует токен. У расширения свой узкий токен. Ключи и пароли хранятся в защищённом хранилище системы (DPAPI на Windows, Связка ключей на macOS, Secret Service на Linux, если он есть), а не в папке памяти. Саму память можно зашифровать паролем (AES-256-GCM, ключ защищён scrypt). Каждый запрос к облачной модели записывается в журнал: что ушло и что скрыто. Об уязвимостях пиши лично автору.
+Локальный API слушает только 127.0.0.1, проверяет заголовок Host и требует токен. Страницы по ссылке и подписки VPN открываются только из интернета, никогда — с этого компьютера или из локальной сети. Ключи и пароли хранятся в защищённом хранилище системы (DPAPI на Windows, Связка ключей на macOS, Secret Service на Linux, если он есть), а не в папке памяти. Саму память можно зашифровать паролем (AES-256-GCM, ключ защищён scrypt). Каждый запрос к облачной модели записывается в журнал: что ушло и что скрыто. Об уязвимостях пиши лично автору.
 
 ## Лицензия
 

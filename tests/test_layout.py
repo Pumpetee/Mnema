@@ -23,6 +23,7 @@ from mnema.memory import (
 )
 from mnema.journal import save_copy  # noqa: E402
 from mnema.vault import Vault  # noqa: E402
+from hidden_topics import lock_cloud  # noqa: E402
 
 TODAY = dt.date(2026, 10, 18)
 
@@ -67,6 +68,7 @@ class TestCards(Base):
         self.assertIn("ищем дизайнера", body)
 
     def test_tagged_card_hidden_from_outside_ai(self):
+        lock_cloud(self.v)
         remember(self.v, "Давление по утрам", "card:Здоровье #health", today=TODAY)
         self.assertIn("tags: [health]", self.v.read_raw("70 Memory/Cards/Здоровье.md"))
         text, _ = context_for(self.v, "chatgpt", log=False, today=TODAY)

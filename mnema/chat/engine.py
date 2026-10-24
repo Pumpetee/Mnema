@@ -2,7 +2,7 @@
 
 Flow of one message:
   1. saved to the chat; learning on it starts at once in the background (live feed shows "читаю → поняла → …");
-  2. system prompt = how to work with him (behavior profile) + memory this model may see + shared team memory;
+  2. system prompt = how to work with him (behavior profile) + memory this model may see + the extra memory folders;
   3. the answer streams; with "второй проход" on, a second call checks the draft against the rules and fixes it;
   4. a ```ask block in the answer becomes a question with buttons.
 """
@@ -60,6 +60,14 @@ def _dir(vault: Vault) -> Path:
 
 def _now() -> str:
     return dt.datetime.now().isoformat(timespec="seconds")
+
+
+def _hidden(g: dict) -> dict:
+    """What stayed on the computer for this answer: secrets cut from the request and from the search query."""
+    out = dict((g.get("usage") or {}).get("redacted") or {})
+    for k, v in (g.get("web_hid") or {}).items():
+        out[k] = out.get(k, 0) + v
+    return out
 
 
 def _read(f: Path) -> str:
@@ -139,6 +147,46 @@ def new_session(vault: Vault) -> dict:
     return s
 
 
+def _names_file(vault: Vault) -> Path:
+    return vault.service / "session_names.json"
+
+
+def session_names(vault: Vault) -> dict:
+    """The names the owner gave his sessions: {session id: name}."""
+    try:
+        d = json.loads(_read(_names_file(vault)))
+        return d if isinstance(d, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def rename_session(vault: Vault, sid: str, name: str) -> dict:
+    from ..fsutil import write_json
+
+    names = session_names(vault)
+    name = (name or "").strip()[:60]
+    if name:
+        names[sid] = name
+    else:
+        names.pop(sid, None)  # an empty name: back to «Сессия»
+    vault.service.mkdir(parents=True, exist_ok=True)
+    write_json(_names_file(vault), names)
+    return names
+
+
+def delete_session(vault: Vault, sid: str) -> int:
+    """Delete every conversation of a session («old» — those started before sessions existed). Pinned ones stay."""
+    n = 0
+    for c in list_chats(vault, limit=100000):
+        if (c.get("session") or "old") == sid and not c.get("pinned"):
+            delete_chat(vault, c["id"])
+            n += 1
+    names = session_names(vault)
+    if sid in names:
+        rename_session(vault, sid, "")
+    return n
+
+
 def list_chats(vault: Vault, limit: int = 200, q: str = "", sort: str = "date") -> list[dict]:
     """Pinned first, then by last activity. q searches titles and messages."""
     out = []
@@ -171,6 +219,7 @@ def list_chats(vault: Vault, limit: int = 200, q: str = "", sort: str = "date") 
                 "hit": hit,
                 "count": len(c.get("messages", [])),
                 "tokens": chat_tokens(c),
+                "saved": sum(int(m.get("saved") or 0) for m in c.get("messages", [])),
             }
         )
     if sort == "tokens":
@@ -258,14 +307,6 @@ def split_model(ref: str) -> tuple[str, str]:
 # ---------------------------------------------------------------- prompt
 
 
-def team_vault(vault: Vault) -> Vault | None:
-    path = (P.load(vault).get("team_vault") or "").strip()
-    if not path or not Path(path).exists():
-        return None
-    tv = Vault(path)
-    return tv if tv.root.resolve() != vault.root.resolve() else None
-
-
 LANGS = ["ru", "en", "zh", "es", "hi", "ar", "pt", "fr", "de", "ja"]
 LANG_NAMES = {
     "ru": "русский",
@@ -292,7 +333,7 @@ def system_prompt(
     from . import small
 
     if model and small.is_small(pid, model):  # a 1–4B model on this computer: a short brief, not the manual
-        lang = prof.get("lang") or "ru"
+        lang = prof.get("lang") or "en"
         lang_line = "" if lang == "ru" else f"Отвечай только на языке: {LANG_NAMES.get(lang, lang)}."
         brief = small.prompt(vault, query, prof, lang_line, ru_date())
         if stats is not None:
@@ -305,8 +346,8 @@ def system_prompt(
     from .. import tuning
 
     eng = tuning.get(vault)
-    budget = eng["memory"]  # Настройки → Движок: how much memory goes into a request
-    if prof.get("economy", True) and query and pid != "local":  # only the part of memory this question needs
+    budget = eng["memory"]  # Настройки → Движок, «Точнее ↔ Экономнее»: how much memory goes into a request
+    if eng["economy"] and query and pid != "local":  # only the part of memory this question needs
         memory = compact_memory(memory, query, min(2200, budget // 2), budget)
     if pid == "local":  # small local model: short prompt, it reads slowly on a CPU
         memory = memory[: budget if eng["ctx"] > 8192 else min(budget, 3000)]
@@ -332,17 +373,28 @@ def system_prompt(
             "=== Память ===\nПамять Mnema выключена владельцем: о нём ты ничего не знаешь и ничего не запоминается. "
             "Если он просит запомнить, скажи, что память выключена и включается в Настройки → Обучение → «Память»."
         )
-    tv = team_vault(vault) if mem_on else None
     sent = len(memory)
-    if tv:
-        team, _ = context_for(tv, client, log=log)
-        full += len(team)
-        if prof.get("economy", True) and query:
-            team = compact_memory(team, query)
-        sent += len(team)
-        parts.append("=== Общая память команды ===\n" + team)
+    if mem_on:  # Настройки → Программа → «Дополнительные папки памяти»: other folders, only what the question needs
+        from .. import extra as EX
+        from ..clients import get_client
+
+        ext, ext_full = EX.context(vault, get_client(vault, client), query, budget, eng["economy"], log=log)
+        if ext:
+            full += ext_full
+            sent += len(ext)
+            parts.append(ext)
     if eff.get("ask_options"):  # after the memory: a long memory must not push the format out of attention
         parts.append(ASK_RULE_HINTS if eff.get("ask_hints") else ASK_RULE)
+    if eng["precise"] >= 3:  # «Точнее»: rather ask than guess
+        parts.append(
+            "Если в вопросе не хватает данных для точного ответа или его можно понять по-разному, сначала задай один "
+            "уточняющий вопрос, а потом отвечай."
+        )
+    elif eng["precise"] <= 1:  # «Экономнее»: one answer, no back-and-forth
+        parts.append(
+            "Уточняющий вопрос задавай, только если без ответа задачу не сделать. Иначе сделай разумное допущение, "
+            "назови его одной фразой и отвечай."
+        )
     parts.append(f"Сегодня {ru_date()}.")
     from .selfknow import MANUAL, about_mnema, kb_for
 
@@ -351,7 +403,7 @@ def system_prompt(
         kb = kb_for(query)
         if kb:
             parts.append(kb)
-    lang = prof.get("lang") or "ru"
+    lang = prof.get("lang") or "en"
     # the language chosen on the first screen (or with the language button): always that one, whatever he wrote in
     parts.append(
         f"Язык ответов: {LANG_NAMES.get(lang, lang)}. Отвечай владельцу только на этом языке, даже если он написал "
@@ -815,7 +867,10 @@ def _generate(
         try:
             from . import economy as EC
 
-            eco = P.load(vault).get("economy", True)
+            from .. import tuning as TU
+
+            eng = TU.get(vault)
+            eco = eng["economy"]
             st: dict = {}
             system = system_prompt(
                 vault, pid, log=len(chat["messages"]) == 1, query=text, stats=st, model=mname
@@ -836,7 +891,9 @@ def _generate(
 
                 system += "\n\n" + PRM.block(prompt)
                 g["phase"] = f"готовлю по рецепту «{prompt['name']}»"
-            msgs, full_h, sent_h = EC.build_history(chat, text, economy=eco)
+            msgs, full_h, sent_h = EC.build_history(
+                chat, text, economy=eco, doc_budget=eng["docs"], history_budget=eng["history"]
+            )
             from . import small
 
             if small.is_small(pid, mname) and msgs and msgs[-1]["role"] == "user":  # facts next to the question
@@ -844,6 +901,7 @@ def _generate(
             if not eco:  # nothing trimmed on purpose — only web reading counts
                 full_h = sent_h
             read_web, sent_web = 0, 0
+            web_hid: dict = {}
             if web or EC.URL_RE.search(text):
                 found = EC.web_context(text, web, budget=3500 if pid == "local" else 7000)  # a CPU model reads slowly
                 if found.get("searched"):  # the search engines got a query: it is in «Что ушло наружу» too
@@ -857,6 +915,7 @@ def _generate(
                         found.get("redacted") or {},
                         {"purpose": "поиск в интернете", "chat": chat["id"], "web": True},
                     )
+                    web_hid = dict(found.get("redacted") or {})
                 g["sources"] = found["sources"]
                 read_web, sent_web = found["read_chars"], len(found["context"])
                 note = f"{WEB_NOTE}\n{found['context']}" if found["context"] else ""
@@ -891,6 +950,7 @@ def _generate(
             g["phase"] = "пишу"
             usage: dict = {}
             g["usage"] = usage
+            g["web_hid"] = web_hid
             from ..clients import get_client
 
             cl = get_client(vault, PR.PROVIDERS[pid]["client"])
@@ -1028,7 +1088,7 @@ def _generate(
                                 for k, v in (g.get("usage") or {}).items()
                                 if k not in ("progress", "reasoning", "redacted")
                             },
-                            **({"redacted": g["usage"]["redacted"]} if (g.get("usage") or {}).get("redacted") else {}),
+                            **({"redacted": hid} if (hid := _hidden(g)) else {}),
                             **({"sources": g["sources"]} if g.get("sources") else {}),
                             **({"saved": g["saved"]} if g.get("saved") else {}),
                             **({"terms": g["terms"]} if g.get("terms") else {}),
@@ -1056,6 +1116,8 @@ def _generate(
                     terms=len(g.get("terms") or []),
                     prompt=bool(prompt),
                 )
+            if g["text"].strip() and not g.get("cut") and not chat.get("private"):
+                _maybe_self_ask(vault, chat["id"], text, model)
             g["phase"] = ""
             g["done"] = True
             if not chat.get("title_manual") and not chat.get("title_auto") and g["text"].strip():
@@ -1066,6 +1128,35 @@ def _generate(
     else:
         threading.Thread(target=work, daemon=True, name="mnema-chat").start()
     return {"chat": chat["id"], "title": chat["title"], "model": model}
+
+
+def _maybe_self_ask(vault: Vault, cid: str, text: str, model: str) -> None:
+    """A question of Mnema's own under the answer, when the talk is about a project (chat/selfask.py)."""
+    from . import selfask as SA
+
+    try:
+        q = SA.pick(vault, text)
+        if q:
+            msg = {"role": "assistant", "kind": "self_ask", "ts": _now(), "model": model, "text": q["text"], "ask": q}
+            modify_chat(vault, cid, lambda c: c["messages"].append(msg))
+    except Exception:
+        pass  # a question of her own is never worth a broken answer
+
+
+def answer_self_ask(vault: Vault, cid: str, i: int, action: str, text: str = "") -> dict:
+    """The owner's answer on the card: still | changed | gone | goal | skip | never."""
+    from . import selfask as SA
+
+    chat = load_chat(vault, cid)
+    msgs = chat["messages"]
+    if not (0 <= i < len(msgs)) or msgs[i].get("kind") != "self_ask" or msgs[i]["ask"].get("done"):
+        raise ValueError("на этот вопрос уже ответили")
+    line = SA.answer(vault, msgs[i]["ask"], action, text)
+
+    def mark(c):
+        c["messages"][i]["ask"].update(done=line, action=action)
+
+    return modify_chat(vault, cid, mark)
 
 
 WEB_MARK = "{{нужен интернет}}"
@@ -1087,6 +1178,8 @@ def redo(vault: Vault, cid: str, web: bool = True) -> dict:
         raise ValueError("нечего переспрашивать")
 
     def drop(c):
+        while c["messages"] and c["messages"][-1].get("kind") == "self_ask":  # a question card goes with its answer
+            c["messages"].pop()
         if c["messages"] and c["messages"][-1]["role"] == "assistant":
             c["messages"].pop()
 
@@ -1288,7 +1381,7 @@ def _auto_title(vault: Vault, cid: str, pid: str, model: str) -> None:
                     {
                         "role": "user",
                         "text": TITLE.format(
-                            q=q[:1500], a=a[:1500], lang=LANG_NAMES.get(P.load(vault).get("lang") or "ru", "русский")
+                            q=q[:1500], a=a[:1500], lang=LANG_NAMES.get(P.load(vault).get("lang") or "en", "русский")
                         ),
                     }
                 ],

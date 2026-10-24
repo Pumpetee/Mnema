@@ -60,6 +60,9 @@ PROMPT = """{mark}
 Источник browser_history — заголовки прочитанных страниц: только устойчивые интересы, если тема повторяется
 много раз, confidence не выше 0.6; о здоровье и личном по истории браузера выводов не делай.
 Источник documents — его документы: бери проекты, роли, договорённости, а не содержимое документа.
+Источник telegram_api — переписка в чате: реплики владельца помечены «Я:», остальные — именем собеседника. Бери факты
+о владельце и о людях вокруг него (person:<Имя>: кто он владельцу, о чём договорились, что важно в общении);
+слова собеседника о себе — факт о собеседнике, а не о владельце; чужие мнения владельцу не приписывай.
 
 Верни ТОЛЬКО JSON: {{"facts": [{{
   "text": "одна строка на языке владельца",
@@ -352,7 +355,8 @@ class ClaudeCodeBrain(_LLMBrain):
         # outside any git repo: otherwise Claude Code puts the repo's git status (file names) into the prompt
         from .. import net
 
-        env = net.env({"GIT_CEILING_DIRECTORIES": str(self.cwd.parent)})
+        # Claude Code keeps no notes of its own about what it read here (its auto-memory)
+        env = net.env({"GIT_CEILING_DIRECTORIES": str(self.cwd.parent), "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"})
         args = [
             exe,
             "-p",

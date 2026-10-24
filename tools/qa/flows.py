@@ -135,7 +135,7 @@ with sync_playwright() as p:
         users = [m["text"] for m in api(f"/api/chat?id={cid}")["messages"] if m["role"] == "user"]
         check("вопрос кнопками: ответ ушёл сообщением", users[-1].strip() == "Первый", users[-1][:40])
 
-    # 5. answer actions: «Поспорить с другими» instead of «Полезно»
+    # 5. answer actions: «Поспорить с разными ИИ» instead of «Полезно»
     page.hover(".msg.ai >> nth=-1")
     check("под ответом нет «Полезно»", page.locator("[data-like]").count() == 0)
 
@@ -293,7 +293,12 @@ with sync_playwright() as p:
     groups0 = page.locator(".csess").count()
     page.click("#news")
     page.wait_for_timeout(800)
-    check("новая сессия: пустая текущая группа сверху", page.locator(".csess.cur.empty").count() == 1)
+    check(
+        "новая сессия: без пустой строки, сверху одна «Текущая сессия»",
+        page.locator(".csess.empty").count() == 0
+        and page.locator(".csess.cur").count() == 1
+        and page.locator(".csess").count() == groups0,
+    )
     for t in ("Первый вопрос новой сессии", "Второй разговор той же сессии"):
         page.fill("#inp", t)
         page.keyboard.press("Enter")

@@ -246,7 +246,7 @@ input,select{background:var(--card);color:var(--ink)}
 <div class="step" id="s3" hidden><div class="memart"><svg viewBox="0 0 150 76"><rect x="88" y="26" width="56" height="44" rx="8" fill="#ecebff" stroke="#5b5bd6" stroke-width="2"/><path d="M88 34h22l5-6h29" fill="none" stroke="#5b5bd6" stroke-width="2"/>
 <g class="f"><rect x="18" y="8" width="20" height="24" rx="3" fill="#fff" stroke="#8a909a" stroke-width="1.5"/><path d="M22 15h12M22 20h12M22 25h8" stroke="#b9b8c9" stroke-width="1.5"/></g>
 <g class="f f2"><rect x="30" y="2" width="20" height="24" rx="3" fill="#fff" stroke="#8a909a" stroke-width="1.5"/><path d="M34 9h12M34 14h12M34 19h8" stroke="#b9b8c9" stroke-width="1.5"/></g>
-<g class="f f3"><rect x="10" y="16" width="20" height="24" rx="3" fill="#fff" stroke="#8a909a" stroke-width="1.5"/><path d="M14 23h12M14 28h12M14 33h8" stroke="#b9b8c9" stroke-width="1.5"/></g></svg></div><h1>Память о тебе для любого ИИ</h1><p>Она живёт у тебя на компьютере обычными файлами и учится на тебе так, как ты разрешишь.</p>
+<g class="f f3"><rect x="10" y="16" width="20" height="24" rx="3" fill="#fff" stroke="#8a909a" stroke-width="1.5"/><path d="M14 23h12M14 28h12M14 33h8" stroke="#b9b8c9" stroke-width="1.5"/></g></svg></div><h1>Память о тебе для любого ИИ</h1><p>Она живёт у тебя на компьютере обычными файлами и учится ровно настолько, насколько ты разрешишь.</p>
 <details class="opt" id="pxbox"><summary>Подключаюсь через прокси или VPN</summary><div class="h">Через него пойдут все разговоры с ИИ, поиск и скачивание моделей.</div>
 <div class="vg" id="vg"></div><div id="vpnr"></div>
 <div class="h" style="margin-top:12px">Или впиши вручную:</div>
@@ -282,7 +282,7 @@ const AI_LANG={ru:['ИИ будет отвечать тебе на русско�
  de:['Die KI antwortet dir auf Deutsch','Auch wenn du in einer anderen Sprache schreibst. Ändern kannst du das jederzeit über die Sprachtaste oben rechts.','Weiter'],
  ja:['AI は日本語で答えます','別の言語で書いても同じです。右上の言語ボタンでいつでも変更できます。','次へ']};
 const LANGS=[['ru','Русский'],['en','English'],['zh','中文'],['es','Español'],['hi','हिन्दी'],['ar','العربية'],['pt','Português'],['fr','Français'],['de','Deutsch'],['ja','日本語']];
-const DICT=__SETUP_I18N__;let LANG='ru';const ORIG=new Map();
+const DICT=__SETUP_I18N__;let LANG='en';const ORIG=new Map();
 function trAll(){const d=DICT[LANG]||{};document.documentElement.dir=LANG==='ar'?'rtl':'ltr';document.documentElement.lang=LANG;
   const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT,{acceptNode:n=>n.nodeType===1&&n.matches('[data-noi18n],script,style')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
   let n;while((n=w.nextNode())){if(n.nodeType===3){if(!ORIG.has(n))ORIG.set(n,n.nodeValue);const o=ORIG.get(n),k=o.trim();if(k)n.nodeValue=d[k]?o.replace(k,d[k]):o}
@@ -445,7 +445,7 @@ def setup_html(lang: str | None = None) -> str:
             continue
         d[f.stem] = {t: exact[t] for t in texts if t in exact}
     html = SETUP_HTML.replace("__SETUP_I18N__", json.dumps(d, ensure_ascii=False))
-    if (lang or windows_lang()) == "ru":
+    if lang == "ru":  # English by default; Russian only when asked for
         for en, ru in SETUP_RU.items():
             html = html.replace(en, ru)
     return OS.os_words(html)
@@ -503,7 +503,7 @@ class App:
             self._app.window.load_html(setup_html())
 
         def _lang(self) -> str:
-            return load_config().get("lang") or "ru"
+            return load_config().get("lang") or "en"
 
         def proxy_detect(self):
             from . import vpn_detect
@@ -521,7 +521,7 @@ class App:
             from .agent import profile as P
 
             patch = {
-                "lang": prefs.get("lang") or "ru",
+                "lang": prefs.get("lang") or "en",
                 "gender": prefs.get("gender") or "",
                 "owner_name": (prefs.get("name") or "")[:60],
                 "ui_theme": prefs.get("theme") if prefs.get("theme") in ("light", "dark", "system") else "",
@@ -602,6 +602,9 @@ class App:
     def open_vault(self, vault: Vault, demo: bool, delay: float = 0.3) -> None:
         cfg = load_config()
         cfg.update(vault=str(vault.root), demo=demo)
+        if not demo:  # the memories this computer knows: the settings switch between them
+            mine = str(vault.root)
+            cfg["vaults"] = [mine] + [p for p in cfg.get("vaults") or [] if Path(p) != Path(mine)][:11]
         save_config(cfg)
         self.start_server(vault)
         # let the JS call that asked for it return first, then navigate
@@ -625,6 +628,10 @@ class App:
             autostart=self.autostart_api,
             info=self.info,
             switch=self.switch,
+            vaults=self.vaults_api,
+            vault_open=self.vault_open_api,
+            vault_forget=self.vault_forget_api,
+            vault_rename=self.vault_rename_api,
             close_pref=self.close_pref_api,
             quit=self.quit_api,
         )
@@ -644,7 +651,7 @@ class App:
         try:  # the language of the screen shown if this folder is ever missing at start
             from .agent import profile as P
 
-            cfg["lang"] = P.load(vault).get("lang") or "ru"
+            cfg["lang"] = P.load(vault).get("lang") or "en"
         except Exception:
             pass
         save_config(cfg)
@@ -667,6 +674,104 @@ class App:
         set_autostart(bool((body or {}).get("on")))
         self.refresh_tray()
         return self.info()
+
+    def vaults_api(self, _=None) -> dict:
+        """The memories this computer knows, the open one first."""
+        cfg = load_config()
+        cur = str(self.vault.root) if self.vault else ""
+        known = cfg.get("vaults") or []
+        if cur and not cfg.get("demo") and cur not in known:
+            known = [cur] + known
+        return {
+            "current": "" if cfg.get("demo") else cur,
+            "list": [
+                {
+                    "path": p,
+                    "name": (cfg.get("names") or {}).get(p) or Path(p).name or p,
+                    "exists": Vault(Path(p)).exists(),
+                }
+                for p in known
+            ],
+        }
+
+    def vault_open_api(self, body=None) -> dict:
+        p = Path(str((body or {}).get("path") or "")).expanduser()
+        v = Vault(p)
+        if not v.exists():
+            return {"error": "Здесь нет памяти Mnema: нет файла «70 Memory/Profile.md»."}
+        self.open_vault(v, demo=False, delay=0.4)
+        return {"ok": True}
+
+    def vault_rename_api(self, body=None) -> dict:
+        """The name a memory is shown with in the settings; the folder itself keeps its name."""
+        b = body or {}
+        cfg = load_config()
+        names = cfg.get("names") or {}
+        path, name = str(b.get("path") or ""), str(b.get("name") or "").strip()[:60]
+        if name:
+            names[path] = name
+        else:
+            names.pop(path, None)
+        cfg["names"] = names
+        save_config(cfg)
+        return {"ok": True, **self.vaults_api()}
+
+    def vault_forget_api(self, body=None) -> dict:
+        """Take a memory off the list; with delete — its folder goes to the Recycle Bin. The open one is closed first:
+        the window moves to the next memory on the list (or to the first screen) and then the folder goes."""
+        from . import osapi
+
+        b = body or {}
+        p = Path(str(b.get("path") or ""))
+        if self.vault and p.resolve() == self.vault.root.resolve():
+            if not b.get("delete"):
+                return {"error": "Это открытая память."}
+            nxt = next((x for x in load_config().get("vaults") or [] if Path(x) != p and Vault(Path(x)).exists()), None)
+            threading.Thread(target=self._close_and_delete, args=(p, nxt), daemon=True).start()
+            return {"ok": True, "closing": True, "next": nxt or ""}
+        if b.get("delete") and p.exists():
+            if not Vault(p).exists():
+                return {"error": "Здесь нет памяти Mnema — папку не трогаю."}
+            if not osapi.to_trash(p):
+                return {"error": "Не получилось переместить папку в корзину. Закрой файлы из неё и повтори."}
+        cfg = load_config()
+        cfg["vaults"] = [x for x in cfg.get("vaults") or [] if Path(x) != p]
+        save_config(cfg)
+        return {"ok": True, **self.vaults_api()}
+
+    def _close_and_delete(self, p: Path, nxt: str | None) -> None:
+        """The open memory is being deleted: let the answer reach the window, close the memory, wipe the folder."""
+        from . import osapi
+
+        time.sleep(0.4)
+        cfg = load_config()
+        cfg["vaults"] = [x for x in cfg.get("vaults") or [] if Path(x) != p]
+        (cfg.get("names") or {}).pop(str(p), None)
+        if not nxt:
+            cfg.update(vault="", demo=False)
+        save_config(cfg)
+        old = self.learner
+        if nxt:
+            self.open_vault(Vault(Path(nxt)), demo=False, delay=0.1)  # stops this memory's server and learning
+        else:
+            if self.server:
+                self.server.shutdown()
+                self.server.server_close()
+                self.server = None
+            if old:
+                old.stop()
+            self.learner = None
+            self.vault = None
+            self.window.load_html(setup_html())
+        if old and old.is_alive():
+            old.join(timeout=15)
+        for _ in range(20):  # a file still held by a finishing write: try again for a while
+            if osapi.to_trash(p):
+                return
+            time.sleep(1)
+        cfg = load_config()  # couldn't: the memory comes back on the list, deleting it again shows the reason
+        cfg["vaults"] = (cfg.get("vaults") or []) + [str(p)]
+        save_config(cfg)
 
     def switch(self, _=None) -> dict:
         """Back to the first screen: create own memory instead of the demo."""
@@ -918,7 +1023,7 @@ class App:
         self.window = webview.create_window(
             APP,
             url=self.url() if vault else None,
-            html=None if vault else (missing_html(cfg["vault"], cfg.get("lang", "ru")) if missing else setup_html()),
+            html=None if vault else (missing_html(cfg["vault"], cfg.get("lang", "en")) if missing else setup_html()),
             width=1240,
             height=860,
             min_size=(900, 600),

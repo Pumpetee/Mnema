@@ -2,7 +2,7 @@
 // ---------------------------------------------------------------- engine: tokens and computer load
 const ENG_MODES = {
   eco: ["Эконом", "Меньше токенов и нагрузки. Ответы короче, компьютер почти не занят"],
-  balance: ["Баланс", "Разумно по всему. Подходит большинству"],
+  balance: ["Баланс", "Золотая середина. Подходит большинству"],
   max: ["Максимум", "Вся память в запросе, длинные ответы, все ядра. Дороже и тяжелее"],
 };
 const LEARN_STEPS = [5, 10, 15, 30, 60, 120, 240, 720, 1440];
@@ -10,10 +10,19 @@ function fmtN(n) {
   return Number(n || 0).toLocaleString(locale());
 }
 function learnL(m) {
-  return m < 60 ? m + " мин" : m < 1440 ? m / 60 + " ч" : "раз в сутки";
+  return m < 60 ? m + " " + tr("мин") : m < 1440 ? m / 60 + " " + tr("ч.") : tr("раз в сутки");
 }
+const PRECISE_L = ["самый экономный", "экономнее", "баланс", "точнее", "максимально точно"];
+const PRECISE_ASK = [
+  "только когда без этого никак",
+  "когда без этого никак",
+  "когда нужно",
+  "чаще",
+  "при любой неясности",
+];
 function engineCard(e) {
   if (!e) return "";
+  const pr = e.precise ?? 2;
   const u = e.usage || { cloud: 0, local: 0 },
     pct = e.month ? Math.min(100, Math.round((u.cloud / e.month) * 100)) : 0;
   const sl = (k, label, min, max, step, val, shown, hint) =>
@@ -22,7 +31,7 @@ function engineCard(e) {
     0,
     LEARN_STEPS.indexOf(e.learn) < 0 ? LEARN_STEPS.findIndex((x) => x >= e.learn) : LEARN_STEPS.indexOf(e.learn),
   );
-  return `<div class="card" data-sec="engine" id="engcard"><h2>Движок${hq("engine")}</h2>
+  return `<div id="engwrap"><div class="card" data-sec="engine" id="engcard"><h2>Движок${hq("engine")}</h2>
    <div class="presets engmodes">${Object.entries(ENG_MODES)
      .map(
        ([k, [t, s]]) =>
@@ -32,24 +41,30 @@ function engineCard(e) {
    ${e.mode === "custom" ? `<div class="hint" style="margin-top:8px">${tr("Сейчас своя настройка: ползунки сдвинуты вручную.")}</div>` : ""}
    <div class="engmeter"><div>${tr("В этом месяце облачные ИИ потратили")} <b>${fmtN(u.cloud)}</b> ${tr("токенов")}${e.month ? ` ${tr("из")} ${fmtN(e.month)}` : ""}. ${tr("На компьютере")} — ${fmtN(u.local)}, ${tr("бесплатно")}.</div>${e.month ? `<div class="engbar ${pct >= 90 ? "hot" : ""}"><i style="width:${pct}%"></i></div>` : ""}</div>
    <details class="engfine" ${LS.get("engfine", false) ? "open" : ""}><summary>${tr("Тонкая настройка")}</summary>
-    <div class="enggrid">
-     <div class="engcol"><h4>${tr("Токены")}</h4>
-      ${sl("memory", tr("Память в запросе"), 1000, 30000, 500, e.memory, fmtN(e.memory) + " " + tr("знаков"), tr("Сколько памяти уходит облачному ИИ с вопросом. Остальное остаётся на компьютере."))}
-      ${sl("answer", tr("Самый длинный ответ"), 300, 16000, 100, e.answer, fmtN(e.answer) + " " + tr("токенов"), tr("Для ИИ по ключу и локальной модели. Claude по подписке так не ограничить, он и не тратит деньги сверх подписки."))}
-      <div class="engsl"><div class="engh"><span>${tr("Лимит на месяц")}</span></div><div class="row"><input class="inp" type="number" min="0" step="100000" id="engmonth" value="${e.month || ""}" placeholder="${tr("без лимита")}" style="width:160px"><span class="hint">${tr("токенов облачных ИИ. Дошли до лимита — облачные ИИ ждут следующего месяца, локальная модель работает.")}</span></div></div></div>
-     <div class="engcol"><h4>${tr("Компьютер")}</h4>
+    <div class="engcol1">
+     <h4>${tr("Токены")}</h4>
+      <div class="engsl engprec"><div class="engh"><span>${tr("Точнее ↔ Экономнее")}${hq("economy")}</span><b data-ev="precise">${tr(PRECISE_L[pr])}</b></div>
+       <div class="precrow"><small>${tr("Точнее")}</small><input type="range" data-ek="precise" min="0" max="4" step="1" value="${4 - pr}"><small>${tr("Экономнее")}</small></div>
+       <div class="hint">${tr("Сверяется")}: ${tr("память")} — ${fmtN(e.memory)} ${tr("знаков")}, ${tr("документ")} — ${tr("до")} ${fmtN(e.docs)} ${tr("знаков")}${pr >= 4 ? ` (${tr("целиком, без сокращений")})` : ""}. ${tr("Уточняет")}: ${tr(PRECISE_ASK[pr])}.</div>
+       <div class="hint">${tr("Точнее — ИИ видит больше памяти и документа и чаще переспрашивает. Это дороже.")}</div></div>
+      ${sl("answer", tr("Самый длинный ответ"), 300, 16000, 100, e.answer, fmtN(e.answer) + " " + tr("токенов"), tr("Работает для ИИ по ключу и локальной модели. Claude по подписке так не ограничить, но он и не тратит сверх подписки."))}
+      <div class="engsl"><div class="engh"><span>${tr("Лимит на месяц")}</span></div><div class="row"><input class="inp" type="number" min="0" step="100000" id="engmonth" value="${e.month || ""}" placeholder="${tr("без лимита")}" style="width:160px"><span class="hint">${tr("токенов облачных ИИ. Дошли до лимита — облачные ИИ ждут следующего месяца, локальная модель работает.")}</span></div></div>
+     <h4>${tr("Компьютер")}</h4>
       ${sl("threads", tr("Ядра процессора"), 1, e.cores, 1, e.threads, e.threads + " " + tr("из") + " " + e.cores, tr("Сколько ядер берут локальная модель и расшифровка встреч. Меньше — компьютер свободнее, ответ дольше."))}
       ${sl("ctx", tr("Сколько держит в голове"), 2048, 32768, 2048, e.ctx, fmtN(e.ctx) + " " + tr("токенов"), tr("Длина разговора, которую локальная модель видит целиком. Больше — нужно больше оперативной памяти."))}
-      <div class="engsl"><div class="tg" style="padding:0;border:0"><button class="sw ${e.low ? "on" : ""}" id="englow"></button><div><b>${tr("Не мешать работе")}</b><p>${tr("Локальная модель работает с низким приоритетом: окна и браузер не тормозят.")}</p></div></div></div>
-      ${sl("learn", tr("Обучение в фоне"), 0, LEARN_STEPS.length - 1, 1, li, learnL(e.learn), tr("Как часто Mnema проверяет источники обучения."))}</div>
-    </div></details></div>`;
+    </div></details></div>
+   <div class="card" data-sec="engine" id="engbg"><h2>${tr("В фоне")}</h2>
+    <div class="tg"><button class="sw ${e.low ? "on" : ""}" id="englow"></button><div><b>${tr("Не мешать работе")}</b><p>${tr("Локальная модель работает с низким приоритетом: окна и браузер не тормозят.")}</p></div></div>
+    <div class="engcol1">${sl("learn", tr("Обучение в фоне"), 0, LEARN_STEPS.length - 1, 1, li, learnL(e.learn), tr("Как часто Mnema проверяет источники обучения."))}</div>
+   </div></div>`;
 }
 function bindEngine() {
-  const c = $("#engcard");
+  const c = $("#engwrap");
   if (!c) return;
   const redraw = (e) => {
     c.outerHTML = engineCard(e);
     bindEngine();
+    decorateToggles($("#engwrap"));
   };
   const set = async (patch) => {
     try {
@@ -62,16 +77,18 @@ function bindEngine() {
   $$("[data-em]", c).forEach((b) => (b.onclick = () => set({ mode: b.dataset.em })));
   $$("[data-ek]", c).forEach((r) => {
     const k = r.dataset.ek,
-      val = () => (k === "learn" ? LEARN_STEPS[+r.value] : +r.value);
+      val = () => (k === "learn" ? LEARN_STEPS[+r.value] : k === "precise" ? 4 - +r.value : +r.value);
     r.oninput = () => {
       const v = val(),
         lab = $(`[data-ev="${k}"]`, c);
       lab.textContent =
         k === "learn"
           ? learnL(v)
-          : k === "threads"
-            ? v + " " + tr("из") + " " + r.max
-            : fmtN(v) + " " + (k === "memory" ? tr("знаков") : tr("токенов"));
+          : k === "precise"
+            ? tr(PRECISE_L[v])
+            : k === "threads"
+              ? v + " " + tr("из") + " " + r.max
+              : fmtN(v) + " " + tr("токенов");
     };
     r.onchange = () => set({ [k]: val() });
   });
@@ -150,7 +167,7 @@ async function outgoingModal(days) {
   pop.innerHTML = `<div class="card"><h2>${tr("Что ушло наружу")}<span class="hint">${tr("за")} ${days} ${tr("дн.")}</span><button class="mx" id="outx">×</button></h2>
    <div class="outsum"><div><b>${d.requests}</b><span>${tr("запросов к облачным ИИ")}</span></div><div><b>${fmtN(d.memory_kept)}</b><span>${tr("знаков памяти остались на компьютере")}</span></div><div><b>${fmtN(Object.values(d.redacted).reduce((a, b) => a + b, 0))}</b><span>${tr("секретов скрыто")}</span></div></div>
    ${by ? `<p class="hint">${tr("Кому")}: ${by}${Object.keys(d.redacted).length ? ` · ${tr("скрыто")}: ${redLine(d.redacted)}` : ""}</p>` : ""}
-   <div class="tg" style="padding:6px 0 10px;border:0"><button class="sw ${d.redact ? "on" : ""}" id="outred"></button><div><b>${tr("Скрывать секреты от облачных ИИ")}</b><p>${tr("Номера карт, пароли и ПИН-коды, ключи, телефоны, паспорта, СНИЛС, ИНН и номера счетов заменяются метками до отправки — и в запросах к поисковикам. В ответе Mnema подставляет настоящие значения на компьютере. Сами значения не пишутся даже в этот отчёт.")}</p></div></div>
+   <div class="tg" style="padding:6px 0 10px;border:0"><button class="sw ${d.redact ? "on" : ""}" id="outred"></button><div><b>${tr("Скрывать секреты от облачных ИИ")}</b><p>${tr("Номера карт, пароли, ПИН-коды, ключи, телефоны, паспорта, СНИЛС, ИНН и счета заменяются метками до отправки, в том числе в поиске. Настоящие значения Mnema возвращает в ответ уже на компьютере. В этот отчёт они тоже не попадают.")}</p></div></div>
    ${rows ? `<div class="outtbl"><table><tr><th>${tr("Когда")}</th><th>${tr("Кому")}</th><th>${tr("Зачем")}</th><th>${tr("Знаков")}</th><th>${tr("Память")}</th><th>${tr("Не видел")}</th><th>${tr("Скрыто")}</th></tr>${rows}</table></div>` : `<p class="hint">${tr("За эти дни ничего не уходило: работала только локальная модель или ты не писал.")}</p>`}
    <p class="hint">${tr("Локальная модель в отчёт не попадает: она на этом компьютере и ничего не отправляет.")}</p></div>`;
   $("#outx", pop).onclick = () => pop.remove();
@@ -176,15 +193,12 @@ const SCRIBE_HINT = {
 };
 function scribeCard(c) {
   if (!c) return "";
-  return `<div class="card" data-sec="meetings" id="scrcard"><h2>${tr("Встречи")}${hq("scribe")}</h2>
-   <div class="shd"><b>${tr("Чем расшифровывать")}</b><span class="hint">${tr("бесплатно и медленнее — или быстро за деньги")}</span></div>
-   ${scribePlans(c, c.mode)}
-   ${c.mode !== "cloud" ? `<div class="shd"><b>${tr("Точность на компьютере")}</b><span class="hint">${tr("сейчас")}: ${esc(c.local_model)} · ${tr("модель скачается один раз")}</span></div>${scribeQuality(c.quality)}` : ""}
-   <div class="shd"><b>${tr("Облачный Whisper")}</b>${c.cloud_ready ? `<span class="pill">✓ ${tr("готов")}: ${tr(c.cloud_from)}</span>` : `<span class="hint">${tr("не подключён")}</span>`}</div>
-   <p class="hint" style="margin:0 0 6px">${tr("Подойдёт ключ OpenAI из подключений к ИИ или свой адрес, совместимый с OpenAI.")}</p>
-   <details><summary class="hint" style="cursor:pointer">${tr("Свой адрес и ключ")}</summary><div class="row" style="margin-top:6px"><input class="inp" id="scrbase" placeholder="https://…/v1" value="${esc(c.base || "")}" style="min-width:260px"><input class="inp" id="scrmodel" placeholder="whisper-1" value="${esc(c.model || "")}" style="width:150px"><input class="inp" id="scrkey" type="password" placeholder="${tr("ключ")}" style="width:200px"><button class="btn l sm" id="scrsave">${tr("Сохранить")}</button></div></details>
-   <div class="shd"><b>${tr("Чем подводить итоги")}</b><span class="hint">${tr("на компьютере — бесплатно, облачной моделью — по подписке или ключу")}</span></div>
-   <select class="inp" id="scrsum" style="max-width:420px"><option>${tr("загружаю…")}</option></select><div class="hint" id="scrsumh" style="margin-top:6px"></div></div>`;
+  return `<div class="card" data-sec="meetings" id="scrcard"><h2>${tr("Записи встреч")}${hq("scribe")}</h2>
+   <div class="shd"><b>${tr("Чем расшифровывать")}</b></div>
+   ${scribePlans(c, c.mode, false, true)}
+   ${c.mode !== "cloud" ? `<div class="shd"><b>${tr("Точность на компьютере")}</b></div>${scribeQuality(c.quality)}` : ""}
+   <div class="shd"><b>${tr("Облачный Whisper")}</b>${c.cloud_ready ? `<span class="pill">✓ ${tr("готов")}: ${tr(c.cloud_from)}</span>` : ""}</div>
+   <details class="scrown"><summary>${tr("Свой адрес и ключ")}</summary><div class="row" style="margin-top:6px"><input class="inp" id="scrbase" placeholder="https://…/v1" value="${esc(c.base || "")}" style="min-width:260px"><input class="inp" id="scrmodel" placeholder="whisper-1" value="${esc(c.model || "")}" style="width:150px"><input class="inp" id="scrkey" type="password" placeholder="${tr("ключ")}" style="width:200px"><button class="btn l sm" id="scrsave">${tr("Сохранить")}</button></div></details></div>`;
 }
 function bindScribeCard() {
   const c = $("#scrcard");
@@ -200,52 +214,6 @@ function bindScribeCard() {
   };
   $$("[data-plan]", c).forEach((b) => (b.onclick = () => set({ mode: b.dataset.plan })));
   $$("[data-sq]", c).forEach((b) => (b.onclick = () => set({ model: b.dataset.sq })));
-  Promise.all([api("/api/models"), api("/api/agent")])
-    .then(([ms, ag]) => {
-      const sel = $("#scrsum", c);
-      if (!sel) return;
-      const cur = (ag.profile || {}).scribe_summary_model || "";
-      const ms2 = ms.providers
-        .filter((p) => p.ready)
-        .flatMap((p) =>
-          p.models
-            .filter((m) => m.id || p.id !== "claude_code")
-            .map((m) => ({
-              v: p.id + ":" + m.id,
-              l:
-                (p.id === "local" ? "💻 " : "☁️ ") +
-                (p.id === "claude_code" ? "" : p.name + " · ") +
-                m.name +
-                (p.id === "local"
-                  ? " · " + tr("бесплатно")
-                  : p.id === "claude_code"
-                    ? " · " + tr("подписка")
-                    : " · " + tr("по ключу")),
-              local: p.id === "local",
-            })),
-        );
-      sel.innerHTML =
-        `<option value="">${tr("Та, что выбрана в чате")}</option>` +
-        ms2.map((m) => `<option value="${esc(m.v)}" ${m.v === cur ? "selected" : ""}>${esc(m.l)}</option>`).join("");
-      const hint = () => {
-        const m = ms2.find((x) => x.v === sel.value);
-        $("#scrsumh", c).textContent = !m
-          ? tr("Итоги подведёт модель, выбранная в чате на момент встречи.")
-          : m.local
-            ? tr("Итоги делаются на компьютере — бесплатно, текст никуда не уходит.")
-            : tr("Текст расшифровки уйдёт этой модели, секреты будут скрыты.");
-      };
-      hint();
-      sel.onchange = async () => {
-        hint();
-        try {
-          await post("/api/agent", { scribe_summary_model: sel.value });
-        } catch (e) {
-          toast(e.message);
-        }
-      };
-    })
-    .catch(() => {});
   $("#scrsave", c).onclick = () =>
     set({ base: $("#scrbase", c).value, cloud_model: $("#scrmodel", c).value, key: $("#scrkey", c).value });
 }

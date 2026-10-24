@@ -231,12 +231,15 @@ async function memPortrait() {
     `<div class="card phero"><div class="pav">${esc((name || "?").slice(0, 1).toUpperCase())}</div><div class="pbody">
       <div class="pname" data-noi18n>${esc(name || tr("Ты"))}</div>
       <div class="pabout">${tr("Это твой портрет. Mnema подставляет его каждому ИИ, с которым ты говоришь, — чтобы тот сразу знал, кто ты и как с тобой работать.")}</div>
-      ${intro.length ? `<div class="who">${intro.map(inline).join("<br>")}</div>` : building ? `<div class="pnone pbuild">${tr("Собираю портрет из того, что уже знаю о тебе…")}</div>` : `<div class="pnone">${tr("Пока Mnema почти ничего о тебе не знает. Портрет заполнится сам по ходу разговоров — или расскажи о себе прямо сейчас: чем занимаешься, что сейчас главное.")}</div>`}
+      ${intro.length ? `<div class="who">${intro.map(inline).join("<br>")}</div>` : building ? `<div class="pnone pbuild">${tr("Собираю портрет из того, что уже знаю о тебе…")}</div>` : `<div class="pnone">${tr("Пока Mnema почти ничего о тебе не знает. Портрет заполнится сам по ходу разговоров — или пройди «Знакомство»: пара минут, и она будет знать главное.")}</div>`}
       <div class="pstats"><span>${ic("book")}<b data-count="${all.length}">0</b> ${tr("фактов")}</span><span>${ic("check")}<b data-count="${learned}">0</b> ${tr("выучено само")}</span>${ms.updated ? `<span>${ic("redo")}${tr("обновлено")} ${ago(ms.updated)}</span>` : ""}</div>
-      <div class="row" style="margin-top:12px;gap:8px"><button class="btn sm" data-tell>${ic("chat")}${tr("Рассказать о себе")}</button><button class="btn g sm" data-edit="70 Memory/Profile.md">${ic("edit")}${tr("Поправить самому")}</button></div></div></div>
+      <div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap"><button class="btn sm" data-int>${ic("user")}${tr("Знакомство")}</button><button class="btn l sm" data-quiz>${ic("check")}${tr("Насколько Mnema меня знает")}</button><button class="btn l sm" data-cmp>${ic("eye")}${tr("С памятью и без")}</button><button class="btn g sm" data-tell>${ic("chat")}${tr("Рассказать о себе")}</button><button class="btn g sm" data-edit="70 Memory/Profile.md">${ic("edit")}${tr("Поправить самому")}</button></div></div></div>
    ${memMap(topics, name)}
    <div class="mtiles">${topics.map(topicTile).join("")}</div>`;
   $$("[data-tell]").forEach((b) => (b.onclick = tellAboutMe));
+  $$("[data-int]").forEach((b) => (b.onclick = interviewView));
+  $$("[data-quiz]").forEach((b) => (b.onclick = quizView));
+  $$("[data-cmp]").forEach((b) => (b.onclick = () => compareView()));
   $$("[data-edit]").forEach((b) => (b.onclick = () => editNote(b.dataset.edit, () => viewMemory("portrait"))));
   bindWhy();
   bindRules();
@@ -332,7 +335,7 @@ function showWhy(d, text) {
         if (a === "close") return pop.remove();
         const body = { id: d.id, action: a };
         if (a === "edit") {
-          const v = prompt("Поправь:", d.text);
+          const v = await askText("Как правильно?", d.text);
           if (!v) return;
           body.text = v;
         }

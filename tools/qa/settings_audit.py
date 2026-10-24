@@ -39,6 +39,9 @@ def press(page, sw):
         page.evaluate(
             f"[...document.querySelectorAll('#st .sw')].filter(b => b.offsetParent && b.checkVisibility() && !b.closest('details:not([open])') && !b.disabled && !b.closest('.dimmed'))[{sw['i']}].click()"
         )
+    page.wait_for_timeout(300)
+    if page.locator(".memask [data-yes]").count():  # turning the memory on asks first: say yes, as the owner would
+        page.click(".memask [data-yes]")
 
 
 def open_sec(page, sec):

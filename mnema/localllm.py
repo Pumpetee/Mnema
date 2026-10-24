@@ -253,16 +253,24 @@ def add_custom_file(path: str) -> dict:
         raise ValueError("нужен файл модели в формате .gguf")
     if p.stat().st_size < 50_000_000:
         raise ValueError("это не похоже на модель: файл слишком маленький")
-    name = re.sub(r"[-_.](Q\d.*|IQ\d.*|f16|bf16)$", "", p.stem, flags=re.I).replace("_", " ")
+    name = _strip_quant(p.stem).replace("_", " ")
     m = _custom_entry(name, p.name, p.stat().st_size, path=str(p), purpose="Добавлена тобой из файла на компьютере.")
     _save_customs([c for c in customs() if c["id"] != m["id"]] + [m])
     return m
 
 
+def _strip_quant(stem: str) -> str:
+    """«Qwen3-4B-Q4_K_M» → «Qwen3-4B»: the quantisation tail goes, found in one pass (no backtracking regex)."""
+    m = re.search(r"[-_.](?:I?Q\d|b?f16$)", stem, re.I)
+    return stem[: m.start()] if m else stem
+
+
 def parse_hf(url: str) -> tuple[str, str]:
     """https://huggingface.co/<owner>/<repo>/(resolve|blob)/<rev>/<path>.gguf → (repo, path)."""
     m = re.match(
-        r"^https?://huggingface\.co/([^/]+/[^/]+)/(?:resolve|blob)/[^/]+/(.+\.gguf)(?:\?.*)?$", url.strip(), re.I
+        r"^https?://huggingface\.co/([^/?]+/[^/?]+)/(?:resolve|blob)/[^/?]+/([^?]+\.gguf)$",
+        url.strip().split("?", 1)[0],
+        re.I,
     )
     if not m:
         raise ValueError("нужна ссылка на файл .gguf с huggingface.co — открой файл на сайте и скопируй адрес")
@@ -279,7 +287,7 @@ def add_custom_url(url: str) -> dict:
         raise ValueError(f"не открылась ссылка: {str(e)[:120]}")
     if size < 50_000_000:
         raise ValueError("по ссылке не модель или её размер не узнать")
-    name = re.sub(r"[-_.](Q\d.*|IQ\d.*|f16|bf16)$", "", Path(file).stem, flags=re.I).replace("_", " ")
+    name = _strip_quant(Path(file).stem).replace("_", " ")
     m = _custom_entry(name, Path(file).name, size, repo=repo, src=file, purpose=f"Добавлена тобой по ссылке: {repo}.")
     _save_customs([c for c in customs() if c["id"] != m["id"]] + [m])
     return m

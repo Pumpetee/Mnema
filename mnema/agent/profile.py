@@ -147,7 +147,11 @@ DEFAULT = {
     "simple": {k: v["default"] for k, v in SIMPLE.items()},
     "custom": "",  # free text added to the instructions
     "default_model": "",  # "provider:model"
-    "team_vault": "",  # shared team memory folder
+    "team_vault": "",  # before 1.4: one shared folder; read as the first of extra_folders
+    "extra_folders": [],  # more folders the memory reaches into (notes, an Obsidian vault, another Mnema memory)
+    "tg_read": {},  # reading the owner's chats through the Telegram API (learn/tg_api.py): api_id, phone, who logged in
+    "self_ask": True,  # a question of her own now and then when the talk is about a project (chat/selfask.py)
+    "self_ask_next": "",  # not before this time: 40–120 minutes after the last such question
     "local_offer": "",  # first-launch offer of the built-in model: "" → show, "dismissed" / "done"
     "scribe_model": "auto",  # meeting scribe: auto (medium if downloaded) | small | medium | large-v3
     "proxy": "",  # "" — the Windows system proxy, "off" — direct, or http://host:port
@@ -163,7 +167,7 @@ DEFAULT = {
     "vpn_name": "",  # the server name from the key
     "vpn_error": "",  # the last check of the VPN failed: what the owner sees instead of «VPN включён»
     "last_model": "",  # the model the owner picked last — the app starts with it
-    "lang": "ru",  # interface language and the language of answers
+    "lang": "en",  # interface language and the language of answers
     "gender": "",  # the owner: "m" | "f" | "" — for grammar when the AI addresses them
     "owner_name": "",  # how to call the owner
     "prompts_mode": "second",  # prompts for recurring tasks: off | second (the second similar request) | every
@@ -196,7 +200,7 @@ def memory_on(vault: Vault) -> bool:
         return True
 
 
-MEMORY_OFF = "Память Mnema выключена: Mnema не подставляет память об ИИ и ничего не запоминает. Включается в Настройки → Обучение → «Память»."
+MEMORY_OFF = "Память Mnema выключена: ИИ ничего о тебе не знают, и ничего не запоминается. Включить — Настройки → Обучение → «Память»."
 
 
 def load(vault: Vault) -> dict:
@@ -299,8 +303,6 @@ def rules_text(prof: dict) -> str:
             sec = [r for r in sec if r]
         if sec:
             lines.append(f"{s['title']}:\n" + "\n".join(f"- {r}" for r in sec))
-    if (prof.get("custom") or "").strip():
-        lines.append("Дополнительно от владельца:\n" + prof["custom"].strip())
     return "\n\n".join(lines)
 
 
@@ -314,7 +316,6 @@ def export_pack(prof: dict, name: str = "Мой набор") -> dict:
         "preset": prof.get("preset"),
         "toggles": prof.get("toggles") or {},
         "simple": {k: v for k, v in (prof.get("simple") or {}).items() if k in ("address", "length")},
-        "custom": prof.get("custom") or "",
     }
 
 
@@ -330,6 +331,5 @@ def import_pack(vault: Vault, pack: dict) -> dict:
             "simple": {
                 k: v for k, v in (pack.get("simple") or {}).items() if k in SIMPLE and v in SIMPLE[k]["choices"]
             },
-            "custom": str(pack.get("custom") or "")[:4000],
         },
     )

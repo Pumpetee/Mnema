@@ -1,7 +1,9 @@
 """The engine: how much Mnema spends — tokens of the AIs and the power of this computer.
 
 Three modes (eco / balance / max) set everything at once; any slider moved by hand makes the mode "custom".
-- memory   — how many characters of memory go into a request to a cloud AI (the rest stays on the computer);
+- precise  — one step from 0 (cheapest) to 4 (most precise). It sets how much memory goes into a request to a cloud AI,
+             how much of an attached document is checked against the question, how much of the conversation goes along,
+             whether the computer trims anything at all (4 sends whole) and how readily the AI asks back;
 - answer   — the longest answer in tokens (API keys and the local model; Claude by subscription can't be capped);
 - month    — monthly token limit for cloud AIs, 0 = no limit (the local model is free and never counted);
 - threads  — processor cores the local model and meeting transcription may take;
@@ -20,12 +22,18 @@ from .vault import Vault
 
 CORES = os.cpu_count() or 4
 PRESETS = {
-    "eco": {"memory": 2500, "answer": 1000, "threads": max(1, CORES // 4), "ctx": 4096, "low": True, "learn": 120},
-    "balance": {"memory": 4200, "answer": 3000, "threads": max(2, CORES // 2), "ctx": 8192, "low": True, "learn": 30},
-    "max": {"memory": 12000, "answer": 8000, "threads": max(2, CORES - 1), "ctx": 16384, "low": False, "learn": 10},
+    "eco": {"precise": 1, "answer": 1000, "threads": max(1, CORES // 4), "ctx": 4096, "low": True, "learn": 120},
+    "balance": {"precise": 2, "answer": 3000, "threads": max(2, CORES // 2), "ctx": 8192, "low": True, "learn": 30},
+    "max": {"precise": 4, "answer": 8000, "threads": max(2, CORES - 1), "ctx": 16384, "low": False, "learn": 10},
+}
+# what each step of «precise» means, cheapest first
+PRECISE = {
+    "memory": [2000, 3000, 4200, 8000, 16000],  # characters of memory in a request
+    "docs": [3500, 5000, 7000, 12000, 20000],  # characters of attached documents checked against the question
+    "history": [8000, 11000, 14000, 20000, 30000],  # characters of the conversation sent along
 }
 LIMITS = {
-    "memory": (1000, 30000),
+    "precise": (0, 4),
     "answer": (300, 16000),
     "threads": (1, CORES),
     "ctx": (2048, 32768),
@@ -43,7 +51,22 @@ def get(vault: Vault) -> dict:
     base = dict(PRESETS["balance" if mode == "custom" else mode])
     if mode == "custom":
         base.update({k: st[k] for k in base if k in st})
-    return {"mode": mode, **base, "month": int(st.get("month") or 0), "cores": CORES}
+        if "precise" not in st and st.get("memory"):  # set before 1.4: the old memory slider picks the nearest step
+            base["precise"] = min(range(5), key=lambda i: abs(PRECISE["memory"][i] - int(st["memory"])))
+    if "precise" not in st and P.load(vault).get("economy") is False:  # the old «economy off» switch: send whole
+        base["precise"] = 4
+    p = max(0, min(4, int(base["precise"])))
+    return {
+        "mode": mode,
+        **base,
+        "precise": p,
+        "memory": PRECISE["memory"][p],
+        "docs": PRECISE["docs"][p],
+        "history": PRECISE["history"][p],
+        "economy": p < 4,  # the most precise step trims nothing on the computer
+        "month": int(st.get("month") or 0),
+        "cores": CORES,
+    }
 
 
 def _clip(k: str, v):

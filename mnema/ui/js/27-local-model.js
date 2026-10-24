@@ -81,7 +81,7 @@ async function localModal(first, onClose) {
        })
        .join("")}
      <div class="lmods">${lmAddCard()}</div>
-     <div class="lmfoot"><span class="hint">Компьютер: память ${d.hardware.ram_gb} ГБ · свободно на диске ${d.hardware.disk_free_gb} ГБ${bps ? " · " + tr("скорость интернета") + " " + mbps(bps) : ""}. Модели лежат в папке Mnema.</span>
+     <div class="lmfoot"><span class="hint">${tr("Компьютер")}: ${tr("память")} ${d.hardware.ram_gb} ${tr("ГБ")} · ${tr("свободно на диске")} ${d.hardware.disk_free_gb} ${tr("ГБ")}${bps ? " · " + tr("скорость интернета") + " " + mbps(bps) : ""}. ${tr("Модели лежат в папке Mnema.")}</span>
        <button class="btn g sm" id="lmclose">${first ? "Не сейчас" : "Закрыть"}</button></div></div>`;
     if (html !== pop._html && !$(".lmaddp", pop)) {
       const c0 = $(".card", pop),
@@ -111,7 +111,8 @@ async function localModal(first, onClose) {
     $$("[data-del]", pop).forEach(
       (b) =>
         (b.onclick = async () => {
-          if (!confirm("Удалить модель с компьютера?")) return;
+          if (!(await ask("Удалить модель с компьютера?", "Файл модели удалится, скачать её можно будет заново.")))
+            return;
           await post("/api/local/delete", { id: b.dataset.del });
           draw();
         }),

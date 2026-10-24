@@ -90,6 +90,12 @@ with sync_playwright() as p:
     page.goto(base + "#settings/learn")
     page.wait_for_timeout(1500)
     page.click("#memsw2")
+    page.wait_for_timeout(700)
+    check(
+        "включение спрашивает подтверждение",
+        page.locator(".memask [data-yes]").count() == 1 and P.load(v).get("memory_on") is False,
+    )
+    page.click(".memask [data-yes]")
     page.wait_for_timeout(2000)
     check("включение из настроек сохраняется", P.load(v).get("memory_on") is True)
     check(

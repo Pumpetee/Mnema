@@ -15,10 +15,11 @@ os.environ["MNEMA_HOME"] = tempfile.mkdtemp()  # secrets of tests never touch th
 from mnema.learn import engine, settings as S  # noqa: E402
 from mnema.learn.brains import NoModelBrain, clean, parse_json, sensitive_tags  # noqa: E402
 from mnema.learn.ledger import Ledger, combined  # noqa: E402
-from mnema.learn.sources import BRAIN_MARK, Episode, observe_browser, read_mail  # noqa: E402
+from mnema.learn.sources import BRAIN_MARK, Episode, read_mail  # noqa: E402
 from mnema.memory import context_for, init_vault  # noqa: E402
 from mnema.vault import Vault  # noqa: E402
 from test_core import fill  # noqa: E402
+from hidden_topics import lock_cloud  # noqa: E402
 
 
 def cc_line(kind, text, i=0):
@@ -141,11 +142,8 @@ class TestSources(Base):
         engine.run(self.v, brain=NoModelBrain())
         self.assertNotIn("космонавт", self.v.read_raw("00 Inbox/Inbox.md"))
 
-    def test_browser_chatgpt_export_notes_telegram(self):
-        s = self.settings(browser="quiet", chatgpt_export="quiet", notes="quiet", telegram="quiet")
-        observe_browser(
-            self.v, "chatgpt", "https://chatgpt.com/c/1", "чат", "Запомни, что мой созвон с командой — по пятницам."
-        )
+    def test_chatgpt_export_notes_telegram(self):
+        s = self.settings(chatgpt_export="quiet", notes="quiet", telegram="quiet")
         exp = self.dir / "gpt"
         exp.mkdir()
         (exp / "conversations.json").write_text(
@@ -217,7 +215,7 @@ class TestSources(Base):
         r = engine.run(self.v, brain=NoModelBrain())
         self.assertFalse(r["errors"], r["errors"])
         mem = "\n".join(p.read_text(encoding="utf-8") for p in self.v.root.rglob("*.md") if ".mnema" not in p.parts)
-        for must in ("по пятницам", "на Python", "перенести запуск на ноябрь", "Ким отвечает за продажи"):
+        for must in ("на Python", "перенести запуск на ноябрь", "Ким отвечает за продажи"):
             self.assertIn(must, mem)
         for never in ("служебное", "чужой человек"):
             self.assertNotIn(never, mem)
@@ -319,6 +317,7 @@ class TestPolicy(Base):
         self.assertIn("выучено", self.v.read_raw("00 Inbox/Inbox.md"))
 
     def test_personal_from_elsewhere_goes_straight_to_a_hidden_section(self):
+        lock_cloud(self.v)
         r = self.go("моя зарплата")
         self.assertEqual((r["written"], r["queued"]), (1, 0))
         card = self.v.read_raw("70 Memory/Cards/Деньги.md")
@@ -331,6 +330,7 @@ class TestPolicy(Base):
 
     def test_sensitive_fact_in_any_section_is_hidden(self):
         """The brain may pick an ordinary section for a health fact — it must still be hidden."""
+        lock_cloud(self.v)
         self.TABLE = {
             **self.TABLE,
             "врач": [

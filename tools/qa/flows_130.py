@@ -1,4 +1,4 @@
-"""1.3.0 through the interface: «Поспорить с другими» under an answer (no «Полезно»), the model menu in two groups —
+"""1.3.0 through the interface: «Поспорить с разными ИИ» under an answer (no «Полезно»), the model menu in two groups —
 cloud and on this computer — with no model first by name, the same groups in the settings."""
 
 import tempfile
@@ -38,10 +38,13 @@ with sync_playwright() as p:
     page.wait_for_timeout(3500)
     clean(page)
     page.hover(".msg.ai >> nth=-1")
-    check("под ответом есть «Поспорить с другими»", page.locator("[data-debate]").count() >= 1)
+    check("под ответом есть «Поспорить с разными ИИ»", page.locator("[data-debate]").count() >= 1)
     check("кнопки «Полезно» больше нет", page.locator("[data-like]").count() == 0)
     page.screenshot(path=str(SHOTS / "mnema-130-debate-btn.png"))
     page.click("[data-debate] >> nth=-1")
+    page.wait_for_timeout(800)
+    check("«С кем поспорить?»: соперники уже отмечены", page.locator(".debpick .obsv.on").count() >= 1)
+    page.click(".debpick [data-go]")  # the suggested opponents, as they are
     page.wait_for_timeout(5000)
     chat = CH.load_chat(v, cid)
     cons = chat.get("consortium") or {}

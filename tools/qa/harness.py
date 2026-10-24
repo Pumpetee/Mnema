@@ -70,6 +70,9 @@ web.gather = lambda q, **kw: {
 def start(fill: bool = True):
     v = Vault(Path(tempfile.mkdtemp(prefix="mnema-qa-vault-")))
     init_vault(v)
+    from mnema.agent import profile as P
+
+    P.save(v, {"lang": "ru"})  # the flows click Russian labels; the interface itself starts in English since 23.10.2026
     if fill:
         remember(v, "Иван — продакт, ведёт проект Mnema", "profile:Кто я")
         remember(v, "Решили запускать пилот в ноябре", "decisions")
@@ -87,8 +90,9 @@ def start(fill: bool = True):
 # endpoints that touch the real computer: answered with a fake ok
 DANGER = (
     "/api/memory/open",
-    "/api/extension/open",
     "/api/files/reveal",
+    "/api/share/save",  # opens Explorer
+    "/api/compare",  # real models, twice each
     "/api/connect",
     "/api/local/download",
     "/api/efs",
@@ -111,6 +115,19 @@ def guard(page, log):
         return route.continue_()
 
     page.route("**/api/**", handler)
+    # Mnema's own confirm / prompt: answered like the browser's were — yes, and a name for a prompt
+    page.add_init_script(
+        """new MutationObserver(() => {
+          const d = document.querySelector('.mdlg:not([data-qa])');
+          if (!d) return;
+          d.dataset.qa = 1;
+          setTimeout(() => {
+            const i = d.querySelector('[data-v]');
+            if (i) i.value = 'Новое имя QA';
+            d.querySelector('[data-yes]').click();
+          }, 50);
+        }).observe(document, {childList: true, subtree: true});"""
+    )
 
 
 def watch(page, log):

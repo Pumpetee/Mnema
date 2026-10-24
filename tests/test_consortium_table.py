@@ -87,6 +87,63 @@ class TestRoundTable(unittest.TestCase):
         wait(cid)
         self.assertEqual([m["speaker"] for m in self.ai(cid)], ["Claude Sonnet", "Claude Opus", "Claude Haiku"])
 
+    def test_stop_cuts_the_one_speaking(self):  # «Остановить»: at once, not after the speaker is done
+        def hook(n, model, meta):
+            if n == 1:
+                CO.control(self.v, meta["chat"], "pause")
+                self.assertTrue(CH._gen[meta["chat"]]["cut"])  # the stream is told to stop now
+
+        self.talk.hook = hook
+        r = CH.send(self.v, "Вопрос", sync=True, learn=False, consortium={"members": M3, "rounds": 1})
+        cid = r["chat"]
+        ai = self.ai(cid)
+        self.assertEqual(len(ai), 1)
+        self.assertTrue(ai[0].get("cut"))  # what was said stays, marked as cut
+        self.assertEqual(CH.load_chat(self.v, cid)["consortium"]["state"]["status"], "paused")
+        self.talk.hook = None
+        CO.control(self.v, cid, "resume")
+        wait(cid)
+        self.assertEqual([m["speaker"] for m in self.ai(cid)], ["Claude Sonnet", "Claude Opus", "Claude Haiku"])
+
+    def test_stopped_before_a_word_the_same_one_speaks_on_resume(self):
+        def hook(n, model, meta):
+            if n == 1:
+                CO.control(self.v, meta["chat"], "pause")
+                return ""
+
+        self.talk.hook = hook
+        r = CH.send(self.v, "Вопрос", sync=True, learn=False, consortium={"members": M3, "rounds": 1})
+        cid = r["chat"]
+        self.assertEqual(self.ai(cid), [])
+        self.talk.hook = None
+        CO.control(self.v, cid, "resume")
+        wait(cid)
+        self.assertEqual([m["speaker"] for m in self.ai(cid)], ["Claude Sonnet", "Claude Opus", "Claude Haiku"])
+
+    def test_every_participant_gets_the_whole_conversation_with_files(self):
+        long_old = "Начало истории. " + "подробность " * 200
+        chat = {
+            "messages": [
+                {"role": "user", "text": long_old},
+                {"role": "assistant", "text": "Ответ одного ИИ до консорциума", "model": "openai:gpt"},
+                {
+                    "role": "user",
+                    "text": "Посмотрите договор",
+                    "files": [
+                        {"name": "договор.txt", "kind": "text", "text": "Пункт 7. Неустойка 0,1% в день. " * 3},
+                        {"name": "скан.png", "kind": "image", "path": "x.png"},
+                    ],
+                },
+            ]
+        }
+        out = CO.history(chat, "claude_code:opus", {"claude_code:opus": "Claude Opus"}, "неустойка")
+        text = "\n".join(m["text"] for m in out)
+        self.assertIn(long_old.strip()[:2000], text)  # recent messages go whole, not cut to a few hundred chars
+        self.assertIn("Ответ одного ИИ до консорциума", text)  # what was said before the council met
+        self.assertIn("[Документ «договор.txt»", text)
+        self.assertIn("Неустойка 0,1%", text)
+        self.assertEqual([f["name"] for f in out[-1]["files"]], ["скан.png"])  # the picture itself goes along
+
     def test_finish_sums_up_right_away(self):
         def hook(n, model, meta):
             if n == 1:

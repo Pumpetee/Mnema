@@ -125,7 +125,7 @@ def init_vault(vault: Vault) -> list[str]:
 
 
 def token(vault: Vault, kind: str = "token") -> str:
-    """kind="token" — full access for the local app, kind="ext_token" — narrow token for the browser extension."""
+    """kind="token" — full access for the local app."""
     f = vault.service / kind
     if not f.exists():
         vault.service.mkdir(parents=True, exist_ok=True)
@@ -148,7 +148,7 @@ def _slug(name: str) -> str:
 def _split_tags(name: str) -> tuple[str, list[str]]:
     """ "Деньги #money" → ("Деньги", ["money"])."""
     tags = list(dict.fromkeys(norm_tag(t) for t in re.findall(r"#([\w-]+)", name)))
-    return re.sub(r"\s*#[\w-]+", "", name).strip(), tags
+    return re.sub(r"(?:^|\s)#[\w-]+", "", name).strip(), tags
 
 
 def _append_section(body: str, heading: str, line: str) -> str:
@@ -169,7 +169,7 @@ def fact_key(line: str) -> str:
     "- **Пилот (статус 01.10.2026):** две компании" → "пилот"."""
     t = re.sub(r"^\s*[-*]\s+", "", line)
     t = re.sub(
-        r"\((?:статус|status)[^)]*\)|\(\d{1,2}\.\d{1,2}\.\d{4}\)|\d{1,2}\.\d{1,2}\.\d{4}\s*·?", " ", t, flags=re.I
+        r"\((?:статус|status)[^()]*\)|\(\d{1,2}\.\d{1,2}\.\d{4}\)|\d{1,2}\.\d{1,2}\.\d{4}\s*·?", " ", t, flags=re.I
     )
     t = t.replace("**", "").replace("__", "")
     m = re.search(r"\s[—–-]\s|:\s", t)
@@ -427,14 +427,15 @@ def remember(
             meta, body = _new_project(name, today)
             event = f"новый проект «{name.strip()}»"
         meta["updated"] = today_str(today)
-        m = re.match(r"^(?:статус|status)\s*[:—-]\s*(.+?)\s*$", fact, re.I)
-        if m and STATUS_WORDS.get(m.group(1).lower()):
-            st = STATUS_WORDS[m.group(1).lower()]
+        m = re.match(r"^(?:статус|status)\s*[:—-](.*)$", fact, re.I)
+        word = m.group(1).strip().lower() if m else ""
+        if word and STATUS_WORDS.get(word):
+            st = STATUS_WORDS[word]
             if st != meta.get("status"):
                 event = f"проект «{name.strip()}»: {meta.get('status', 'active')} → {st}"
             meta.update(status=st, status_updated=today_str(today))
-        m = re.match(r"^(?:цель|goal)\s*[:—-]\s*(.+)$", fact, re.I)
-        if m:
+        m = re.match(r"^(?:цель|goal)\s*[:—-](.*)$", fact, re.I)
+        if m and m.group(1).strip():
             meta["goal"] = m.group(1).strip()
         body, replaced = _put_fact(body, f"- {date} · {fact}{src}" if not status_dates(fact) else line, "Журнал")
         new = dump_frontmatter(meta, body)
@@ -534,13 +535,13 @@ def resolve_stale(vault: Vault, item_id: str, action: str, text: str = "", today
     old = lines[idx]
     stamp = f"(статус {ru_date(today)})"
     if action == "still":
-        lines[idx] = re.sub(r"\((?:статус|status)\s+[^)]*\)", stamp, old, flags=re.I)
+        lines[idx] = re.sub(r"\((?:статус|status)\s[^()]*\)", stamp, old, flags=re.I)
         summary = f"всё ещё в силе: {it['text'][:100]}"
     elif action == "changed":
         new = " ".join(text.split())
         if not new:
             raise ValueError("пустой факт")
-        lines[idx] = f"- {re.sub(r'[(]статус[^)]*[)]', '', new, flags=re.I).strip()} {stamp}"
+        lines[idx] = f"- {re.sub(r'[(]статус[^()]*[)]', '', new, flags=re.I).strip()} {stamp}"
         summary = f"обновлено: {new[:100]}"
     elif action == "gone":
         lines.pop(idx)

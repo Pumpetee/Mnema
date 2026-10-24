@@ -454,7 +454,17 @@ DEFS = [
         _count("local_answers"),
         True,
     ),
-    ("spendthrift", "rare", "rare", "💸", "Транжира", "Выключи экономию токенов", 1, _count("economy_off"), True),
+    (
+        "spendthrift",
+        "rare",
+        "rare",
+        "💸",
+        "Транжира",
+        "Сдвинь «Точнее ↔ Экономнее» до упора к «Точнее»",
+        1,
+        _count("economy_off"),
+        True,
+    ),
     ("underground", "rare", "rare", "🕵️", "Подпольщик", "Подключи прокси SOCKS5", 1, _count("socks"), True),
     ("independent", "rare", "rare", "🦅", "Самостоятельный", "Выключи туториал", 1, _count("tutorial_off"), True),
     (
@@ -846,6 +856,9 @@ def on_post(vault: Vault, path: str, b: dict) -> None:
         if "proxy" in b:
             event(vault, "setting", what="proxy", value=str(b.get("proxy") or ""))
         if b.get("economy") is False:
+            event(vault, "setting", what="economy_off")
+    elif path == "/api/engine":
+        if b.get("precise") == 4 or b.get("mode") == "max":
             event(vault, "setting", what="economy_off")
     elif path == "/api/clients":
         items = raw if isinstance(raw, list) else b.get("clients", [])

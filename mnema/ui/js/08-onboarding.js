@@ -243,15 +243,15 @@ async function sourcesAsk() {
   const sub = (k) => f[k].path || d.sources[k].note || "";
   const ask = () => {
     pop.innerHTML = `<div class="card"><div class="saart">${["💬", "📝", "📄", "✈️", "🌐"].map((e, k) => `<span style="--k:${k}">${e}</span>`).join("")}<i class="sahub">${ic("mem")}</i></div>
-    <h2>${tr("Можно мне смотреть другие программы?")}</h2>
-    <p>${tr("Так я узнаю тебя быстрее: из того, что ты уже пишешь в других местах — чаты с ИИ, заметки, документы, Telegram, браузер. Всё читается здесь, на компьютере, и только то, что ты выберешь.")}</p>
-    <p class="hint">${tr("Если нет — учусь только из наших разговоров и работаю с папкой памяти. Передумать можно в Настройки → Обучение.")}</p>
-    <div class="safoot"><button class="btn g" data-no>${tr("Нет, только Mnema")}</button><button class="btn" data-yes>${tr("Да, выбрать что")}</button></div></div>`;
+    <h2>${tr("Можно Mnema смотреть другие программы?")}</h2>
+    <p>${tr("Так Mnema узнает тебя быстрее — по тому, что ты уже пишешь в других местах: чаты с ИИ, заметки, документы, Telegram, браузер. Всё читается здесь, на компьютере, и только то, что ты выберешь.")}</p>
+    <p class="hint">${tr("Если нет — Mnema учится только на разговорах с ней. Передумать можно в Настройки → Обучение.")}</p>
+    <div class="safoot"><button class="btn g" data-no>${tr("Нет, только Mnema")}</button><button class="btn" data-yes>${tr("Да, выберу что")}</button></div></div>`;
     $("[data-no]", pop).onclick = () => done(false, []);
     $("[data-yes]", pop).onclick = pick;
   };
   const pick = () => {
-    pop.innerHTML = `<div class="card"><h2>${tr("Что мне можно смотреть?")}</h2><p>${tr("Нашла это на твоём компьютере. Читаю только то, что отметишь.")}</p>
+    pop.innerHTML = `<div class="card"><h2>${tr("Что Mnema можно смотреть?")}</h2><p>${tr("Нашла это на твоём компьютере. Читаю только то, что отметишь.")}</p>
     <div class="salist">${ids.map((k) => `<label class="sarow"><input type="checkbox" data-sid="${k}"><span><b>${esc(tr(d.sources[k].name))}</b><small data-noi18n>${esc(sub(k))}</small></span></label>`).join("")}</div>
     <div class="safoot"><button class="btn g" data-back>${tr("Назад")}</button><button class="btn" data-ok disabled>${tr("Включить отмеченное")}</button></div></div>`;
     const ok = $("[data-ok]", pop),
@@ -281,7 +281,7 @@ async function sourcesAsk() {
     if (on.length) {
       toast(tr("Включила. Начинаю читать"));
       post("/api/learn/run", {}).catch(() => {});
-    } else if (!yes) toast(tr("Хорошо: только наши разговоры и папка памяти"));
+    } else if (!yes) toast(tr("Хорошо: учусь только на наших разговорах"));
   };
   ask();
 }

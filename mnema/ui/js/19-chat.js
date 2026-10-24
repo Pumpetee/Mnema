@@ -39,7 +39,7 @@ async function viewChat(id) {
    <section class="main"><div class="top">
      <button class="ib" id="tleft" title="Список разговоров" ${L ? "hidden" : ""}>${ic("left")}</button>
      <button class="modelpill" id="model" data-menu title="Модель"><span class="mdot"></span><span class="mtxt"><b id="mlabel"></b><small id="mfree"></small></span>${ic("chev")}${hq("models")}</button><button class="heatpill" id="heat" data-menu hidden data-level="idle">${ic("thermo")}<i class="hdot"></i>${hq("heat")}</button>
-     <div class="tcenter"><div class="title" id="ctitle" title="Нажми дважды, чтобы переименовать"></div><span class="tside"><button class="ib rename" id="crn" title="Переименовать">${ic("edit")}</button><span id="privtag"></span></span></div>
+     <div class="tcenter"><div class="title" id="ctitle" title="${tr("Нажми дважды, чтобы переименовать")}"></div><span class="tside"><button class="ib rename" id="crn" title="Переименовать">${ic("edit")}</button><span id="privtag"></span></span></div>
 </div>
      <div id="ctable"></div><div class="msgs" id="msgs"></div>
      <div class="composer" id="composer"><div id="recbar"></div><div class="cbox"><button class="hq chelp" id="chelp" title="${tr("Что умеет строка ввода")}">?</button><button class="ccfg" id="ccfg" title="Настроить строку ввода">${ic("gear")}</button><div class="qbar" id="qbar" hidden></div><div class="fbar" id="fbar" hidden></div><textarea id="inp" rows="1" placeholder="Напиши что угодно — я помню тебя и учусь по ходу" title="Enter — отправить, Shift+Enter — новая строка"></textarea>
@@ -164,6 +164,7 @@ async function viewChat(id) {
   clearInterval(CHAT.polling);
   CHAT.polling = null;
   CHAT.id = id || "";
+  if (CHAT.id) LS.set("lastchat", CHAT.id); // «Чаты» on the rail comes back here
   CHAT.chat = null;
   CHAT.newPrivate = false;
   CHAT.pendingTitle = "";
@@ -171,12 +172,18 @@ async function viewChat(id) {
   CHAT.pendingCons = null;
   drawModelLabel();
   drawList("");
-  if (CHAT.id) {
-    const c = await api("/api/chat?id=" + CHAT.id);
+  let c = null;
+  const known = !CHAT.id || !cl.chats || cl.chats.some((x) => x.id === CHAT.id); // deleted meanwhile: not asked for
+  if (CHAT.id && known) c = await api("/api/chat?id=" + CHAT.id).catch(() => null);
+  if (c) {
     renderChat(c);
     const s2 = await api("/api/chat/poll?id=" + CHAT.id);
     if (!s2.done) poll();
-  } else renderEmpty();
+  } else {
+    if (CHAT.id) LS.set("lastchat", ""); // deleted meanwhile: a new conversation instead
+    CHAT.id = "";
+    renderEmpty();
+  }
   drawPrivate();
   refreshStatus();
   inp.focus();
@@ -277,7 +284,8 @@ async function refreshStatus() {
       document.body.classList.toggle("mem-off", !MEM.on);
     }
     const lon = MEM.on && !s.demo && !s.paused && !(!ms.chat_learning && !ms.background.length) && br.level !== "bad";
-    STATUS.dot = st[0] === "info" && lon ? "" : st[0];
+    // memory off: the dot by the gear turns yellow — a plain chat, nothing is remembered
+    STATUS.dot = !MEM.on ? "pause" : st[0] === "info" && lon ? "" : st[0];
     STATUS.label = tr(
       !MEM.on
         ? "Память выключена"
@@ -489,6 +497,17 @@ function dayGroup(ts) {
   const days = Math.floor((new Date(n.toDateString()) - new Date(d.toDateString())) / 864e5);
   return days <= 0 ? "Сегодня" : days === 1 ? "Вчера" : days < 7 ? "На этой неделе" : "Раньше";
 }
+// what an answer cost, as the provider counted it: input, read from its cache, the answer itself
+function tokSpent(t) {
+  const names = { in: "вход", input: "вход", cache: "из кеша", out: "ответ", output: "ответ" };
+  const total = Object.values(t).reduce((a, b) => a + (+b || 0), 0);
+  if (!total) return "";
+  const parts = Object.entries(t)
+    .filter(([, v]) => +v)
+    .map(([k, v]) => `${tr(names[k] || k)}: ${(+v).toLocaleString(locale())}`)
+    .join(" · ");
+  return `<span class="saved spent" title="${esc(parts)}">${ic("coin")}${tr("потрачено")} ${fmtTok(total, true)}</span>`;
+}
 function fmtTok(n, bare) {
   if (!n) return tr("токенов нет");
   const word = bare ? "" : " " + tr("токенов");
@@ -593,7 +612,7 @@ async function drawList(q) {
   }
   const byday = LS.get("byday", false);
   const item = (c) =>
-    `<div class="citem ${c.id === CHAT.id ? "on" : ""}" data-c="${c.id}"><div class="t"><div class="tr">${c.pinned ? ic("pin", "s") : ""}${c.private ? ic("eyeoff", "s") : ""}<b>${esc(c.title || "Без названия")}</b></div><span class="meta3">${family(c.model) ? `<span class="ctag2">${esc(family(c.model))}</span>` : ""}<span>${esc(fmtDate(c.updated))}</span>${c.tokens ? `<span class="tk" title="${esc(fmtTok(c.tokens))}">${esc(fmtTok(c.tokens, true))}</span>` : ""}</span>${c.hit ? `<span class="hit">${esc(c.hit)}</span>` : ""}</div><div class="acts2"><button data-rn="${c.id}" title="Переименовать">${ic("edit")}</button><button class="more2" data-menu data-cm="${c.id}" title="Действия">${ic("dots")}</button></div></div>`;
+    `<div class="citem ${c.id === CHAT.id ? "on" : ""}" data-c="${c.id}"><div class="t"><div class="tr">${c.pinned ? ic("pin", "s") : ""}${c.private ? ic("eyeoff", "s") : ""}<b>${esc(c.title || "Без названия")}</b></div><span class="meta3">${family(c.model) ? `<span class="ctag2">${esc(family(c.model))}</span>` : ""}<span>${esc(fmtDate(c.updated))}</span>${c.tokens ? `<span class="tk" title="${esc(tr("потрачено") + " " + fmtTok(c.tokens) + (c.saved ? " · " + tr("сэкономлено") + " ≈ " + fmtTok(c.saved) : ""))}">${esc(fmtTok(c.tokens, true))}${c.saved >= 100 ? `<em class="tksv">−${esc(fmtTok(c.saved, true))}</em>` : ""}</span>` : ""}</span>${c.hit ? `<span class="hit">${esc(c.hit)}</span>` : ""}</div><div class="acts2"><button data-rn="${c.id}" title="Переименовать">${ic("edit")}</button><button class="more2" data-menu data-cm="${c.id}" title="Действия">${ic("dots")}</button></div></div>`;
   const chats = cl.chats.filter((c) => !fam || family(c.model) === fam);
   if (sort === "date" && !byday && !q) {
     // sessions: the conversations started after one «Новая сессия» press, joined by a line on the left
@@ -614,10 +633,26 @@ async function drawList(q) {
       groups.delete("old");
       groups.set("old", o);
     }
+    if (cur && groups.has(cur)) {
+      // the current session always on top: an old one goes down even when one of its conversations was just continued
+      const c = groups.get(cur);
+      groups.delete(cur);
+      const rest = [...groups];
+      groups.clear();
+      groups.set(cur, c);
+      rest.forEach(([k, v]) => groups.set(k, v));
+    }
+    // a session just started has no conversations yet: no empty line for it — the newest group stays «Текущая
+    // сессия» until the first conversation of the new one; older sessions are named by their day
+    let top = true;
     for (const [k, cs] of groups) {
       // conversations started before sessions existed form one more session, the last one
-      const empty = !cs.length;
-      html += `<div class="csess ${k === cur ? "cur" : ""} ${empty ? "empty" : ""} ${fold.includes(k) && !empty ? "fold" : ""}" data-s="${esc(k)}"><button class="csh" ${empty ? "disabled" : `title="${tr("Свернуть или развернуть")}"`}><b>${k === cur ? "Текущая сессия" : "Сессия"}</b>${empty ? "" : `<em>${cs.length}</em>${ic("chev")}`}</button><div class="csl">${cs.map(item).join("")}</div></div>`;
+      if (!cs.length) continue;
+      const now = k === cur || top,
+        day = String(fmtDate(cs[0].updated) || "").split(",")[0],
+        name = (cl.session_names || {})[k] || (now ? tr("Текущая сессия") : tr("Сессия") + (day ? " · " + day : ""));
+      top = false;
+      html += `<div class="csess ${now ? "cur" : ""} ${fold.includes(k) ? "fold" : ""}" data-s="${esc(k)}"><div class="cshrow"><button class="csh" title="${tr("Свернуть или развернуть")}"><b data-noi18n>${esc(name)}</b><em>${cs.length}</em>${ic("chev")}</button><button class="cshm kebab" data-sm="${esc(k)}" title="${tr("Ещё")}">${ic("dots")}</button></div><div class="csl">${cs.map(item).join("")}</div></div>`;
     }
   } else
     chats.forEach((c) => {
@@ -632,6 +667,49 @@ async function drawList(q) {
     });
   box.innerHTML =
     html || `<div class="hint" style="padding:10px">${q ? "Ничего не нашла" : "Разговоров пока нет"}</div>`;
+  $$("[data-sm]", box).forEach(
+    (b) =>
+      (b.onclick = (e) => {
+        e.stopPropagation();
+        const k = b.dataset.sm,
+          n = cl.chats.filter((c) => (c.session || "old") === k && !c.pinned).length,
+          named = (cl.session_names || {})[k] || "";
+        menu(b, [
+          {
+            label: tr("Переименовать"),
+            icon: "edit",
+            run: async () => {
+              const name = await askText("Как назвать сессию?", named);
+              if (name === null) return;
+              await post("/api/session/rename", { id: k, name }).catch((err) => toast(err.message));
+              drawList("");
+            },
+          },
+          {
+            label: tr("Удалить"),
+            icon: "trash",
+            danger: true,
+            run: async () => {
+              if (!n) return toast(tr("В этой сессии нет разговоров"));
+              if (
+                !(await ask(
+                  "Удалить сессию?",
+                  tr("Разговоров в ней") +
+                    ": " +
+                    n +
+                    ". " +
+                    tr("Закреплённые останутся. Выученное из разговоров останется в памяти."),
+                ))
+              )
+                return;
+              await post("/api/session/delete", { id: k }).catch((err) => toast(err.message));
+              if (cl.chats.some((c) => c.id === CHAT.id && (c.session || "old") === k && !c.pinned)) go("chat");
+              else drawList("");
+            },
+          },
+        ]);
+      }),
+  );
   $$(".csh", box).forEach(
     (b) =>
       (b.onclick = () => {
@@ -656,7 +734,7 @@ async function drawList(q) {
         if (b.dataset.rn === CHAT.id) return renameInline();
         const it = b.closest(".citem"),
           cur = $(".t b", it).textContent;
-        const t = prompt("Название разговора:", cur);
+        const t = await askText("Как назвать разговор?", cur);
         if (t && t.trim()) {
           await post("/api/chat/update", { id: b.dataset.rn, title: t.trim() });
           drawList(($("#csearch") || {}).value || "");
@@ -681,7 +759,7 @@ async function chatMenu(anchor, cid) {
       icon: "edit",
       run: async () => {
         if (cid === CHAT.id) return renameInline();
-        const t = prompt("Название разговора:", c.title);
+        const t = await askText("Как назвать разговор?", c.title);
         if (t) {
           await post("/api/chat/update", { id: cid, title: t });
           rel();
@@ -727,7 +805,13 @@ async function chatMenu(anchor, cid) {
       icon: "trash",
       danger: true,
       run: async () => {
-        if (!confirm("Удалить разговор «" + (c.title || "") + "»? Выученное из него останется в памяти.")) return;
+        if (
+          !(await ask(
+            "Удалить разговор?",
+            (c.title ? "«" + c.title + "». " : "") + tr("Выученное из него останется в памяти."),
+          ))
+        )
+          return;
         await post("/api/chat/delete", { id: cid });
         toast("Удалила");
         if (cid === CHAT.id) viewChat();
@@ -803,9 +887,7 @@ function drawChips() {
   }
   if (c) {
     c.classList.toggle("on", !!CHAT.cons);
-    $("span:not(.hq)", c).textContent = CHAT.cons
-      ? tr("Консорциум") + " · " + CHAT.cons.members.length
-      : tr("Консорциум");
+    $("span:not(.hq)", c).textContent = tr("Консорциум"); // who is in it shows at the top, above the conversation
   }
 }
 function plusMenu(anchor) {
@@ -821,6 +903,11 @@ function plusMenu(anchor) {
     tour = LS.get("tour", true),
     priv = isPrivate();
   m.innerHTML = `<button data-p="terms" class="${terms ? "on" : ""}">${ic("hint")}<span>Подсказки к терминам</span>${hq("hints")}<i class="sw2"></i></button>
+    <div class="sep"></div><div class="mhead">${tr("Попробовать")}</div>
+    <button data-p="roast">${ic("trophy")}<span>${tr("Прожарка")}<small>${tr("несколько ИИ разнесут идею, резюме или текст")}</small></span></button>
+    <button data-p="compare">${ic("eye")}<span>${tr("С памятью и без")}<small>${tr("один вопрос — два ответа рядом")}</small></span></button>
+    <button data-p="quiz">${ic("check")}<span>${tr("Насколько Mnema тебя знает")}<small>${tr("квиз по твоей памяти")}</small></span></button>
+    <button data-p="interview">${ic("user")}<span>${tr("Знакомство")}<small>${tr("пара минут вопросов — и память не пустая")}</small></span></button>
 `;
   document.body.appendChild(m);
   const r = anchor.getBoundingClientRect();
@@ -852,6 +939,10 @@ function plusMenu(anchor) {
           return;
         }
         m.remove();
+        if (k === "roast") return consortModal(false, "roast");
+        if (k === "compare") return compareView();
+        if (k === "quiz") return quizView();
+        if (k === "interview") return interviewView();
         if (k === "cons") consortModal();
         if (k === "audio") $("#apick").click();
       }),
@@ -871,7 +962,7 @@ function micMenu(anchor) {
   const m = document.createElement("div");
   m.className = "pmenu menu";
   m.innerHTML = `<button data-v="cmd">${ic("mic")}<span>Сказать команду<small>распознаю на компьютере и отправлю</small></span></button>
-    <button data-v="meet">${ic("users")}<span>Записать встречу<small>расшифровка и саммери</small></span>${hq("scribe")}</button>`;
+    <button data-v="meet">${ic("users")}<span>Записать встречу<small>расшифровка и итоги</small></span>${hq("scribe")}</button>`;
   document.body.appendChild(m);
   const r = anchor.getBoundingClientRect();
   m.style.left = Math.max(8, Math.min(window.innerWidth - m.offsetWidth - 8, r.right - m.offsetWidth)) + "px";
@@ -1165,11 +1256,25 @@ function actionAsk(cid, p) {
 document.addEventListener("click", (e) => {
   const b = e.target.closest && e.target.closest("[data-reveal]");
   if (b) post("/api/files/reveal", { path: b.dataset.reveal }).catch((err) => toast(err.message));
+  const o = e.target.closest && e.target.closest("[data-fopen]");
+  if (o) post("/api/files/open", { path: o.dataset.fopen }).catch((err) => toast(err.message));
 });
+// a document path in an answer («PDF готов: C:\…\отчёт.pdf») gets an «Открыть» button next to it
+const OPENABLE = /\.(pdf|docx?|xlsx?|pptx|csv|md|txt|png|jpe?g|odt|rtf)$/i;
+const PATH_RE =
+  /(?<![\w/"'=])(?:[A-Za-z]:\\|(?<![\w:/.])\/(?:Users|home|tmp|Volumes)\/)[^<>\n"|?*]*?\.(?:pdf|docx?|xlsx?|pptx|csv|md|txt|png|jpe?g|odt|rtf)(?![\w])/g;
+function fileButtons(html) {
+  return html
+    .replace(PATH_RE, (p) => {
+      const raw = p.replace(/&amp;/g, "&");
+      return `${p}<button class="btn sm fopen" data-fopen="${esc(raw)}">${ic("file")}${tr("Открыть")}</button>`;
+    })
+    .replace(/(<button class="btn sm fopen"[^>]*>[\s\S]*?<\/button>)<\/code>/g, "</code>$1"); // after the code, not in it
+}
 function msgHtml(m, last, i, lastAi) {
   if (m.hidden) return "";
   if (m.kind === "action")
-    return `<div class="actline ${m.refused || m.failed ? "bad" : ""}">${ic(m.refused || m.failed ? "x" : "check")}<span data-noi18n>${actText(m)}</span>${m.path ? `<button class="btn g sm" data-reveal="${esc(m.path)}">${tr("Показать в папке")}</button>` : ""}</div>`;
+    return `<div class="actline ${m.refused || m.failed ? "bad" : ""}">${ic(m.refused || m.failed ? "x" : "check")}<span data-noi18n>${actText(m)}</span>${m.path && !m.failed && OPENABLE.test(m.path) ? `<button class="btn sm" data-fopen="${esc(m.path)}">${ic("file")}${tr("Открыть")}</button>` : ""}${m.path ? `<button class="btn g sm" data-reveal="${esc(m.path)}">${tr("Показать в папке")}</button>` : ""}</div>`;
   if (m.role === "user")
     return `<div class="msg user">${m.quote ? `<div class="uq">${esc(m.quote)}</div>` : ""}${(m.files || []).length ? `<div class="fchips">${m.files.map((f) => `<span class="chipf" title="${f.kind === "text" ? "прочитан на этом компьютере" : ""}">${ic("file")}${esc(f.name)}${f.info && f.info.pages ? ` · ${f.info.pages} стр.` : f.info && f.info.sheets ? ` · листов ${f.info.sheets}` : f.info && f.info.slides ? ` · слайдов ${f.info.slides}` : ""}</span>`).join("")}</div>` : ""}<div class="b">${esc(m.text)}</div></div>`;
   const srcs = (m.sources || []).length
@@ -1180,9 +1285,10 @@ function msgHtml(m, last, i, lastAi) {
     ? `<span class="saved" title="${esc(tr("Скрыто до отправки") + ": " + redLine(m.redacted))}">${ic("lock")}${tr("скрыто")}: ${redc}</span>`
     : "";
   const saved =
-    m.saved >= 500
-      ? `<span class="saved" title="Документы, память и страницы прочитаны на компьютере, модели ушли только нужные части">≈ ${fmtTok(m.saved)} сэкономлено</span>`
-      : "";
+    (m.tokens ? tokSpent(m.tokens) : "") +
+    (m.saved >= 100
+      ? `<span class="saved sv" title="${esc(tr("Документы, память и страницы прочитаны на компьютере, модели ушли только нужные части"))}">${ic("down")}${tr("сэкономлено")} ≈ ${fmtTok(m.saved, true)}</span>`
+      : "");
   const spk = m.speaker
     ? `<div class="spk"><i style="background:${spkColor(m.model)}"></i>${esc(m.speaker)}${m.summary ? `<em>${tr("итог")}</em>` : ""}${m.cut ? `<span>· ${tr("перебит")}</span>` : ""}</div>`
     : "";
@@ -1192,17 +1298,27 @@ function msgHtml(m, last, i, lastAi) {
     return `<div class="cdiv">${ic("chat")}<span>${tr("Консорциум завершён, дальше отвечает")} <b data-noi18n>${esc(consName(m.model || ""))}</b></span></div>`;
   if (m.error && !m.text)
     return `<div class="msg ai"><div class="av"></div><div>${spk}<p class="err">${linkSettings(esc(m.error))}</p></div></div>`;
+  if (m.kind === "self_ask") {
+    const q = m.ask || {};
+    const opts = q.options || [];
+    return `<div class="msg ai"><div class="av"></div><div class="offer selfask" data-sa="${i}"><p>${ic("hint")}<span>${esc(tr(m.text))}</span></p>${
+      q.done
+        ? `<p class="done">${esc(tr(q.done))}</p>`
+        : `${q.type === "goal" ? `<input class="inp" data-satext placeholder="${tr("Цель одной фразой")}">` : `<input class="inp" data-satext hidden placeholder="${tr("Что изменилось — одной фразой")}">`}
+        <div class="row">${opts.map(([k, l], n) => `<button class="btn ${n ? "g " : ""}sm" data-saa="${k}">${tr(l)}</button>`).join("")}<button class="btn g sm" data-saa="skip">${tr("Не сейчас")}</button><button class="btn g sm sanever" data-saa="never">${tr("Не спрашивать так")}</button></div>`
+    }</div></div>`;
+  }
   if (m.kind === "prompt_offer") {
     const o = m.offer || {};
     return `<div class="msg ai"><div class="av"></div><div class="offer"><p>${o.similar ? `${tr("Похожая задача уже была:")} «<span data-noi18n>${esc(o.similar.length > 140 ? o.similar.slice(0, 140) + "…" : o.similar)}</span>». ` : tr("Похоже, эта задача будет повторяться.") + " "}${tr("Записать рецепт этой задачи? В следующий раз сделаю так же — без объяснений и уточнений.")}${hq("prompts")}</p>${
       o.choice
-        ? `<p class="done">${o.choice === "write" ? "Записала рецепт «" + esc(o.name || "") + "». Он в настройках: «Как отвечает» → «Рецепты задач»." : o.choice === "never" ? "Хорошо, для таких больше не предлагаю." : "Делаю без рецепта."}</p>`
+        ? `<p class="done">${o.choice === "write" ? "Записала рецепт «" + esc(o.name || "") + "». Он в настройках: «Как отвечает» → «Повторяющиеся задачи»." : o.choice === "never" ? "Хорошо, для таких больше не предлагаю." : "Делаю без рецепта."}</p>`
         : `<div class="row"><button class="btn sm" data-offer="write">Записать рецепт</button><button class="btn g sm" data-offer="skip">Просто сделать</button><button class="btn g sm" data-offer="never">Не предлагать для таких</button></div>`
     }</div></div>`;
   }
   const needWeb =
     m.needs_web && last
-      ? `<div class="needweb">${ic("globe")}<div><b>${tr("Тут нужны свежие данные из интернета")}</b><span>${tr("Ответил по тому, что знаю. С поиском ответ будет точнее.")}</span></div><button class="btn sm" data-webredo>${tr("Включить интернет и ответить заново")}</button></div>`
+      ? `<div class="needweb">${ic("globe")}<div><b>${tr("Тут нужны свежие данные из интернета")}</b><span>${tr("Ответ — по тому, что ИИ знает сам. С поиском будет точнее.")}</span></div><button class="btn sm" data-webredo>${tr("Включить интернет и ответить заново")}</button></div>`
       : "";
   const cav = m.speaker
     ? `<div class="av cav" style="--sc:${spkColor(m.model)}">${esc(m.speaker.slice(0, 1))}</div>`
@@ -1221,7 +1337,7 @@ function msgHtml(m, last, i, lastAi) {
       : "";
   return (
     asked +
-    `<div class="msg ai ${m.summary ? "sum" : ""} ${m.speaker ? "cmsg" : ""}" style="${m.speaker ? "--sc:" + spkColor(m.model) : ""}" ${i !== undefined ? `data-i="${i}"` : ""}>${cav}<div>${sumh}${spk}<div class="md">${md(m.text, last)}</div>${m.error ? `<p class="err">${linkSettings(esc(m.error))}</p>` : ""}${needWeb}${m.prompt ? `<div class="byprompt">${ic("book")}по рецепту «${esc(m.prompt)}»</div>` : ""}${srcs}${i !== undefined ? `<div class="acts ${m.useful ? "keep" : ""}"><button data-copy="${i}">${ic("copy")}Копировать</button><button data-reply="${i}">${ic("reply")}Ответить</button>${!m.speaker && !m.summary && !(CHAT.chat && CHAT.chat.consortium) ? `<button data-debate="${i}">${ic("users")}Поспорить с другими</button>` : ""}${m.checked ? '<span class="meta" style="align-self:center;margin-left:6px">перепроверено перед отправкой</span>' : ""}${saved}${hidden}</div>` : ""}</div></div>`
+    `<div class="msg ai ${m.summary ? "sum" : ""} ${m.speaker ? "cmsg" : ""}" style="${m.speaker ? "--sc:" + spkColor(m.model) : ""}" ${i !== undefined ? `data-i="${i}"` : ""}>${cav}<div>${sumh}${spk}<div class="md">${fileButtons(md(m.text, last))}</div>${m.error ? `<p class="err">${linkSettings(esc(m.error))}</p>` : ""}${needWeb}${m.prompt ? `<div class="byprompt">${ic("book")}по рецепту «${esc(m.prompt)}»</div>` : ""}${srcs}${i !== undefined ? `<div class="acts ${m.useful ? "keep" : ""}"><button data-copy="${i}">${ic("copy")}Копировать</button><button data-reply="${i}">${ic("reply")}Ответить</button>${!m.speaker && !m.summary && !(CHAT.chat && CHAT.chat.consortium) ? `<button data-debate="${i}">${ic("users")}Поспорить с разными ИИ</button>` : ""}${m.summary && m.text ? `<button data-share="${i}">${ic("right")}${tr("Поделиться")}</button>` : ""}${m.checked ? '<span class="meta" style="align-self:center;margin-left:6px">перепроверено перед отправкой</span>' : ""}${saved}${hidden}</div>` : ""}</div></div>`
   );
 }
 // ---------------- a question from the model as a card
@@ -1244,7 +1360,7 @@ const tipCost = (m) => {
   return (t.in || 0) + (t.out || 0) + (t.cache || 0);
 };
 function costTip(c) {
-  const ms = (c && c.messages) || [];
+  const ms = ((c && c.messages) || []).filter((m) => m.kind !== "self_ask");
   if (!c || c.consortium || !ms.length || ms[ms.length - 1].role !== "assistant" || ms[ms.length - 1].speaker)
     return null;
   if (LS.get("costtip", true) === false || (LS.get("costtip_hide", []) || []).includes(c.id)) return null;
@@ -1342,7 +1458,7 @@ function learnAskHtml(q) {
 async function answerLearnAsk(card, action) {
   const body = { id: card.dataset.lask, action, chat: CHAT.id };
   if (action === "edit") {
-    const t = prompt(tr("Как правильно?"), $(".lasktext", card).textContent);
+    const t = await askText("Как правильно?", $(".lasktext", card).textContent);
     if (!t) return;
     body.text = t;
   }
@@ -1420,7 +1536,12 @@ function renderChat(c) {
   drawModelLabel();
   $("#ctitle").textContent = c.title || tr("Разговор");
   const ms = c.messages || [];
-  const lastAi = ms.map((m) => m.role).lastIndexOf("assistant");
+  // a question card of Mnema's own under the answer doesn't take «the last answer» away from it
+  const tail = ms.length - 1 - (ms.length && ms[ms.length - 1].kind === "self_ask" ? 1 : 0);
+  const lastAi = ms
+    .slice(0, tail + 1)
+    .map((m) => m.role)
+    .lastIndexOf("assistant");
   let rnd = 0;
   $("#msgs").innerHTML =
     ms
@@ -1431,7 +1552,7 @@ function renderChat(c) {
           rnd = m.round;
           sep = `<div class="rsep"><span>${tr("Круг")} ${m.round}${m.stage && m.stage !== "Итог" ? " · " + tr(m.stage) : ""}</span></div>`;
         }
-        return sep + msgHtml(m, i === ms.length - 1, i, i === lastAi && i === ms.length - 1);
+        return sep + msgHtml(m, i === tail, i, i === lastAi && i === tail);
       })
       .join("") +
     [learnAskHtml(c.learn_ask), costTipHtml(c)].map((h) => (h ? `<div class="msg lwrap">${h}</div>` : "")).join("");
@@ -1507,6 +1628,36 @@ document.addEventListener(
 function bindMsg() {
   markTerms();
   $$("[data-webredo]").forEach((b) => (b.onclick = webRedo));
+  $$("[data-sa]").forEach((card) =>
+    $$("[data-saa]", card).forEach(
+      (b) =>
+        (b.onclick = async () => {
+          const act = b.dataset.saa,
+            inp = $("[data-satext]", card);
+          if (act === "changed" && inp.hidden) {
+            inp.hidden = false;
+            inp.focus();
+            b.dataset.saa = "changed";
+            return;
+          }
+          if ((act === "changed" || act === "goal") && !inp.value.trim()) return inp.focus();
+          $$("[data-saa]", card).forEach((x) => (x.disabled = true));
+          try {
+            renderChat(
+              await post("/api/chat/self_ask", {
+                chat: CHAT.id,
+                i: +card.dataset.sa,
+                action: act,
+                text: inp ? inp.value : "",
+              }),
+            );
+          } catch (e) {
+            toast(e.message);
+            $$("[data-saa]", card).forEach((x) => (x.disabled = false));
+          }
+        }),
+    ),
+  );
   $$("[data-offer]").forEach(
     (b) =>
       (b.onclick = async () => {
@@ -1532,6 +1683,7 @@ function bindMsg() {
       }),
   );
   $$("[data-debate]").forEach((b) => (b.onclick = () => debateAnswer(+b.dataset.debate)));
+  $$("[data-share]").forEach((b) => (b.onclick = () => shareSummary(+b.dataset.share)));
   $$("[data-reply]").forEach((b) => (b.onclick = () => setQuote(CHAT.chat.messages[+b.dataset.reply].text)));
 }
 function setQuote(t) {
@@ -1593,6 +1745,7 @@ async function startByMnema() {
       ...(CHAT.newPrivate ? { private: true } : {}),
     });
     CHAT.id = r.chat;
+    LS.set("lastchat", r.chat);
     if (CHAT.pendingTitle) {
       const nt = CHAT.pendingTitle;
       CHAT.pendingTitle = "";
@@ -1676,6 +1829,7 @@ async function sendMsg() {
       ...(!CHAT.id && CHAT.newPrivate ? { private: true } : {}), // «Без обучения» holds from the first message
     });
     CHAT.id = r.chat;
+    LS.set("lastchat", r.chat);
     if (CHAT.pendingTitle) {
       const nt = CHAT.pendingTitle;
       CHAT.pendingTitle = "";
@@ -1844,7 +1998,7 @@ function sessExplain() {
     <div class="sxscene">${lane("long", "Один длинный разговор", "каждый ответ тянет за собой всю историю", "токены на ответ растут")}${lane("short", "Новый разговор на новую тему", "память с тобой, лишней истории нет", "токены на ответ не копятся")}</div>
     <div class="sxgrid">
       <div class="sxpt"><span class="sxic">${ic("plus")}</span><div><b>${tr("Новый разговор")}</b><p>${tr("Новая тема в той же сессии. Модель начинает с чистого листа: знает тебя по памяти, но не тащит переписку других разговоров.")}</p></div></div>
-      <div class="sxpt"><span class="sxic">${ic("session")}</span><div><b>${tr("Новая сессия")}</b><p>${tr("Новая группа разговоров в списке: новый день, новая задача. Отделяет одно от другого, контекст тоже чистый.")}</p></div></div>
+      <div class="sxpt"><span class="sxic">${ic("session")}</span><div><b>${tr("Новая сессия")}</b><p>${tr("Новая группа разговоров в списке: новый день или новая задача. Контекст тоже начинается с чистого листа.")}</p></div></div>
     </div>
     <p class="sxtip">${ic("hint")}<span>${tr("Сменилась тема — начни новый разговор. Нужное из прошлого Mnema уже записала в память.")}</span></p>
     <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-x>${tr("Понятно")}</button></div></div>`;
@@ -1856,7 +2010,45 @@ function sessExplain() {
   $$("[data-x]", pop).forEach((b) => (b.onclick = close));
 }
 
-// «Поспорить с другими»: the answer's author defends it, one or two other connected AIs question it, then a verdict
+// who argues: the connected models to tick, the suggestion ticked; the first ticked sums up
+function debatePick(all, pre) {
+  return new Promise((done) => {
+    const chosen = pre.slice();
+    const pop = document.createElement("div");
+    pop.className = "modal obspick debpick";
+    const draw = () => {
+      pop.innerHTML = `<div class="card"><h2>${tr("С кем поспорить?")}</h2><p class="hint">${tr("Автор ответа будет его защищать, отмеченные ИИ — искать в нём ошибки. Итог подведёт первый отмеченный. До трёх соперников.")}</p>
+        <div class="obslist">${all
+          .map((a, k) => {
+            const n = chosen.indexOf(a.ref);
+            return `<button class="obsv ${n >= 0 ? "on" : ""}" data-k="${k}"><i>${n >= 0 ? n + 1 : ""}</i><div><b data-noi18n>${esc(a.name)}</b></div><span>${n === 0 ? tr("подведёт итог") : ""}</span></button>`;
+          })
+          .join("")}</div>
+        <div class="row" style="justify-content:flex-end;gap:8px;margin-top:16px"><button class="btn g" data-x>${tr("Отмена")}</button><button class="btn" data-go ${chosen.length ? "" : "disabled"}>${tr("Начать спор")}</button></div></div>`;
+      $$("[data-k]", pop).forEach(
+        (b) =>
+          (b.onclick = () => {
+            const r = all[+b.dataset.k].ref,
+              n = chosen.indexOf(r);
+            if (n >= 0) chosen.splice(n, 1);
+            else if (chosen.length < 3) chosen.push(r);
+            else return toast(tr("Не больше трёх соперников"));
+            draw();
+          }),
+      );
+      $("[data-x]", pop).onclick = () => close(null);
+      $("[data-go]", pop).onclick = () => chosen.length && close(chosen);
+    };
+    const close = (v) => {
+      pop.remove();
+      done(v);
+    };
+    pop.onclick = (e) => e.target === pop && close(null);
+    draw();
+    document.body.appendChild(pop);
+  });
+}
+// «Поспорить с разными ИИ»: the answer's author defends it, one or two other connected AIs question it, then a verdict
 async function debateAnswer(i) {
   const msgs = CHAT.chat.messages,
     m = msgs[i],
@@ -1872,15 +2064,37 @@ async function debateAnswer(i) {
   try {
     provs = (await api("/api/models")).providers;
   } catch (e) {}
-  const mine = String(by).split(":")[0],
-    others = (provs || [])
+  // other AIs first; then other models of the same one — Sonnet argues with Opus just as well
+  const [mine, own] = String(by).split(":"),
+    myP = (provs || []).find((p) => p.id === mine),
+    myModel = own || (myP && myP.models && myP.models[0] ? myP.models[0].id : ""),
+    elsewhere = (provs || [])
       .filter((p) => p.ready && p.id !== mine && p.models && p.models.length)
-      .map((p) => p.id + ":" + p.models[0].id)
-      .slice(0, 2);
-  if (!others.length) {
+      .map((p) => p.id + ":" + (p.models.find((x) => x.id) || p.models[0]).id),
+    siblings =
+      myP && myP.ready ? (myP.models || []).filter((x) => x.id && x.id !== myModel).map((x) => mine + ":" + x.id) : [];
+  // every connected model but the author can be picked; the suggestion is ticked already
+  const all = (provs || [])
+    .filter((p) => p.ready && p.models && p.models.length)
+    .flatMap((p) =>
+      p.models
+        .filter((x) => (x.id || p.id !== mine) && !(p.id === mine && x.id === myModel))
+        .filter((x) => x.id || p.models.length === 1)
+        .map((x) => ({
+          ref: p.id + ":" + x.id,
+          name: x.name && x.name !== x.id ? x.name : p.name + (x.id ? " · " + x.id : ""),
+          group: p.name,
+        })),
+    );
+  if (!all.length) {
     toast(tr("Чтобы было с кем спорить, подключи ещё один ИИ: Настройки → ИИ и модели"));
     return;
   }
+  const others = await debatePick(
+    all,
+    [...elsewhere, ...siblings].filter((r) => all.some((a) => a.ref === r)).slice(0, 2),
+  );
+  if (!others) return;
   try {
     await post("/api/chat/cons", {
       chat: CHAT.id,
@@ -1888,7 +2102,7 @@ async function debateAnswer(i) {
       members: [by, ...others],
       rounds: 2,
       format: "debate",
-      summarizer: others[others.length - 1],
+      summarizer: others[0],
       challenge: { by, answer: m.text, question },
     });
     renderChat(await api("/api/chat?id=" + CHAT.id));

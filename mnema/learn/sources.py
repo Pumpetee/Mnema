@@ -143,60 +143,6 @@ def read_claude_code(vault: Vault, opts: dict, cursor: dict, days: int | None, l
     return out
 
 
-# ---------------------------------------------------------------- browser extension
-
-
-def browser_file(vault: Vault) -> Path:
-    return vault.service / "learn" / "browser.jsonl"
-
-
-def observe_browser(vault: Vault, client: str, url: str, title: str, text: str, prev: str = "") -> None:
-    """Called by the API when the extension sees the owner send a message in ChatGPT / Gemini."""
-    f = browser_file(vault)
-    f.parent.mkdir(parents=True, exist_ok=True)
-    rec = {
-        "client": client,
-        "url": url[:300],
-        "title": title[:200],
-        "text": _clip(text, 3000),
-        "prev": _clip(prev, 700),
-        "ts": dt.datetime.now().isoformat(timespec="seconds"),
-    }
-    from ..fsutil import append_text
-
-    append_text(f, json.dumps(rec, ensure_ascii=False) + "\n")
-
-
-def read_browser(vault: Vault, opts: dict, cursor: dict, days: int | None, limit: int) -> list[Episode]:
-    f = browser_file(vault)
-    if not f.exists():
-        return []
-    lines = f.read_text(encoding="utf-8").splitlines()
-    done = cursor.get("lines", 0)
-    out = []
-    for i in range(done, len(lines)):
-        try:
-            r = json.loads(lines[i])
-        except ValueError:
-            continue
-        out.append(
-            Episode(
-                "browser",
-                f"{r.get('client')}#{i}",
-                r.get("ts", ""),
-                r.get("text", ""),
-                prev=r.get("prev", ""),
-                title=r.get("title", ""),
-                meta={"client": r.get("client")},
-            )
-        )
-        if len(out) >= limit:
-            cursor["lines"] = i + 1
-            return out
-    cursor["lines"] = len(lines)
-    return out
-
-
 # ---------------------------------------------------------------- ChatGPT export
 
 
@@ -414,11 +360,11 @@ def _life(name):
 
 READERS = {
     "claude_code": read_claude_code,
-    "browser": read_browser,
     "chatgpt_export": read_chatgpt_export,
     "notes": read_notes,
     "mail": read_mail,
     "telegram": read_telegram,
+    "telegram_api": lambda *a, **k: __import__("mnema.learn.tg_api", fromlist=["read"]).read(*a, **k),
     "calendar": _life("read_calendar"),
     "documents": _life("read_documents"),
     "browser_history": _life("read_browser_history"),

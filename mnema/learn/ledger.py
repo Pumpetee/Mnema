@@ -36,7 +36,7 @@ def now() -> str:
 
 
 def norm(t: str) -> str:
-    t = re.sub(r"\((?:статус|status)[^)]*\)|\d{1,2}\.\d{1,2}\.\d{4}|· выучено", " ", t.lower())
+    t = re.sub(r"\((?:статус|status)[^()]*\)|\d{1,2}\.\d{1,2}\.\d{4}|· выучено", " ", t.lower())
     return " ".join(re.sub(r"[^\w\s]", " ", t).split())
 
 

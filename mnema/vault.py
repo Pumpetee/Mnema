@@ -130,7 +130,7 @@ def parse_frontmatter(text: str) -> tuple[dict, str]:
     for line in head.strip("\n").splitlines():
         if line.lstrip().startswith("#") or not line.strip():
             continue
-        item = re.match(r"^\s*-\s+(.*)$", line)
+        item = re.match(r"^\s*-\s(.*)$", line)  # one space after the dash, the rest is stripped below
         if item and last is not None:  # Obsidian's list form
             cur = meta.get(last)
             meta[last] = (cur if isinstance(cur, list) else []) + [item.group(1).strip().strip("\"'")]

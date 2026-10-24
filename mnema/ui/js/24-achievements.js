@@ -43,9 +43,8 @@ function drawAchCard() {
     ${
       !MEM.on
         ? `<div class="memoffrow">${tr("Выключена: ИИ не знают тебя, Mnema ничего не запоминает")}</div>`
-        : `${row("folder", "folder", tr("Память только у тебя"), (sf && sf.encrypted ? tr("зашифрована · ") : "") + tr("открыть папку"))}
-    ${sf ? row("access", "lock", g.length ? `${tr("Личное скрыто от")} ${g.length} ${tr("ИИ")}` : tr("Все ИИ видят всю память"), tr("кто что видит"), !g.length) : ""}
-    ${sf ? row("out", "eye", `${tr("Наружу за неделю")}: ${sf.out_requests}${sf.out_redacted ? ` · ${tr("скрыто")} ${sf.out_redacted}` : ""}`, sf.redact ? (sf.out_redacted ? `${tr("секретов скрыто")}: ${sf.out_redacted}` : tr("секреты скрываются")) : tr("секреты уходят как есть"), !sf.redact) : ""}`
+        : `${row("folder", "folder", tr("Локальная память на ПК"), (sf && sf.encrypted ? tr("зашифрована · ") : "") + tr("открыть папку"))}
+    ${row("access", "lock", tr("Настройки доступа"), g.length ? `${tr("Личное скрыто от")} ${g.length} ${tr("ИИ")}` : tr("кто из ИИ что видит"))}`
     }`;
   $("#memsw", lc).onclick = () => memSet(!MEM.on);
   if ($("#memtut", lc)) $("#memtut", lc).onclick = () => memTour();
@@ -168,9 +167,9 @@ function achGallery(group) {
     pop.innerHTML = `<div class="card"><div class="lvhero"><div class="lvglow"></div>
        <div class="lvbig"><svg viewBox="0 0 104 104"><defs><linearGradient id="lvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b7cff"/><stop offset="1" stop-color="#4fb6ff"/></linearGradient></defs><circle cx="52" cy="52" r="${R}" class="lvtrack"/><circle cx="52" cy="52" r="${R}" class="lvbar" stroke="url(#lvg)" stroke-dasharray="${C}" stroke-dashoffset="${C}" style="--off:${C * (1 - L.progress)}"/></svg><div class="lvnum"><small>${tr("уровень")}</small><b>${L.level}</b></div></div>
        <div class="lvinfo"><div class="lvname">${esc(L.name)}</div>
-        <div class="lvxp"><div class="lvline"><i style="--w:${pct}%"></i></div><div class="lvlbl"><span><b>${L.xp}</b> XP</span><span>${L.to ? `${tr("до")} «${esc(L.next_name || "")}» — ${L.to - L.xp} XP` : tr("высший уровень")}</span></div></div>
+        <div class="lvxp"><div class="lvline"><i style="--w:${pct}%"></i></div><div class="lvlbl"><span><b>${L.xp}</b> XP</span><span>${L.to ? `${tr("до")} «${esc(tr(L.next_name || ""))}» — ${L.to - L.xp} XP` : tr("высший уровень")}</span></div></div>
         <div class="lvstats"><div><b>${d.got}<small>/${d.total}</small></b><span>${tr("открыто")}</span></div><div><b>${rare.filter((i) => i.got).length}<small>/${rare.length}</small></b><span>${tr("редких")}</span></div><div><b>${ep.filter((i) => i.got).length}<small>/${ep.length}</small></b><span>${tr("эпических")}</span></div></div></div>
-       <label class="achsw" title="${tr("Выключишь — ни всплывашек, ни этого раздела. Вернуть — в шестерёнке")}"><span>${tr("Показывать достижения")}</span><button class="sw on" id="achoff"></button></label><button class="lmx" id="achx">×</button></div>
+       <label class="achsw" title="${tr("Выключишь — пропадут и всплывающие награды, и этот раздел. Вернуть можно в шестерёнке")}"><span>${tr("Показывать достижения")}</span><button class="sw on" id="achoff"></button></label><button class="lmx" id="achx">×</button></div>
       <div class="achtabs">${[["all", "Все"], ...Object.entries(d.groups)].map(([k, t]) => `<button data-g="${k}" class="${k === g ? "on" : ""}">${esc(t)}<span>${d.items.filter((i) => (k === "all" || i.group === k) && i.got).length}/${d.items.filter((i) => k === "all" || i.group === k).length}</span></button>`).join("")}</div>
       <div class="achgrid">${items
         .map(

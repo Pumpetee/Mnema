@@ -198,7 +198,11 @@ def _parse(key: str) -> dict:
 
 def keys_from_subscription(url: str) -> list[str]:
     from . import net
+    from .web import public_url
     import urllib.request
+
+    if not public_url(url):
+        raise ValueError("ссылка подписки должна вести на сервер в интернете (https://…)")
 
     try:
         raw = (
@@ -239,7 +243,15 @@ def config(outbound: dict, port: int) -> dict:
     }
 
 
+def _forget_config() -> None:
+    try:
+        (home() / "config.json").unlink()
+    except OSError:
+        pass
+
+
 def stop() -> None:
+    _forget_config()
     p = _proc.get("p")
     if p and p.poll() is None:
         p.terminate()
@@ -275,12 +287,15 @@ def start(outbound: dict, name: str = "") -> int:
     while time.time() - t < 8:
         if p.poll() is not None:
             log.close()
+            _forget_config()
             err = (home() / "xray.log").read_text(encoding="utf-8", errors="replace")[-400:]
             raise RuntimeError("ключ не принят движком VPN: " + (err.strip().splitlines() or ["ошибка"])[-1])
         with socket.socket() as s:
             if s.connect_ex(("127.0.0.1", port)) == 0:
+                _forget_config()  # read by now: the key lives only in the secret store and in Xray's memory
                 return port
         time.sleep(0.2)
+    _forget_config()
     raise RuntimeError("движок VPN не запустился")
 
 

@@ -14,6 +14,7 @@ sys.path.insert(0, str(REPO))
 from mnema.memory import init_vault, remember  # noqa: E402
 from mnema.vault import Vault  # noqa: E402
 from test_core import fill  # noqa: E402
+from hidden_topics import lock_cloud  # noqa: E402
 
 ENV = {**os.environ, "PYTHONPATH": str(REPO), "PYTHONUTF8": "1"}
 
@@ -98,6 +99,7 @@ class TestMcp(unittest.TestCase):
         self.assertIn("Доход", r[6]["result"]["content"][0]["text"])  # claude may see money
 
     def test_chatgpt_limits_over_mcp(self):
+        lock_cloud(Vault(self.dir))
         r = self.session(
             "chatgpt",
             [

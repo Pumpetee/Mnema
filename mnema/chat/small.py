@@ -166,7 +166,7 @@ def warm(vault: Vault, model: str) -> dict:
     from .engine import LANG_NAMES, ru_date
 
     prof = P.load(vault)
-    lang = prof.get("lang") or "ru"
+    lang = prof.get("lang") or "en"
     system = prompt(
         vault, "", prof, "" if lang == "ru" else f"Отвечай только на языке: {LANG_NAMES.get(lang, lang)}.", ru_date()
     )

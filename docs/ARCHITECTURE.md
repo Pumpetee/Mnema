@@ -8,7 +8,7 @@
 Mnema.exe (mnema/desktop.py)
  ├─ window: pywebview on Microsoft WebView2 → http://127.0.0.1:<port>/
  ├─ tray icon (pystray): open, learn now, pause, proxy, autostart, exit
- ├─ local API (mnema/api.py, a thread): the interface, the browser extension, the window's hooks
+ ├─ local API (mnema/api.py, a thread): the interface and the window's hooks
  ├─ learner (mnema/learn/engine.py, a thread): reads the allowed sources on a timer
  └─ llama-server (vendor/llama, a child process, only while a local model is used)
 

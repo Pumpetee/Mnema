@@ -9,13 +9,16 @@ function go(v, arg) {
     clearInterval(CHAT.feedTimer);
     CHAT.feedTimer = null;
   }
-  VIEWS[v](arg)
+  (Object.hasOwn(VIEWS, v) ? VIEWS[v] : VIEWS.chat)(arg) // only the known views: «#constructor» opens the chat
     .then(() => drawGear()) // the orange «без обучения» dot belongs to the chat only
     .catch((e) => toast(e.message));
   badge();
   if (location.hash.slice(1).split("/")[0] !== v) history.replaceState(null, "", "#" + v);
 }
-$$(".rail button").forEach((b) => (b.onclick = () => go(b.dataset.v)));
+// «Чаты» opens the conversation the owner was in last; «Новый разговор» and Ctrl+N start a new one
+$$(".rail button").forEach(
+  (b) => (b.onclick = () => go(b.dataset.v, b.dataset.v === "chat" ? LS.get("lastchat", "") : undefined)),
+);
 (function logoLife() {
   const go = () => {
     const l = $(".logo");

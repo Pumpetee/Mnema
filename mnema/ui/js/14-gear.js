@@ -56,8 +56,8 @@ function gearFill(m) {
     cur = s.paused ? "pause" : (Object.values(s.sources || {}).find((x) => x.enabled) || {}).mode || "mixed",
     th = themeCfg().mode,
     lg = LANGS.find((x) => x[0] === I18N.lang) || LANGS[0];
-  m.innerHTML = `<div class="ghead"><span class="ld ${STATUS.dot || ""}"></span><div><b>${esc(STATUS.label || tr("Mnema учится"))}</b><small>${esc(STATUS.when || "")}</small></div><button class="sw ${s.paused ? "" : "on"}" id="glon" title="${tr(s.paused ? "Включить обучение" : "Поставить на паузу")}"></button></div>
-    <div class="gline"><span>${tr("Память")}</span><button class="sw ${MEM.on ? "on" : ""}" id="gmem" title="${tr("ИИ знают тебя, Mnema учится")}"></button></div>
+  // the memory itself is switched in one place, the memory block on the left; here only learning can pause
+  m.innerHTML = `<div class="ghead"><span class="ld ${STATUS.dot || ""}"></span><div><b>${esc(STATUS.label || tr("Mnema учится"))}</b><small>${esc(STATUS.when || "")}</small></div>${MEM.on ? `<button class="sw ${s.paused ? "" : "on"}" id="glon" title="${tr(s.paused ? "Продолжить обучение" : "Поставить обучение на паузу")}"></button>` : ""}</div>
     <div class="gmodes ${MEM.on ? "" : "dimmed"}">${QUICK.filter((q) => q[0] !== "pause")
       .map(
         ([k, t, d]) =>
@@ -81,12 +81,13 @@ function gearFill(m) {
     <button class="gbig" data-g="memtour">${ic("lock")}<span>${tr("Как работает память")}</span><small>${tr(`${MEMTOUR.length} шагов`)}</small></button>
     <button class="gbig" data-g="kb">${ic("book")}<span>${tr("Справочник Mnema")}</span><small>${tr("как всё устроено")}</small></button>
     <button class="gbig" data-g="settings">${ic("set")}<span>${tr("Все настройки")}</span></button>`;
-  $("#glon", m).onclick = async (e) => {
-    const on = !e.currentTarget.classList.contains("on");
-    e.currentTarget.classList.toggle("on", on);
-    await post("/api/learn/settings", { paused: !on });
-    refreshStatus();
-  };
+  if ($("#glon", m))
+    $("#glon", m).onclick = async (e) => {
+      const on = !e.currentTarget.classList.contains("on");
+      e.currentTarget.classList.toggle("on", on);
+      await post("/api/learn/settings", { paused: !on });
+      refreshStatus();
+    };
   $$("[data-q]", m).forEach(
     (b) =>
       (b.onclick = async () => {
@@ -128,7 +129,7 @@ function gearFill(m) {
     e.currentTarget.classList.toggle("on", on);
     applyAch();
     drawAchCard();
-    toast(on ? tr("Достижения включены") : tr("Достижения выключены — без всплывашек и раздела"));
+    toast(on ? tr("Достижения включены") : tr("Достижения выключены: ни наград, ни раздела"));
   };
   $$("[data-g]", m).forEach(
     (b) =>
@@ -151,7 +152,6 @@ function gearFill(m) {
         })[g]();
       }),
   );
-  if ($("#gmem", m)) $("#gmem", m).onclick = () => memSet(!MEM.on).then(() => gearFill(m));
 }
 const TOUR_STEPS = [
   [
@@ -162,25 +162,25 @@ const TOUR_STEPS = [
   ],
   [
     "Всё лежит у тебя",
-    "Память — обычные файлы Markdown в папке на этом компьютере. Их можно открыть, поправить или удалить. Без твоего выбора модели в облаке ничего не уходит.",
+    "Память — обычные файлы Markdown в папке на этом компьютере. Их можно открыть, поправить или удалить. В облако что-то уходит, только если ты сам выбрал облачную модель.",
     "folder",
     "Открыть папку",
   ],
   [
     "Учится сама, по ходу разговора",
-    'Замечает факты о тебе. Уверенное записывает сама, спорное спрашивает. Что поняла и почему — в шестерёнке справа вверху. Разговор "без обучения" ничему её не учит.',
+    "Замечает факты о тебе. Уверенное записывает сама, спорное спрашивает. Что поняла и почему — в шестерёнке справа вверху. Разговор «без обучения» ничему её не учит.",
     "feed",
     "Показать ленту",
   ],
   [
     "Модель выбираешь ты",
-    "Встроенная работает на компьютере бесплатно и без интернета. Claude, ChatGPT и Gemini подключаются подпиской или ключом. Переключатель — слева вверху.",
+    "Встроенная работает на компьютере бесплатно и без интернета. Claude подключается подпиской или ключом, ChatGPT и Gemini — ключом. Переключатель — слева вверху.",
     "model",
     "Выбрать модель",
   ],
   [
     "Документы и интернет",
-    'Прикрепи PDF, Excel, Word или презентацию — читаю на компьютере и отдаю модели только нужные места. Кнопка "Интернет" разрешает искать в авторитетных источниках, когда вопрос про внешние факты.',
+    "Прикрепи PDF, Excel, Word или презентацию — читаю на компьютере и отдаю модели только нужные места. Кнопка «Интернет» разрешает искать в авторитетных источниках, когда вопрос про внешние факты.",
     "file",
     "Прикрепить файл",
   ],

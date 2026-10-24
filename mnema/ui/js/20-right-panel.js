@@ -191,7 +191,7 @@ function bindFeed() {
         a = b.dataset.a,
         body = { id: ev.dataset.item, action: a };
       if (a === "edit") {
-        const v = prompt("Поправь:", ev.dataset.text);
+        const v = await askText("Как правильно?", ev.dataset.text);
         if (!v) return;
         body.text = v;
       }

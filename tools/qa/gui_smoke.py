@@ -69,6 +69,10 @@ try:
                 why += ", encrypts"
             else:
                 ok, why = False, why + ", but encryption does not work in the build"
+            if st.get("telegram"):
+                why += ", carries Telegram"
+            else:
+                ok, why = False, why + ", but Telegram is missing from the build"
             if ok:  # «Выход», as from the tray: the program must really end, not hang without a window
                 req = urllib.request.Request(f"http://127.0.0.1:{port}/api/app/quit", headers={"X-Mnema-Token": token})
                 urllib.request.urlopen(req, timeout=5).read()

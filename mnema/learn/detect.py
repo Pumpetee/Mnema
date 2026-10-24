@@ -2,12 +2,11 @@
 Mnema never reads folders on its own: the first launch asks whether it may look at other programs at all, then shows
 what was found, all unticked.
 
-On without asking: conversations in Mnema and the corrections in them. Everything else, the ChatGPT/Gemini extension
-included, goes to settings["found"] with its path filled in and waits for a tick.
+On without asking: conversations in Mnema and the corrections in them. Everything else goes to settings["found"]
+with its path filled in and waits for a tick.
 
 A source is switched on only when it really exists here and needs nothing from the owner:
-- always: conversations in Mnema, corrections in conversations with AI, the ChatGPT/Gemini extension (it only receives
-  what the extension sends — nothing happens without it);
+- always: conversations in Mnema, corrections in conversations with AI;
 - Claude Code — its conversation folder exists and is not empty;
 - notes — an Obsidian vault Obsidian itself lists (the one opened last);
 - documents — the Documents folder has documents in it;
@@ -27,7 +26,7 @@ import os
 import sys
 from pathlib import Path
 
-ALWAYS = ("mnema_chat", "corrections", "browser")
+ALWAYS = ("mnema_chat", "corrections")
 DOC_EXT = {".docx", ".doc", ".txt", ".md", ".pdf", ".rtf", ".odt"}
 
 

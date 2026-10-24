@@ -16,6 +16,8 @@ xlrd==2.0.2             # Excel .xls
 python-pptx==1.0.2      # PowerPoint
 cryptography==48.0.1    # Mnema's own encryption of the memory folder; the last release with an Intel Mac wheel
 PySocks==1.7.1          # SOCKS5 proxy bridge
+telethon==1.45.0        # Telegram: reading the owner's chats through the API (read only)
+python-socks[asyncio]==2.8.2  # Telegram through the owner's proxy or VPN
 ddgs==9.16.0            # web search without keys
 faster-whisper==1.2.1   # speech recognition on this computer
 SoundCard==0.4.6        # recording the microphone and the computer's sound

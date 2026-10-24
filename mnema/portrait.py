@@ -162,7 +162,7 @@ def compose(vault: Vault, fs: list[str], brain=None) -> str:
             brain = None
     if isinstance(brain, _LLMBrain):
         brain.vault = vault
-        lang = LANGS.get(P.load(vault).get("lang") or "ru", "русский")
+        lang = LANGS.get(P.load(vault).get("lang") or "en", "русский")
         try:
             text = brain._ask_safe(
                 PROMPT.format(lang=lang, facts="\n".join(f"- {f}" for f in fs[:40])), purpose="портрет"

@@ -82,7 +82,7 @@ def save(vault: Vault, chat_id: str, files: list[dict]) -> list[dict]:
 
         from ..agent import profile as P
 
-        lang = P.load(vault).get("lang") or "ru"
+        lang = P.load(vault).get("lang") or "en"
         text = None
         if ext in docs.SUPPORTED:
             try:

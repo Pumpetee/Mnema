@@ -14,6 +14,7 @@ from mnema.chat import consortium as CO, engine as CH, providers as PR  # noqa: 
 from mnema.memory import init_vault  # noqa: E402
 from mnema.vault import Vault  # noqa: E402
 from test_core import fill  # noqa: E402
+from hidden_topics import lock_cloud  # noqa: E402
 
 
 class Talk:
@@ -63,13 +64,14 @@ class TestConsortium(unittest.TestCase):
         self.assertEqual(fourth[1]["text"], "Мнение claude_code №1")
 
     def test_memory_rules_per_participant(self):
+        lock_cloud(self.v)
         cfg = {"members": ["claude_code:sonnet", "gemini:gemini-2.5-pro"], "rounds": 1}
         CH.send(self.v, "Привет", sync=True, learn=False, consortium=cfg)
         self.assertIn("Доход 100к", self.talk.calls[0]["system"])  # Claude may see money
         self.assertNotIn("Доход 100к", self.talk.calls[1]["system"])  # Gemini may not
 
     def test_argue_with_one_answer(self):
-        """«Поспорить с другими»: the author defends its answer, the others question it, a verdict at the end."""
+        """«Поспорить с разными ИИ»: the author defends its answer, the others question it, a verdict at the end."""
         import time
 
         r = CH.send(self.v, "Снижать ли цену?", model="openai:gpt-4o", sync=True, learn=False)

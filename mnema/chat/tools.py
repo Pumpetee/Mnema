@@ -144,6 +144,25 @@ class Refused(ValueError):
     pass
 
 
+# documents «Открыть» may hand to their program; nothing that runs code
+OPENABLE = {
+    ".pdf",
+    ".docx",
+    ".doc",
+    ".xlsx",
+    ".xls",
+    ".pptx",
+    ".csv",
+    ".md",
+    ".txt",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".odt",
+    ".rtf",
+}
+
+
 def resolve(vault: Vault, path: str) -> Path:
     if not (path or "").strip():
         raise Refused("не указан путь")
@@ -251,7 +270,28 @@ def _snapshot(
     return ev
 
 
+def read_only(vault: Vault, p: Path) -> bool:
+    """A place Mnema never writes to, whatever the folders for actions say: an Obsidian vault (a folder with
+    .obsidian in it or above it) and the extra memory folders — Mnema reads them and writes only into its own memory."""
+    p = p.resolve()
+    own = vault.root.resolve()
+    if p == own or own in p.parents:
+        return False
+    from .. import extra
+    from ..agent import profile as P
+
+    for f in extra.folders(P.load(vault)):
+        r = Path(f).expanduser().resolve()
+        if p == r or r in p.parents:
+            return True
+    return any((d / ".obsidian").is_dir() for d in [p, *p.parents] if d != p or p.is_dir())
+
+
 def _write_bytes(vault: Vault, client: str, p: Path, data: bytes, summary: str) -> None:
+    if read_only(vault, p):
+        raise Refused(
+            "это хранилище Obsidian или дополнительная папка памяти — Mnema их только читает и ничего в них не пишет"
+        )
     rel = in_vault(vault, p)
     if rel and p.suffix.lower() == ".md":
         from ..journal import write_with_journal
@@ -314,7 +354,7 @@ def run(vault: Vault, call: dict, client: str = "owner") -> tuple[str, str, str]
         rel = in_vault(vault, p)
         from ..agent import profile as P
 
-        lang = P.load(vault).get("lang") or "ru"
+        lang = P.load(vault).get("lang") or "en"
         text = _read_note(vault, rel, client) if rel and p.suffix.lower() == ".md" else _read_any(p, lang)
         cut = len(text) > MAX_READ
         return (text[:MAX_READ] + ("\n…[файл длиннее, показано начало]" if cut else "")), f"Прочитала файл {p}", str(p)

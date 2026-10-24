@@ -24,6 +24,7 @@ def get(vault: Vault, path: str, q: dict):
             "chats": CH.list_chats(vault, q=q.get("q", ""), sort=q.get("sort", "date")),
             "default_model": CH.default_model(vault),
             "session": CH.current_session(vault),
+            "session_names": CH.session_names(vault),
         }
     if path == "/api/knowledge":  # «Справочник Mnema»: the knowledge base, section by section
         from .chat.selfknow import kb_sections
@@ -118,6 +119,30 @@ def get(vault: Vault, path: str, q: dict):
         return 200, {
             **OG.report(vault, max(1, min(90, int(q.get("days", 7))))),
             "redact": bool(P.load(vault).get("redact", True)),
+        }
+    if path == "/api/telegram":  # the owner's Telegram, read only
+        from .learn import tg_api
+
+        return 200, tg_api.status(vault)
+    if path == "/api/quiz":  # «Насколько Mnema тебя знает»: facts from the memory, one by one
+        from . import play
+
+        return 200, play.quiz(vault)
+    if path == "/api/interview":  # «Знакомство»: the questions
+        from . import play
+
+        return 200, {"questions": [{"key": k, "q": q, "eg": eg} for k, q, eg in play.INTERVIEW]}
+    if path == "/api/telegram/chats":  # the owner's chats to pick from
+        from .learn import tg_api
+
+        return 200, {"chats": tg_api.dialogs(vault)}
+    if path == "/api/obsidian":  # the Obsidian vaults on this computer, for «Подключить Obsidian»
+        from . import extra
+
+        mine = extra.folders(P.load(vault))
+        return 200, {
+            "vaults": [{**v, "added": v["path"] in mine} for v in extra.obsidian_vaults(vault)],
+            "folders": [{"path": p, "obsidian": extra.is_obsidian(__import__("pathlib").Path(p))} for p in mine],
         }
     if path == "/api/engine":
         from . import tuning
@@ -310,7 +335,7 @@ def _brain_status(b: dict, kind: str, vault: Vault | None = None) -> dict:
         "kind": kind,
         "ok": ok,
         "level": "ok" if ok else "bad",
-        "message": "Понимаю речь через твой ключ." if ok else "Для своего ключа не хватает ключа или модели.",
+        "message": "Понимаю речь через твой ключ." if ok else "Для своего ключа укажи ключ и модель.",
     }
 
 
@@ -418,6 +443,10 @@ def post(vault: Vault, path: str, b: dict):
         return 200, r
     if path == "/api/session/new":
         return 200, CH.new_session(vault)
+    if path == "/api/session/rename":
+        return 200, {"names": CH.rename_session(vault, str(b.get("id", "")), str(b.get("name", "")))}
+    if path == "/api/session/delete":
+        return 200, {"deleted": CH.delete_session(vault, str(b.get("id", "")))}
     if path == "/api/chat/learn_now":
         return 200, CH.learn_chat_now(vault, str(b.get("id", "")))
     if path == "/api/chat/update":
@@ -470,10 +499,20 @@ def post(vault: Vault, path: str, b: dict):
         return 200, {"url": d["url"], "title": d.get("title") or url, "text": d["text"][:120_000]}
     if path == "/api/chat/action":  # the owner's word on an action the model asked for
         return 200, CH.answer_action(str(b.get("chat", "")), str(b.get("id", "")), str(b.get("choice", "")))
+    if path == "/api/files/open":  # «Открыть» a document the AI made: in its own program
+        from .chat import tools as TL
+
+        from . import osapi
+
+        p = TL.resolve(vault, str(b.get("path", "")))
+        if not p.is_file():
+            return 404, {"error": "Файла нет: его переместили или удалили"}
+        if p.suffix.lower() not in TL.OPENABLE:
+            return 400, {"error": "Такой файл открывается только из папки: «Показать в папке»"}
+        osapi.open_path(p)
+        return 200, {"ok": True}
     if path == "/api/files/reveal":  # «Показать в папке» under an action
         import os
-        import sys
-        from pathlib import Path
 
         from .chat import tools as TL
 
@@ -503,6 +542,52 @@ def post(vault: Vault, path: str, b: dict):
                 "error": E.human(e, PR.PROVIDERS.get(pid, {}).get("name", pid), vpn=E.vpn_name(vault)),
             }
         return 200, {"ok": True, "models": ids, "providers": PR.status(vault)}
+    if path == "/api/telegram":  # the owner's chats through the Telegram API, read only: login, code, password, forget
+        from .learn import tg_api
+
+        return 200, tg_api.configure(vault, b)
+    if path == "/api/compare":  # «С памятью и без»: the same question, a plain chat and Mnema, side by side
+        from . import play
+
+        return 200, play.compare(vault, str(b.get("question") or ""), b.get("models") or None)
+    if path == "/api/quiz":  # an answer in the quiz fixes the memory: yes | changed | no
+        from . import play
+
+        return 200, play.quiz_answer(
+            vault, str(b.get("id") or ""), str(b.get("verdict") or ""), str(b.get("text") or "")
+        )
+    if path == "/api/interview":  # «Знакомство»: the answers become ordinary facts
+        from . import play
+
+        return 200, play.interview_save(vault, b.get("answers") or {})
+    if path == "/api/share/save":  # «Поделиться»: the card as a picture in Pictures/Mnema, shown in its folder
+        import base64
+        import re as _re
+        import time as _time
+        from pathlib import Path as _P
+
+        from . import osapi
+
+        data = base64.b64decode(str(b.get("png") or "").split(",", 1)[-1])
+        if not data.startswith(b"\x89PNG"):
+            raise ValueError("это не картинка")
+        folder = _P.home() / "Pictures" / "Mnema"
+        folder.mkdir(parents=True, exist_ok=True)
+        name = _re.sub(r"[^\w -]+", "", str(b.get("name") or "mnema"))[:40].strip() or "mnema"
+        p = folder / f"{name} {_time.strftime('%Y-%m-%d %H-%M-%S')}.png"
+        p.write_bytes(data)
+        osapi.reveal(p)
+        return 200, {"ok": True, "path": str(p)}
+    if path == "/api/settings/reset":  # Движок, Записи встреч, Программа back to the defaults
+        from . import tuning
+
+        tuning.save(vault, {"mode": "balance", "month": 0})
+        d = P.DEFAULT
+        P.save(
+            vault,
+            {k: d[k] for k in ("economy", "scribe_mode", "scribe_model", "scribe_keep_audio", "tools", "tools_ask")},
+        )
+        return 200, {"ok": True}
     if path == "/api/agent":
         if b.get("preset"):
             P.apply_preset(vault, str(b["preset"]))
@@ -516,6 +601,8 @@ def post(vault: Vault, path: str, b: dict):
                 "custom",
                 "default_model",
                 "team_vault",
+                "extra_folders",
+                "self_ask",
                 "scribe_model",
                 "local_offer",
                 "economy",
@@ -538,6 +625,10 @@ def post(vault: Vault, path: str, b: dict):
             )
         }
         prof = P.save(vault, patch) if patch else P.load(vault)
+        if "extra_folders" in patch:  # a folder just added is read in the background
+            from . import extra
+
+            extra.warm_all(vault)
         if "proxy" in b:  # address in the profile, password in the Windows secret store
             net.save(vault, str(b.get("proxy") or ""), b.get("proxy_password") if "proxy_password" in b else None)
             prof = P.load(vault)
@@ -640,6 +731,10 @@ def post(vault: Vault, path: str, b: dict):
         elif what == "now":
             return 200, {**sync.public(vault), "result": sync.run(vault, str(b.get("id", "")))}
         return 200, sync.public(vault)
+    if path == "/api/chat/self_ask":
+        return 200, CH.answer_self_ask(
+            vault, str(b.get("chat", "")), int(b.get("i", -1)), str(b.get("action", "skip")), str(b.get("text", ""))
+        )
     if path == "/api/prompts/answer":
         return 200, CH.answer_offer(vault, str(b.get("chat", "")), str(b.get("choice", "skip")))
     if path == "/api/prompts/delete":
@@ -761,28 +856,8 @@ def post(vault: Vault, path: str, b: dict):
             return 400, {"error": "этот адрес не открываю"}
         webbrowser.open(url)  # the owner's normal browser
         return 200, {"ok": True}
-    if path == "/api/extension/open":  # the browser extension: copied to ~/.mnema/extension, the folder opened
-        import os
-        import shutil
-        import sys
-        from pathlib import Path
-
-        src = Path(getattr(sys, "_MEIPASS", "")) / "extension" if getattr(sys, "frozen", False) else None
-        if not src or not src.exists():
-            src = Path(__file__).resolve().parents[1] / "extension"
-        if not (src / "manifest.json").exists():
-            return 400, {"error": "Папки расширения нет в этой сборке Mnema. Переустанови Mnema с сайта."}
-        from .cli import HOME
-
-        dst = HOME / "extension"  # a stable place: Chrome keeps loading it after Mnema updates
-        shutil.copytree(src, dst, dirs_exist_ok=True)
-        from . import osapi
-
-        osapi.open_path(dst)
-        return 200, {"ok": True, "folder": str(dst)}
     if path == "/api/memory/open":
         import os
-        import sys
 
         from . import osapi
 

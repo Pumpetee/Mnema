@@ -7,7 +7,7 @@ remember TEXT [--to WHERE] [--client ID]
 undo ID | journal [-n N] | stale [--days N] | now
 mcp --client ID              MCP server over stdio (Claude Desktop, Claude Code, Cursor)
 hook [--part N]              Claude Code SessionStart hook output (parts of ≤9000 chars)
-serve [--port N]             local app and API for the browser extension
+serve [--port N]             local app and its API
 station [--host H --port N]  the owner's own server: sync target and MCP over HTTP for any agent
 station-key --client ID      a new MCP key for an agent, tied to an assistant's access rules
 sync [--only ID]             one sync pass with every target (Google Drive, Dropbox, folder, station)

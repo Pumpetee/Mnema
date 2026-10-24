@@ -2,7 +2,7 @@
 
 Search: free engines without keys, first relevant answer wins — Bing and Yahoo through the ddgs library (it talks
 like a normal browser, so engines don't block it after a few queries), then DuckDuckGo, Bing and Wikipedia directly.
-An optional Brave key goes first if the owner set one. Pages are downloaded and cleaned locally (docs.html_text),
+No paid search keys (the Brave key setting is gone since 1.4). Pages are downloaded and cleaned locally (docs.html_text),
 then retrieve.best() picks the passages relevant to the question. The model gets a few numbered excerpts with
 links — not whole pages — so it can answer and cite [1], [2] at a fraction of the tokens.
 """
@@ -27,7 +27,32 @@ UA = {
 URL_IN_TEXT = re.compile(r"https?://[^\s<>\"')\]]+")
 
 
+def public_url(url: str) -> bool:
+    """http(s) to a public address: not this computer, not the home or office network, not a link-local address.
+    A page a link points to is read only from the internet, never from inside."""
+    import ipaddress
+    import socket
+
+    u = urllib.parse.urlparse(url)
+    if u.scheme not in ("http", "https") or not u.hostname:
+        return False
+    host = u.hostname.strip("[]").lower()
+    if host in ("localhost",) or host.endswith((".local", ".localhost", ".internal", ".lan", ".home")):
+        return False
+    try:
+        addrs = {ai[4][0] for ai in socket.getaddrinfo(host, None)}
+    except OSError:
+        return True  # not resolved here: through a proxy it is the proxy's name lookup, which is outside
+    for a in addrs:
+        ip = ipaddress.ip_address(a.split("%")[0])
+        if not ip.is_global or ip.is_multicast:
+            return False
+    return True
+
+
 def _open(url: str, direct: bool, timeout: int, data: bytes | None = None, headers: dict | None = None):
+    if not public_url(url):
+        raise ValueError("этот адрес внутри компьютера или локальной сети — такие Mnema не открывает")
     req = urllib.request.Request(url, data=data, headers={**UA, **(headers or {})})
     if direct:
         return urllib.request.build_opener(urllib.request.ProxyHandler({})).open(req, timeout=timeout)
@@ -451,7 +476,7 @@ def _search_once(query: str, n: int) -> list[dict]:
         per, keep = {}, []
         for r in res:
             host = (urllib.parse.urlparse(r["url"]).hostname or "").lower()
-            if host.endswith("wikipedia.org") and host.split(".")[0] not in WIKI_LANGS:
+            if (host == "wikipedia.org" or host.endswith(".wikipedia.org")) and host.split(".")[0] not in WIKI_LANGS:
                 continue  # Wikipedia in the owner's languages only
             site = ".".join(host.split(".")[-2:])
             per[site] = per.get(site, 0) + 1

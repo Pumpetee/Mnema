@@ -51,8 +51,11 @@ def doc_text(f: dict) -> str:
     return f.get("text", "")
 
 
-def build_history(chat: dict, query: str, economy: bool = True) -> tuple[list[dict], int, int]:
-    """(messages for the model, chars without economy, chars actually sent)."""
+def build_history(
+    chat: dict, query: str, economy: bool = True, doc_budget: int = DOC_BUDGET, history_budget: int = HISTORY_BUDGET
+) -> tuple[list[dict], int, int]:
+    """(messages for the model, chars without economy, chars actually sent). The budgets come from «Точнее ↔
+    Экономнее» in Настройки → Движок."""
     msgs = [m for m in chat["messages"] if m["role"] in ("user", "assistant") and m.get("text") and not m.get("kind")]
     docs = [(m, f) for m in msgs for f in (m.get("files") or []) if f.get("kind") == "text"]
     full = sum(len(m["text"]) for m in msgs) + sum(len(doc_text(f)) for _, f in docs)
@@ -75,13 +78,13 @@ def build_history(chat: dict, query: str, economy: bool = True) -> tuple[list[di
                 body += "\n[Прикреплено: " + ", ".join(names) + " — нужные места подставляются к последнему вопросу]"
             body = inline_text(body, [f for f in files if f.get("kind") == "other"])
         size += len(body)
-        if economy and size > HISTORY_BUDGET and out:
+        if economy and size > history_budget and out:
             break
         out.append({"role": m["role"], "text": body, "files": files if newest else None})
     out.reverse()
     if economy and docs and out:
         # all documents of this chat, searched locally for the current question
-        per = max(1500, DOC_BUDGET // len(docs))
+        per = max(1500, doc_budget // len(docs))
         parts = []
         for _, f in docs[-6:]:
             excerpt, cut = best(query, doc_text(f), budget=per)

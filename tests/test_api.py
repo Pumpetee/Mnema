@@ -16,6 +16,7 @@ from mnema.api import make_server  # noqa: E402
 from mnema.memory import init_vault, token  # noqa: E402
 from mnema.vault import Vault  # noqa: E402
 from test_core import fill  # noqa: E402
+from hidden_topics import lock_cloud  # noqa: E402
 
 
 class TestApi(unittest.TestCase):
@@ -57,30 +58,17 @@ class TestApi(unittest.TestCase):
         except urllib.error.HTTPError as e:
             return e.code, json.loads(e.read().decode("utf-8"))
 
-    def test_learning_api_and_extension_observe(self):
-        ext = self.req("/api/ext_token")[1]["token"]
-        # browser learning off → the extension is told so and nothing is stored
-        code, d = self.req("/api/observe", {"client": "chatgpt", "text": "Запомни, что я играю в теннис."}, tok=ext)
-        self.assertEqual((code, d["learning"]), (200, False))
-        self.assertFalse(self.req("/api/ping", tok=ext)[1]["learn"])
-        # switch it on (owner token) in quiet mode, brain without model
-        code, _ = self.req("/api/learn/settings", {"sources": {"browser": {"enabled": True, "mode": "quiet"}}})
-        self.assertEqual(code, 200)
-        self.assertTrue(self.req("/api/ping", tok=ext)[1]["learn"])
-        code, d = self.req(
-            "/api/observe",
-            {"client": "chatgpt", "text": "Запомни, что я играю в теннис по четвергам.", "prev": "Чем могу помочь?"},
-            tok=ext,
-        )
-        self.assertTrue(d["learning"])
-        # the extension can't touch learning settings or run it
-        self.assertEqual(self.req("/api/learn/settings", {"paused": True}, tok=ext)[0], 403)
-        self.assertEqual(self.req("/api/learn/status", tok=ext)[0], 403)
-        self.assertEqual(self.req("/api/observe", {"client": "claude", "text": "x"}, tok=ext)[0], 403)
-        # a pass learns it
+    def test_learning_api(self):
         from mnema.learn import engine
+        from mnema.learn.sources import Episode
 
-        engine.run(self.v)
+        code, _ = self.req("/api/learn/settings", {"sources": {"mnema_chat": {"enabled": True, "mode": "quiet"}}})
+        self.assertEqual(code, 200)
+        engine.learn_episodes(
+            self.v,
+            [Episode("mnema_chat", "c1#1", "", "Запомни, что я играю в теннис по четвергам.", prev="Чем могу помочь?")],
+            "mnema_chat",
+        )
         self.assertIn("теннис по четвергам", self.v.read_raw("00 Inbox/Inbox.md"))
         items = self.req("/api/learn/items?view=learned")[1]["items"]
         it = next(i for i in items if "теннис" in i["text"])
@@ -92,45 +80,16 @@ class TestApi(unittest.TestCase):
         self.assertNotIn("теннис", self.v.read_raw("00 Inbox/Inbox.md"))
         status = self.req("/api/learn/status")[1]
         self.assertIn("claude_code", status["sources"])
+        self.assertNotIn("browser", status["sources"])  # the browser extension is gone
         self.assertEqual(self.req("/api/learn/review", {"id": "nope", "action": "keep"})[0], 400)
-        self.req("/api/learn/settings", {"sources": {"browser": {"enabled": False}}})
 
-    def test_extension_token_is_narrow(self):
-        code, d = self.req("/api/ext_token")
-        self.assertEqual(code, 200)
-        ext = d["token"]
-        self.assertNotEqual(ext, self.tok)
-        self.assertEqual(self.req("/api/ping", tok=ext)[0], 200)
-        code, d = self.req("/api/context?client=gemini", tok=ext)
-        self.assertEqual(code, 200)
-        self.assertNotIn("Макет готов", d["text"])  # gemini does not see projects
-        self.assertNotIn("100к", d["text"])  # nor money
-        code, d = self.req("/api/remember", {"fact": "из расширения", "client": "chatgpt"}, tok=ext)
-        self.assertEqual(code, 200)
-        self.assertEqual(d["path"], "00 Inbox/Inbox.md")
-        # everything else is closed for the extension token
-        for path in [
-            "/api/journal",
-            "/api/notes",
-            "/api/clients",
-            "/api/ext_token",
-            "/api/now",
-            "/api/context?client=claude",
-            "/api/context",
-            "/api/note?rel=70%20Memory/Profile.md",
-            "/",
-        ]:
-            if path == "/":
-                continue  # UI page has no /api/ prefix, checked below
-            self.assertEqual(self.req(path, tok=ext)[0], 403, path)
-        for path, body in [
-            ("/api/remember", {"fact": "x", "client": "claude", "where": "decisions"}),
-            ("/api/remember", {"fact": "x", "client": "chatgpt", "where": "decisions"}),
-            ("/api/undo", {"id": "x"}),
-            ("/api/clients", []),
-            ("/api/note", {"rel": "70 Memory/Profile.md", "raw": "x"}),
-        ]:
-            self.assertEqual(self.req(path, body, tok=ext)[0], 403, (path, body))
+    def test_one_token_and_no_browser_door(self):
+        # the browser extension (removed 24.10.2026) had its own token and routes: none of them is left
+        (self.v.service / "ext_token").write_text("old-extension-token", encoding="utf-8")
+        self.assertEqual(self.req("/api/ping", tok="old-extension-token")[0], 401)
+        self.assertEqual(self.req("/api/ext_token")[0], 404)
+        self.assertNotEqual(self.req("/api/observe", {"client": "chatgpt", "text": "x"})[0], 200)
+        self.assertNotEqual(self.req("/api/extension/open", {})[0], 200)
 
     def test_token_required(self):
         code, _ = self.req("/api/now", tok=False)
@@ -149,6 +108,7 @@ class TestApi(unittest.TestCase):
         self.assertNotIn("__MNEMA_TOKEN__", html)
 
     def test_context_respects_client(self):
+        lock_cloud(self.v)
         code, d = self.req("/api/context?client=chatgpt")
         self.assertEqual(code, 200)
         self.assertNotIn("100к", d["text"])

@@ -99,8 +99,7 @@ function compCard(id) {
      .join(
        "",
      )}</div><div class="hint" style="margin-top:4px">${c.send === "enter" ? tr("Shift+Enter — новая строка") : tr("Enter — новая строка")}</div></div></div>
-   <div class="set"><b>${tr("Подписи у кнопок")}</b><div><button class="sw ${c.labels ? "on" : ""}" data-cl></button></div></div>
-   <div class="row"><button class="btn g sm" data-creset>${tr("Как было")}</button></div></div>`;
+   <div class="set"><b>${tr("Подписи у кнопок")}</b><div><button class="sw ${c.labels ? "on" : ""}" data-cl></button></div></div></div>`;
 }
 function bindCompCard(card, redraw) {
   const save = (p) => {
@@ -123,11 +122,6 @@ function bindCompCard(card, redraw) {
   );
   $("[data-cp]", card).onchange = (e) => save({ placeholder: e.target.value.trim() });
   $("[data-cl]", card).onclick = () => save({ labels: !compCfg().labels });
-  $("[data-creset]", card).onclick = () => {
-    LS.set("composer", {});
-    applyComposer();
-    redraw();
-  };
   let drag = null;
   $$(".crow", card).forEach((r) => {
     r.ondragstart = () => {

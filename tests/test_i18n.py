@@ -30,6 +30,8 @@ class TestLanguage(unittest.TestCase):
         shutil.rmtree(self.dir, ignore_errors=True)
 
     def test_answers_in_the_chosen_language(self):
+        self.assertIn("Язык ответов: английский (English)", CH.system_prompt(self.v, "claude_code", log=False))
+        P.save(self.v, {"lang": "ru"})
         self.assertIn("Язык ответов: русский", CH.system_prompt(self.v, "claude_code", log=False))
         P.save(self.v, {"lang": "de"})
         self.assertIn("Язык ответов: немецкий (Deutsch)", CH.system_prompt(self.v, "claude_code", log=False))

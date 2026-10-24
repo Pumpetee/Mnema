@@ -5,7 +5,7 @@ recorded as two separate channels, so the transcript shows who speaks without gu
 hallucinations ("Спасибо за просмотр") and speaker echo picked up by the microphone are cut out.
 
 Audio and transcript are files in the memory folder, «80 Meetings/<дата> <название>/». Where speech is recognised —
-here or by a cloud Whisper — is decided by Настройки → Встречи (see scribe_cloud.py); the owner is always told.
+here or by a cloud Whisper — is decided by Настройки → Записи встреч (see scribe_cloud.py); the owner is always told.
 The summary request goes to the chosen chat model, as with any message.
 """
 
@@ -65,7 +65,7 @@ def human_error(e: BaseException) -> str:
     if any(w in text for w in ("snapshot", "HF_HUB", "huggingface", "hf.co")) or isinstance(e, (ConnectionError,)):
         return (
             "Не скачалась модель распознавания речи (около 0,5 ГБ): её нужно скачать один раз, нужен интернет. "
-            "Подключись и повтори — или выбери облачную расшифровку: Настройки → Встречи."
+            "Подключись и повтори — или выбери облачную расшифровку: Настройки → Записи встреч."
         )
     if _re.search(r"[А-Яа-яЁё]", text) and not _re.search(r"Errno|WinError", text):
         return text[:300]
@@ -378,7 +378,7 @@ def _launch(vault: Vault, d: Path, name: str, tracks: list, duration: int, model
                 else:
                     say(
                         f"Расшифровка на компьютере займёт примерно {SC.minutes(est)}. Быстрее — с ключом OpenAI: "
-                        f"Настройки → Встречи"
+                        f"Настройки → Записи встреч"
                     )
             else:
                 say("Расшифровываю на компьютере")

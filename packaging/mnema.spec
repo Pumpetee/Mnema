@@ -15,7 +15,6 @@ LINUX = not WIN and not MAC
 datas = [
     (os.path.join(ROOT, "mnema", "ui"), "mnema/ui"),
     (os.path.join(ROOT, "mnema", "knowledge"), "mnema/knowledge"),
-    (os.path.join(ROOT, "extension"), "extension"),  # the browser extension for ChatGPT and Gemini
     (os.path.join(ROOT, "vendor", "xray"), "xray"),  # VPN keys
 ]
 binaries, hidden = [], []
@@ -29,7 +28,8 @@ datas += [(os.path.join(ROOT, "vendor", "ocr"), "ocr")]  # the Cyrillic and Lati
 # + local documents (PDF, Excel, PowerPoint) and free web search (ddgs talks to engines like a browser)
 for pkg in ("faster_whisper", "ctranslate2", "onnxruntime", "av", "soundcard", "soundfile", "tokenizers",
             "pypdf", "openpyxl", "xlrd", "pptx", "ddgs", "primp", "lxml", "psutil",
-            "rapidocr", "pypdfium2", "pypdfium2_raw", "shapely", "pyclipper", "omegaconf"):
+            "rapidocr", "pypdfium2", "pypdfium2_raw", "shapely", "pyclipper", "omegaconf",
+            "telethon", "python_socks"):  # Telegram: the owner's chats through the API, through his proxy
     d, b, h = collect_all(pkg)
     datas += d
     binaries += b

@@ -38,10 +38,21 @@ class AccessTest(unittest.TestCase):
         cl = load_clients(self.v)
         self.assertEqual(list(cl)[:2], ["local", "claude"])
         self.assertEqual(cl["claude"].scopes, ["rules"])  # the owner's choice stays
-        self.assertIn("money", cl["openrouter"].deny_tags)  # a new column comes with its own safe defaults
+        self.assertNotIn("people", cl["openrouter"].scopes)  # a new column comes with its own defaults
+        self.assertEqual(cl["openrouter"].write_scopes, ["inbox"])
         self.assertIn("people", cl["local"].scopes)
 
     def test_locked_topics_never_leave(self):
+        from mnema.clients import save_clients
+
+        # nothing is hidden by default (23.10.2026): a topic the owner locks for an AI never reaches it
+        self.assertTrue([m for m in self.money if m in build_context(self.v, get_client(self.v, "chatgpt"))])
+        cl = load_clients(self.v)
+        for cid in ("chatgpt", "gemini", "openrouter", "cursor"):
+            self.assertEqual(cl[cid].deny_tags, [])
+            self.assertTrue(cl[cid].can_write)
+            cl[cid].deny_tags = ["money"]
+        save_clients(self.v, cl)
         for cid in ("chatgpt", "gemini", "openrouter", "cursor"):
             t = build_context(self.v, get_client(self.v, cid))
             self.assertFalse([m for m in self.money if m in t], cid)

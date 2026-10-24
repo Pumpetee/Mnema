@@ -345,6 +345,7 @@ def _stream_raw(
             env=net.env(
                 {
                     "GIT_CEILING_DIRECTORIES": str(cwd.parent),
+                    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",  # no notes of its own about the owner
                     # the same longest answer as every other model (Настройки → Движок)
                     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": str(_tuning.get(vault)["answer"]),
                 }

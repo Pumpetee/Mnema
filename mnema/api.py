@@ -3,12 +3,8 @@
 Security:
 - listens on 127.0.0.1 only;
 - every /api/ call needs the X-Mnema-Token header (token lives in <vault>/.mnema/token);
-- the browser extension gets its own narrow token (<vault>/.mnema/ext_token): connection check,
-  context as chatgpt/gemini and writing to inbox only. A leaked extension token can't read the journal,
-  notes, other clients or change access;
 - the Host header must be 127.0.0.1/localhost — blocks DNS-rebinding pages from reading the app;
-- no CORS headers: other websites can't read responses. The browser extension calls the API from
-  its background worker with host permissions, which is not subject to CORS.
+- no CORS headers: other websites can't read responses.
 """
 
 from __future__ import annotations
@@ -27,7 +23,6 @@ from .vault import Vault
 from . import osapi
 
 UI = Path(__file__).resolve().parent / "ui" / "index.html"
-EXT_CLIENTS = {"chatgpt", "gemini"}
 APP_HOOKS: dict = {}  # filled by the desktop program: show, info, autostart, switch
 # the owner's notes, not the generated layers (Now, Index), the journal, the saves or service files
 EDITABLE = re.compile(
@@ -39,22 +34,16 @@ EDITABLE = re.compile(
 
 def make_handler(vault: Vault, port: int):
     tok = token(vault)
-    ext_tok = token(vault, "ext_token")
     from . import net
 
     net.load(vault)  # the owner's proxy: every AI, search and download goes through it
+    from . import extra
+
+    extra.warm_all(vault)  # the extra memory folders (an Obsidian vault…) are read in the background
     from . import vpnkey  # connected by a VPN key: bring it up again (the port may change)
     import threading as _th
 
     _th.Thread(target=lambda: vpnkey.resume(vault), daemon=True, name="mnema-vpn").start()
-    try:
-        from . import web
-        from .learn import secrets_store
-        from .learn.settings import _vid
-
-        web.set_brave_key(secrets_store.get(_vid(vault), "web.brave"))
-    except Exception:
-        pass
     hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
 
     class H(BaseHTTPRequestHandler):
@@ -95,7 +84,6 @@ def make_handler(vault: Vault, port: int):
             if self.headers.get("Host", "") not in hosts:
                 self.send(403, {"error": "bad host"})
                 return False
-            self.ext = False
             path = urlparse(self.path).path
             if path.startswith("/api/") and not path.startswith(("/api/ping", "/api/app/")) and not vault.root.exists():
                 self.send(
@@ -108,9 +96,7 @@ def make_handler(vault: Vault, port: int):
                 return False
             if path.startswith("/api/"):
                 given = self.headers.get("X-Mnema-Token")
-                if given == ext_tok:
-                    self.ext = True
-                elif given != tok:
+                if given != tok:
                     self.send(401, {"error": "нужен токен"})
                     return False
                 if (
@@ -124,39 +110,35 @@ def make_handler(vault: Vault, port: int):
                         return False
             return True
 
-        def ext_denied(self, path: str, q: dict) -> bool:
-            """Extension token: only ping, context and inbox for browser clients."""
-            if not self.ext:
-                return False
-            ok = path == "/api/ping" or (
-                path in ("/api/context", "/api/remember", "/api/observe")
-                and q.get("client") in EXT_CLIENTS
-                and q.get("where", "inbox") == "inbox"
-            )
-            if not ok:
-                self.send(403, {"error": "токену расширения это недоступно"})
-            return not ok
-
         # -- routes
         def do_GET(self):
             if not self.guard():
                 return
             u = urlparse(self.path)
             q = {k: v[0] for k, v in parse_qs(u.query).items()}
-            if self.ext_denied(u.path, q):
-                return
             try:
                 if u.path == "/api/ping":
+                    from .agent import profile as P
+
                     return self.send(
-                        200, {"ok": True, "version": __version__, "learn": api_learn.browser_learning(vault)}
+                        200,
+                        {
+                            "ok": True,
+                            "version": __version__,
+                            "lang": P.load(vault).get("lang") or "en",
+                        },
                     )
                 if u.path == "/api/app/selftest":  # the built program checks its own parts (CI)
                     from . import crypt, ocr
 
-                    return self.send(200, {"ocr": ocr.selftest(), "crypt": crypt.selftest()})
+                    from .learn import tg_api
+
+                    return self.send(
+                        200, {"ocr": ocr.selftest(), "crypt": crypt.selftest(), "telegram": tg_api.selftest()}
+                    )
                 if u.path.startswith("/api/app/"):
                     name = u.path.rsplit("/", 1)[-1]
-                    hook = APP_HOOKS.get(name) if name in ("show", "info", "switch", "quit") else None
+                    hook = APP_HOOKS.get(name) if name in ("show", "info", "switch", "quit", "vaults") else None
                     return self.send(200, hook() if hook else {"desktop": False, "port": port})
                 r = api_chat.get(vault, u.path, q)
                 if r:
@@ -226,8 +208,6 @@ def make_handler(vault: Vault, port: int):
                             for s in vault.stale()
                         ],
                     )
-                if u.path == "/api/ext_token":
-                    return self.send(200, {"token": ext_tok})
                 if u.path == "/api/clients":
                     return self.send(200, [c.__dict__ for c in load_clients(vault).values()])
                 return self.send(404, {"error": "нет такого пути"})
@@ -243,8 +223,6 @@ def make_handler(vault: Vault, port: int):
             try:
                 b = self.body()
                 self._post = (u.path, b)
-                if self.ext_denied(u.path, {k: str(v) for k, v in b.items()} if isinstance(b, dict) else {}):
-                    return
                 if u.path == "/api/remember":
                     from .agent import profile as P
 
@@ -256,12 +234,16 @@ def make_handler(vault: Vault, port: int):
                     return self.send(200, {"id": ev["id"], "path": ev["paths"][0]})
                 if u.path.startswith("/api/app/"):
                     name = u.path.rsplit("/", 1)[-1]
-                    hook = APP_HOOKS.get(name) if name in ("autostart", "close_pref") else None
+                    hook = (
+                        APP_HOOKS.get(name)
+                        if name in ("autostart", "close_pref", "vault_open", "vault_forget", "vault_rename")
+                        else None
+                    )
                     return self.send(200, hook(b) if hook else {"desktop": False})
                 r = api_chat.post(vault, u.path, b if isinstance(b, dict) else {})
                 if r:
                     return self.send(*r)
-                if u.path.startswith("/api/learn/") or u.path == "/api/observe":
+                if u.path.startswith("/api/learn/"):
                     r = api_learn.post(vault, u.path, b if isinstance(b, dict) else {})
                     if r:
                         return self.send(*r)

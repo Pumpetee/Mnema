@@ -45,6 +45,47 @@ def open_path(p: Path | str) -> None:
         subprocess.Popen(["open" if IS_MAC else "xdg-open", p], start_new_session=True)
 
 
+def to_trash(p: Path | str) -> bool:
+    """Move a folder to the Recycle Bin / Trash, so a deleted memory can still be brought back. True when it went."""
+    p = Path(p)
+    if not p.exists():
+        return True
+    try:
+        if IS_WIN:
+            import ctypes
+            from ctypes import wintypes
+
+            class SHFILEOPSTRUCTW(ctypes.Structure):
+                _fields_ = [
+                    ("hwnd", wintypes.HWND),
+                    ("wFunc", ctypes.c_uint),
+                    ("pFrom", wintypes.LPCWSTR),
+                    ("pTo", wintypes.LPCWSTR),
+                    ("fFlags", ctypes.c_ushort),
+                    ("fAnyOperationsAborted", wintypes.BOOL),
+                    ("hNameMappings", ctypes.c_void_p),
+                    ("lpszProgressTitle", wintypes.LPCWSTR),
+                ]
+
+            # FO_DELETE = 3; FOF_SILENT | FOF_NOCONFIRMATION | FOF_ALLOWUNDO | FOF_NOERRORUI
+            op = SHFILEOPSTRUCTW(
+                None, 3, str(p.resolve()) + "\0", None, 0x0004 | 0x0010 | 0x0040 | 0x0400, False, None, None
+            )
+            ok = ctypes.windll.shell32.SHFileOperationW(ctypes.byref(op)) == 0 and not op.fAnyOperationsAborted
+        elif sys.platform == "darwin":
+            import subprocess
+
+            script = 'tell application "Finder" to delete POSIX file "' + str(p.resolve()).replace('"', '\\"') + '"'
+            ok = subprocess.run(["osascript", "-e", script], capture_output=True, timeout=60).returncode == 0
+        else:
+            import subprocess
+
+            ok = subprocess.run(["gio", "trash", str(p)], capture_output=True, timeout=60).returncode == 0
+    except Exception:
+        ok = False
+    return ok and not p.exists()
+
+
 def reveal(p: Path | str) -> None:
     """Show a file selected in its folder (Explorer, Finder); on Linux open the folder."""
     p = Path(p)

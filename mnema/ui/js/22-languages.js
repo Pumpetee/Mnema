@@ -14,9 +14,9 @@ const LANGS = [
   ["de", "Deutsch"],
   ["ja", "日本語"],
 ];
-const I18N = { lang: LS.get("lang", "ru"), dict: {}, pats: [] };
+const I18N = { lang: LS.get("lang", "en"), dict: {}, pats: [] };
 const NO_I18N =
-  ".md,.msg.user .b,.uq,textarea,select,code,pre,.facts li,.path,#ctitle,.citem .tr b,.hit,.ttip,.editor,[data-noi18n],.who,.spk,.conline,.pi b," +
+  ".md,.msg.user .b,.uq,textarea,code,pre,.facts li,.path,#ctitle,.citem .tr b,.hit,.ttip,.editor,[data-noi18n],.who,.spk,.conline,.pi b," +
   ".mtprev,.mth b,.mbub b,.mbub span,.mtlist,.rlq,.mtmh b";
 async function loadLang() {
   const l = I18N.lang;

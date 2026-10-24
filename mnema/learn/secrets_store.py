@@ -70,8 +70,13 @@ def _store_ok() -> bool:
 def _store_put(account: str, value: str) -> bool:
     try:
         if sys.platform == "darwin":
+
+            def q(s: str) -> str:
+                return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
             r = subprocess.run(
-                ["security", "add-generic-password", "-U", "-s", SERVICE, "-a", account, "-w", value],
+                ["security", "-i"],
+                input=f"add-generic-password -U -s {q(SERVICE)} -a {q(account)} -w {q(value)}\n".encode("utf-8"),
                 capture_output=True,
                 timeout=15,
             )
@@ -134,15 +139,30 @@ def put(vault_id: str, key: str, value: str) -> None:
     if old.startswith(MARK) and not value:
         _store_del(old[len(MARK) :])
     account = f"{vault_id}/{key}"
-    if value and sys.platform != "win32" and _store_ok() and _store_put(account, value):
+    stored = value and sys.platform != "win32" and _store_ok() and _store_put(account, value)
+    if stored and _store_get(account) == value:  # read back: a store that took nothing must not lose the key
         slot[key] = MARK + account
     elif value:
         slot[key] = _enc(value)
     else:
         slot.pop(key, None)
+    _write(data)
+
+
+def _write(data: dict) -> None:
+    """The file is created readable by the owner only, before anything is written into it."""
+    import json
+
     f = _file()
     f.parent.mkdir(parents=True, exist_ok=True)
-    write_json(f, data, indent=2)
+    if sys.platform == "win32":
+        write_json(f, data, indent=2)  # DPAPI: the values are bound to this Windows user anyway
+        return
+    tmp = f.with_name(f"{f.name}.{os.getpid()}.tmp")
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(data, ensure_ascii=False, indent=2))
+    os.replace(tmp, f)
     try:
         os.chmod(f, 0o600)
     except OSError:
@@ -180,8 +200,6 @@ def vault_id(vault) -> str:
             src = orphans[0] if len(orphans) == 1 else None
         if src is not None:
             data[vid] = data.pop(src)
-            out = _file()
-            out.parent.mkdir(parents=True, exist_ok=True)
-            write_json(out, data, indent=2)
+            _write(data)
     _ids[root] = vid
     return vid

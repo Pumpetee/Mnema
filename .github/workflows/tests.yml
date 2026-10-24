@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   python:
     strategy:
@@ -43,6 +46,6 @@ jobs:
         with:
           node-version: "22"
       - name: Syntax of every script
-        run: for f in mnema/ui/js/*.js extension/*.js; do node --check "$f"; done
+        run: for f in mnema/ui/js/*.js; do node --check "$f"; done
       - name: Code style
-        run: npx --yes prettier@3.9.10 --print-width 120 --check "mnema/ui/js/*.js" "mnema/ui/css/*.css" "mnema/ui/index.html" "extension/*.js"
+        run: npx --yes prettier@3.9.10 --print-width 120 --check "mnema/ui/js/*.js" "mnema/ui/css/*.css" "mnema/ui/index.html"

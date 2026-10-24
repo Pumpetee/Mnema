@@ -24,6 +24,16 @@ def _card(v: Vault, name: str, text: str) -> None:
     p.write_text(text, encoding="utf-8")
 
 
+def _lock(v: Vault) -> None:
+    """The owner hides money, health and private from the cloud AIs (nothing is hidden by default since 23.10.2026)."""
+    from mnema.clients import load_clients, save_clients
+
+    cl = load_clients(v)
+    for cid in ("chatgpt", "gemini", "openrouter", "cursor"):
+        cl[cid].deny_tags = ["money", "health", "private"]
+    save_clients(v, cl)
+
+
 def _cloud(v: Vault, client: str = "chatgpt") -> str:
     return context_for(v, client, log=False)[0]
 
@@ -33,6 +43,7 @@ class HiddenNeverLeaves(unittest.TestCase):
 
     def setUp(self):
         self.v = _vault()
+        _lock(self.v)
 
     def test_status_change_in_hidden_card_stays_hidden_in_events(self):  # QA 1
         remember(self.v, "Ипотека OLDDEBT 3 млн (статус 01.09.2026)", "card:Деньги #money")
@@ -134,6 +145,7 @@ class McpRights(unittest.TestCase):
 
     def setUp(self):
         self.v = _vault()
+        _lock(self.v)
         remember(self.v, "Отвечай коротко OWNERRULE", "rules")
         remember(self.v, "MONEYJ долг 900 тысяч", "card:Деньги #money")
         remember(self.v, "HEALTHJ мигрень", "profile:Здоровье #health")
@@ -1118,7 +1130,7 @@ class SettingsFilesHold(unittest.TestCase):
         v = _vault()
         P.save(v, {"owner_name": "Иван"})
         (v.service / "agent.json").write_text('{"lang": "ru", "owner_na', encoding="utf-8")
-        self.assertEqual(P.load(v)["lang"], "ru")  # defaults, the program keeps working
+        self.assertEqual(P.load(v)["lang"], "en")  # defaults, the program keeps working
         self.assertTrue(list(v.service.glob("agent.json.broken-*")))
         (v.service / "clients.json").write_text("[{", encoding="utf-8")
-        self.assertIn("money", load_clients(v)["chatgpt"].deny_tags)  # never «everyone sees everything»
+        self.assertNotIn("people", load_clients(v)["chatgpt"].scopes)  # the defaults, never «everyone sees everything»

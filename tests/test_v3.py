@@ -142,6 +142,11 @@ class TestChat(Base):
         self.assertEqual(CH.load_chat(self.v, a)["session"], s1["id"])
 
     def test_model_permissions_follow_the_provider(self):
+        from mnema.clients import load_clients, save_clients
+
+        cl = load_clients(self.v)
+        cl["gemini"].deny_tags = ["money"]  # the owner hid money from Gemini (nothing is hidden by default)
+        save_clients(self.v, cl)
         CH.send(self.v, "Привет", model="gemini:some-model", sync=True)
         sysm = self.fake.calls[0]["system"]
         self.assertNotIn("Доход 100к", sysm)  # gemini: money hidden
@@ -184,10 +189,36 @@ class TestChat(Base):
         team = Vault(self.dir / "team")
         init_vault(team)
         team.write_raw("70 Memory/Rules.md", "# Правила\n\n- В команде созвоны по понедельникам.\n")
-        P.save(self.v, {"team_vault": str(team.root)})
+        P.save(self.v, {"team_vault": str(team.root)})  # set before 1.4: the first extra folder
         CH.send(self.v, "x", model="claude_code:", sync=True)
-        self.assertIn("Общая память команды", self.fake.calls[-1]["system"])
+        self.assertIn("Дополнительная папка памяти: team", self.fake.calls[-1]["system"])
         self.assertIn("созвоны по понедельникам", self.fake.calls[-1]["system"])
+
+    def test_extra_folder_of_plain_notes(self):
+        from mnema import extra
+        from mnema.clients import load_clients, save_clients
+
+        notes = self.dir / "notes"
+        (notes / "Работа").mkdir(parents=True)
+        (notes / "Работа" / "Поставщики.md").write_text(
+            "# Поставщики\n\nОсновной поставщик бумаги — ООО Листок, договор до марта.\n", encoding="utf-8"
+        )
+        (notes / "Деньги.md").write_text("# Деньги\n\n- Долг SECRETDEBT #money\n- Вклад открыт\n", encoding="utf-8")
+        (notes / ".obsidian").mkdir()
+        (notes / ".obsidian" / "x.md").write_text("SKIPPED", encoding="utf-8")
+        P.save(self.v, {"extra_folders": [str(notes)]})
+        extra._idx.clear()
+        CH.send(self.v, "кто поставщик бумаги?", model="claude_code:", sync=True)
+        sys_ = self.fake.calls[-1]["system"]
+        self.assertIn("Obsidian: notes", sys_)  # a folder with .obsidian inside is an Obsidian vault
+        self.assertIn("ООО Листок", sys_)
+        self.assertNotIn("SKIPPED", sys_)
+        cl = load_clients(self.v)
+        cl["claude"].deny_tags = ["money"]
+        save_clients(self.v, cl)
+        extra._idx.clear()
+        CH.send(self.v, "что с долгом и вкладом?", model="claude_code:", sync=True)
+        self.assertNotIn("SECRETDEBT", self.fake.calls[-1]["system"])  # hidden topics are cut here too
 
     def test_bad_chat_id(self):
         with self.assertRaises(KeyError):

@@ -20,7 +20,7 @@ async function consAct(action, extra) {
       return;
     }
     if (action === "pause") {
-      toast(tr("Договорит текущий, остальные подождут"));
+      toast(tr("Остановила. Обсуждение продолжится, когда нажмёшь «Продолжить»"));
       if (CHAT.live) {
         CHAT.live.pausing = true;
         drawTable();
@@ -121,9 +121,9 @@ function drawTable() {
   const stg = (consPlan(c.rounds)[Math.min(t.round, c.rounds) - 1] || [""])[0];
   const msg = {
     running: `${stg ? `<em class="cstg">${tr(stg)}</em>` : ""}${tr("Говорит")} <b data-noi18n>${esc(t.speaker || "")}</b>${t.next ? ` · ${tr("дальше")} <b data-noi18n>${esc(t.next)}</b>` : ` · ${tr("подведёт итог")}`}`,
-    pausing: tr("Пауза: договорит текущий, остальные ждут"),
+    pausing: tr("Останавливаю…"),
     summary: tr("Обсуждение завершается: подводят итог"),
-    paused: tr("Пауза. Внеси ясность сообщением или нажми «Продолжить»"),
+    paused: tr("Пауза. Напиши уточнение или нажми «Продолжить»"),
     waiting: `<b data-noi18n>${esc(t.asked || "")}</b> ${tr("спросил тебя — остальные ждут ответа")}`,
     ready: tr("Задай вопрос — обсудят по кругу, а ты можешь вмешаться в любой момент"),
     done: `${ic("check")}${tr("Обсуждение завершено. Задай новый вопрос — или пусть обсудят ещё раз")}`,

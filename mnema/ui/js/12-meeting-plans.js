@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------- meetings: how to transcribe, as plans — what it costs, how fast, where the audio goes
 // Cloud price: OpenAI whisper-1, $0.006 per minute (OpenAI price list) → $0.36 per hour of recording.
-function scribePlans(sc, mode, compact) {
+function scribePlans(sc, mode, compact, bare) {
   const hour = sc.rtf ? Math.max(1, Math.round(sc.rtf * 60)) : 0,
     spd = hour ? tr("час записи ≈") + " " + hour + " " + tr("мин") : tr("замерю на первой записи");
   const P = [
@@ -60,7 +60,7 @@ function scribePlans(sc, mode, compact) {
       [k, icn, t, cls, tag, rows],
       n,
     ) => `<button class="splan ${k === mode ? "on" : ""}" data-plan="${k}" style="--d:${n * 0.05}s"><span class="spi">${icn}</span><b>${tr(t)}</b><em class="stag ${cls}">${tr(tag)}</em>
-    ${compact ? "" : ul(rows)}${k === mode ? `<i class="spck">${ic("check")}</i>` : ""}</button>`,
+    ${compact || bare ? "" : ul(rows)}${k === mode ? `<i class="spck">${ic("check")}</i>` : ""}</button>`,
   ).join("")}</div>${compact ? `<div class="spdet">${ul((P.find((x) => x[0] === mode) || P[0])[5])}</div>` : ""}
     ${(mode === "cloud" || mode === "partial") && !sc.cloud_ready ? `<div class="snokey">${ic("x")}${tr("Для облака нужен ключ OpenAI или свой адрес — без него расшифрую на компьютере бесплатно.")}</div>` : ""}`;
 }
@@ -81,7 +81,7 @@ function scribeQuality(q) {
       acc,
       sp,
       size,
-    ]) => `<button class="sq ${k === q ? "on" : ""}" data-sq="${k}"><b>${tr(t)}</b><small>${tr(d)}</small>
+    ]) => `<button class="sq ${k === q ? "on" : ""}" data-sq="${k}" title="${esc(tr(d))}"><b>${tr(t)}</b>
     ${acc ? `<div class="sqm"><span>${tr("точность")}</span>${dots(acc, "a")}</div><div class="sqm"><span>${tr("скорость")}</span>${dots(sp, "s")}</div><em>${size} · ${tr("бесплатно")}</em>` : `<em>${tr("бесплатно")}</em>`}</button>`,
   ).join("")}</div>`;
 }
