@@ -16883,6 +16883,76 @@ body.wlc-on .tour {
   text-transform: uppercase;
   color: var(--ink3);
 }
+/* «Все модели»: the old and special-purpose ones under a line; the key and the check folded */
+.mlist .mlold {
+  grid-column: 1 / -1;
+  margin: 10px 0 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+.mlist button.cur {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+.pmset {
+  margin-top: 14px;
+}
+.pmset > summary {
+  cursor: pointer;
+  color: var(--ink2);
+  font-size: 13px;
+}
+/* the model menu: «Облачные» / «На компьютере», then each AI with its best models and «Все модели» */
+.m3sec {
+  padding: 10px 10px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+.m3grp.m3prov {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px 2px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ink2);
+}
+.m3prov > span {
+  flex: 1;
+  white-space: nowrap;
+}
+.mmenu .m3all,
+.m3all {
+  display: inline-flex !important;
+  width: auto !important;
+  flex: none;
+  margin: 0 !important;
+  border: 0;
+  background: none;
+  padding: 2px 6px !important;
+  border-radius: 6px;
+  font: inherit;
+  font-size: calc(11.5px * var(--fs));
+  font-weight: 500 !important;
+  color: var(--acc) !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mmenu .m3all:hover,
+.m3all:hover {
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+}
 .aigrp {
   display: flex;
   align-items: baseline;

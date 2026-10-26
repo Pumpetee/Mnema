@@ -1740,58 +1740,44 @@ function modelMenu(anchor) {
     ollama: "#334155",
   };
   const NM = {
-    local: "На этом компьютере",
-    claude_code: "Claude",
+    local: "Встроенная модель",
+    claude_code: "Claude по подписке",
     openai: "ChatGPT",
     gemini: "Gemini",
     openrouter: "OpenRouter",
     ollama: "Ollama",
     anthropic: "Claude · ключ API",
   };
-  const SUB = {
-    local: "бесплатно, без интернета",
-    claude_code: "по подписке",
-    openai: "OpenAI · свой ключ",
-    gemini: "Google · свой ключ",
-    openrouter: "любые модели по одному ключу",
-    ollama: "на компьютере",
-    anthropic: "Anthropic · свой ключ",
-  };
-  const row = (ref, name) =>
-    `<button data-m="${esc(ref)}" class="m2row ${ref === CHAT.model || (ref === "claude_code:sonnet" && CHAT.model === "claude_code:") ? "cur" : ""}"><i></i><span data-noi18n>${esc(name)}</span></button>`;
-  const card = (p, models, extra) =>
-    `<div class="m2card" style="--pc:${COL[p.id] || "#64748b"}"><div class="m2h"><span class="m2av">${esc((NM[p.id] || p.name).slice(0, 1))}</span><div><b>${tr(NM[p.id] || p.name)}</b><small>${tr(SUB[p.id] || "")}</small></div></div>${models}${extra || ""}</div>`;
   const ready = P.filter((p) => p.ready),
     LOCAL = ["local", "ollama"],
     label = (p) => tr(NM[p.id] || p.name),
     // cloud first, then this computer; inside each — by name: no model goes first because of who made it
     byName = (a, b) => LOCAL.includes(a.id) - LOCAL.includes(b.id) || label(a).localeCompare(label(b));
-  const items = ready.sort(byName).flatMap((p) => {
-    const ms = p.id === "claude_code" ? p.models.filter((x) => x.id) : p.models;
-    return ms.slice(0, p.id === "local" ? 6 : 5).map((x) => ({ ref: p.id + ":" + x.id, name: x.name, p }));
-  });
-  const more = ready.filter(
-    (p) => (p.id === "claude_code" ? p.models.filter((x) => x.id) : p.models).length > (p.id === "local" ? 6 : 5),
-  );
-  const rowsOf = (list) =>
-    list
-      .map(
-        ({ ref, name, p }) =>
-          `<button data-m="${esc(ref)}" class="m3row ${ref === CHAT.model || (ref === "claude_code:sonnet" && CHAT.model === "claude_code:") ? "cur" : ""}" style="--pc:${COL[p.id] || "#64748b"}"><i></i><span data-noi18n>${esc(name)}</span><em>${tr(SUB[p.id] || p.name)}</em></button>`,
-      )
+  // one rule for every AI: its three best models, the chosen one if it is further down, and «Все модели» under them
+  const TOP = 3;
+  const shown = (p) => {
+    const ms = (p.id === "claude_code" ? p.models.filter((x) => x.id) : p.models).filter((x) => !x.old);
+    const top = ms.slice(0, TOP);
+    const cur = p.models.find((x) => p.id + ":" + x.id === CHAT.model && x.id);
+    if (cur && !top.includes(cur)) top.push(cur);
+    return top;
+  };
+  const mrow = (p, x) => {
+    const ref = p.id + ":" + x.id;
+    const on = ref === CHAT.model || (ref === "claude_code:sonnet" && CHAT.model === "claude_code:");
+    return `<button data-m="${esc(ref)}" class="m3row ${on ? "cur" : ""}" style="--pc:${COL[p.id] || "#64748b"}"><i></i><span data-noi18n>${esc(x.name)}</span></button>`;
+  };
+  const group = (p) =>
+    `<div class="m3grp m3prov"><span>${esc(label(p))}</span><button class="m3all" data-p="${p.id}">${tr("Все модели")} · ${p.models.filter((x) => x.id || p.id !== "claude_code").length}</button></div>` +
+    shown(p)
+      .map((x) => mrow(p, x))
       .join("");
-  const cloudItems = items.filter((x) => !LOCAL.includes(x.p.id)),
-    localItems = items.filter((x) => LOCAL.includes(x.p.id));
+  const sorted = ready.sort(byName);
+  const cloud = sorted.filter((p) => !LOCAL.includes(p.id)),
+    here = sorted.filter((p) => LOCAL.includes(p.id));
   const cards =
-    (cloudItems.length ? `<div class="m3grp">${tr("Облачные")}</div>` + rowsOf(cloudItems) : "") +
-    (localItems.length ? `<div class="m3grp">${tr("На компьютере")}</div>` + rowsOf(localItems) : "") +
-    (ready.some((p) => p.id === "local")
-      ? `<button class="m2more" data-p="local">${tr("Другие модели на компьютере")}</button>`
-      : "") +
-    more
-      .filter((p) => p.id !== "local")
-      .map((p) => `<button class="m2more" data-p="${p.id}">${tr("Все модели")} ${esc(NM[p.id] || p.name)}</button>`)
-      .join("");
+    (cloud.length ? `<div class="m3sec">${tr("Облачные")}</div>` + cloud.map(group).join("") : "") +
+    (here.length ? `<div class="m3sec">${tr("На компьютере")}</div>` + here.map(group).join("") : "");
   const add = P.filter((p) => !p.ready)
     .sort(byName)
     .map(
@@ -1853,14 +1839,23 @@ async function connectModal(pid) {
   };
   const how = PROV_HOW[pid] || { t: "" };
   const draw = (models, msg) => {
-    const list = models || p.models;
+    const list = (models || p.models).map((x) => (typeof x === "string" ? { id: x, name: x } : x));
+    const good = list.filter((x) => !x.old),
+      aged = list.filter((x) => x.old);
+    const btn = (x) =>
+      `<button data-pm="${esc(x.id)}" class="${p.id + ":" + x.id === CHAT.model ? "cur" : ""}">${esc(x.name)}</button>`;
+    // connected: the models come first, the key and the check fold below; not yet: how to connect first
+    const models_ = list.length
+      ? `<div class="fld" style="margin-top:12px"><span>${tr("Выбери модель")} (${list.length})</span><input id="pq" placeholder="${tr("поиск")}"></div><div class="mlist" id="pml">${good.map(btn).join("")}${aged.length ? `<div class="mlold">${tr("Старые и служебные")}</div>${aged.map(btn).join("")}` : ""}</div>`
+      : "";
+    const setup = `<div class="how">${esc(how.t)}${how.u ? ` <a href="#" id="openu" style="color:var(--acc)">Открыть сайт</a>` : ""}</div>
+    ${pid === "claude_code" ? "" : p.needs_key ? `<div class="fld"><span>Ключ API хранится в защищённом хранилище системы, не в папке памяти</span><input id="pkey" type="password" placeholder="${p.key ? "сохранён " + esc(p.key) : "вставь ключ"}"></div>` : `<div class="fld"><span>Адрес</span><input id="pend" value="${esc(p.endpoint)}" placeholder="http://127.0.0.1:11434"></div>`}
+    <div class="row" style="margin-top:10px"><button class="btn" id="pgo">${pid === "claude_code" ? "Проверить снова" : "Проверить и найти модели"}</button><span class="hint" id="pmsg">${esc(msg || "")}</span></div>`;
+    const on = p.connected && !p.disabled && list.length;
     pop.innerHTML = `<div class="card"><h2>${esc(p.name)} <span class="hint">${provState(p)}</span></h2>
     ${p.problem && !p.disabled ? `<div class="aiprob">${esc(p.problem)}</div>` : ""}
     ${p.disabled ? `<div class="how">${tr("Этот ИИ выключен: его нет в списках моделей. Ключ и настройки сохранены.")} <button class="btn sm" id="pon">${tr("Включить")}</button></div>` : ""}
-    <div class="how">${esc(how.t)}${how.u ? ` <a href="#" id="openu" style="color:var(--acc)">Открыть сайт</a>` : ""}</div>
-    ${pid === "claude_code" ? "" : p.needs_key ? `<div class="fld"><span>Ключ API хранится в защищённом хранилище системы, не в папке памяти</span><input id="pkey" type="password" placeholder="${p.key ? "сохранён " + esc(p.key) : "вставь ключ"}"></div>` : `<div class="fld"><span>Адрес</span><input id="pend" value="${esc(p.endpoint)}" placeholder="http://127.0.0.1:11434"></div>`}
-    <div class="row" style="margin-top:10px"><button class="btn" id="pgo">${pid === "claude_code" ? "Проверить снова" : "Проверить и найти модели"}</button><span class="hint" id="pmsg">${esc(msg || "")}</span></div>
-    ${list.length ? `<div class="fld" style="margin-top:12px"><span>Выбери модель (${list.length})</span><input id="pq" placeholder="поиск"></div><div class="mlist" id="pml">${list.map((x) => `<button data-pm="${esc(typeof x === "string" ? x : x.id)}">${esc(typeof x === "string" ? x : x.name)}</button>`).join("")}</div>` : ""}
+    ${on ? `${models_}<details class="pmset" ${msg ? "open" : ""}><summary>${tr(p.needs_key ? "Ключ и проверка" : "Подключение и проверка")}</summary>${setup}</details>` : setup + models_}
     <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn g sm" id="pclose">Закрыть</button></div></div>`;
     $("#pclose", pop).onclick = () => pop.remove();
     if ($("#pon", pop))
@@ -1915,10 +1910,7 @@ async function connectModal(pid) {
             p,
             CHAT.providers.find((x) => x.id === pid),
           );
-          draw(
-            r.ok ? r.models.map((x) => ({ id: x, name: x })) : null,
-            r.ok ? `Подключено: ${r.models.length} моделей` : "Не вышло: " + r.error,
-          );
+          draw(null, r.ok ? `Подключено: ${r.models.length} моделей` : "Не вышло: " + r.error);
         }
       } catch (err) {
         $("#pmsg", pop).textContent = "Не вышло: " + err.message;

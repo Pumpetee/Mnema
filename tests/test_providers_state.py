@@ -183,3 +183,35 @@ class FakeClaudeCode(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ModelOrder(unittest.TestCase):
+    """The menu shows the top three of every AI: current good models, never «gpt-3.5» or an image model."""
+
+    def test_openai(self):
+        from mnema.chat import model_rank as R
+
+        ids = ["chatgpt-image-latest", "gpt-3.5-turbo", "gpt-3.5-turbo-0125", "gpt-4o", "gpt-4o-2024-08-06"]
+        ids += ["gpt-4o-mini-tts", "gpt-4.1", "gpt-5", "gpt-5-mini", "gpt-5-pro", "gpt-5.1", "gpt-5.2", "o3"]
+        r = R.rank("openai", ids)
+        self.assertEqual(r[:3], ["gpt-5.2", "gpt-5.1", "gpt-5"])
+        for x in ("chatgpt-image-latest", "gpt-3.5-turbo", "gpt-3.5-turbo-0125", "gpt-4o-mini-tts", "gpt-5-pro"):
+            self.assertTrue(R.old(x), x)
+        self.assertEqual(set(r[-6:]), {x for x in ids if R.old(x)})
+
+    def test_gemini_and_dates(self):
+        from mnema.chat import model_rank as R
+
+        g = ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-embedding-001", "gemini-2.5-flash-lite"]
+        self.assertEqual(R.rank("gemini", g)[:2], ["gemini-2.5-pro", "gemini-2.5-flash"])  # «gemini» is not «mini»
+        a = {"claude-opus-4-5-20251101": 3, "claude-sonnet-4-5-20250929": 2, "claude-3-5-haiku-20241022": 1}
+        self.assertEqual(R.rank("anthropic", list(a), a)[0], "claude-opus-4-5-20251101")
+        self.assertTrue(R.old("claude-3-5-haiku-20241022"))
+
+    def test_status_marks_and_orders(self):
+        v = Vault(Path(tempfile.mkdtemp()))
+        init_vault(v)
+        PR.save(v, "openai", key="sk-x", models=["gpt-3.5-turbo", "gpt-5", "gpt-image-1"])
+        ms = st(v, "openai")["models"]
+        self.assertEqual([m["id"] for m in ms], ["gpt-5", "gpt-3.5-turbo", "gpt-image-1"])
+        self.assertEqual([bool(m.get("old")) for m in ms], [False, True, True])

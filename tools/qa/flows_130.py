@@ -66,7 +66,7 @@ with sync_playwright() as p:
     clean(page)
     page.click("#model", timeout=5000)
     page.wait_for_timeout(800)
-    groups = page.locator(".m3grp").all_inner_texts()
+    groups = page.locator(".m3sec").all_inner_texts()
     check(
         "в меню моделей группа «Облачные» (группа «На компьютере» — когда есть модель на компьютере)",
         groups and "ОБЛАЧ" in groups[0].upper(),

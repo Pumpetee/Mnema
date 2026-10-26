@@ -50,8 +50,9 @@ class SelfAsk(unittest.TestCase):
         from mnema.chat import engine as CH, providers as PR
         from test_v3 import FakeStream
 
-        orig = PR.stream
+        orig, signed = PR.stream, PR.claude_signed_in
         PR.stream = FakeStream("Ответ про склад")
+        PR.claude_signed_in = lambda: True  # the build machines have no Claude Code
         try:
             P.save(self.v, {"default_model": "claude_code:"})
             r = CH.send(self.v, "что дальше по ремонту склада?", sync=True, learn=False)
@@ -65,6 +66,7 @@ class SelfAsk(unittest.TestCase):
             ms = CH.load_chat(self.v, r["chat"])["messages"]
             self.assertEqual([m.get("kind", m["role"]) for m in ms], ["user", "assistant"])  # one fresh answer
         finally:
+            PR.claude_signed_in = signed
             PR.stream = orig
 
     def test_off_and_memory_off(self):

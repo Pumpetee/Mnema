@@ -18,12 +18,15 @@ import urllib.request
 from pathlib import Path
 from typing import Iterator
 
+import datetime as dt
+
 from .. import net
 from .. import tuning as _tuning
 from ..learn import secrets_store
 from ..learn.brains import claude_exe, claude_signed_in
 from ..vault import Vault
 from ..fsutil import read_json, write_json
+from . import model_rank
 
 PROVIDERS = {
     "local": {
@@ -100,6 +103,7 @@ def save(
     endpoint: str | None = None,
     key: str | None = None,
     disabled: bool | None = None,
+    created: dict | None = None,
 ) -> dict:
     """disabled: the owner switched this AI off — it leaves every list of models, its key and models stay."""
     if pid not in PROVIDERS:
@@ -109,7 +113,9 @@ def save(
         data[pid]["disabled"] = bool(disabled)
         data[pid].pop("problem", None)  # switched back on — tried afresh
     if models is not None:
-        data[pid]["models"] = [m for m in models if isinstance(m, str) and m.strip()][:200]
+        data[pid]["models"] = [m for m in models if isinstance(m, str) and m.strip()][:400]
+    if created is not None:
+        data[pid]["created"] = created
     if endpoint is not None:
         data[pid]["endpoint"] = endpoint.strip()
     if key is not None and not key.startswith("••••"):
@@ -173,7 +179,10 @@ def status(vault: Vault) -> list[dict]:
             models = (
                 [{"id": m, "name": n} for m, n in CLAUDE_CODE_MODELS]
                 if pid == "claude_code"
-                else [{"id": m, "name": m} for m in data[pid]["models"]]
+                else [
+                    {"id": m, "name": m, **({"old": True} if model_rank.old(m) and pid != "ollama" else {})}
+                    for m in model_rank.rank(pid, data[pid]["models"], data[pid].get("created"))
+                ]
             )
         off, problem = bool(data[pid].get("disabled")), problem_of(data, pid) if ready else ""
         out.append(
@@ -208,9 +217,17 @@ def fetch_models(vault: Vault, pid: str) -> list[str]:
 
         return [m["id"] for m in localllm.installed_models()]
     base, key = base_of(vault, pid), key_of(vault, pid)
+    created: dict[str, float] = {}  # the provider's own date of each model: the newest good ones go on top
     if pid == "anthropic":
         d = _get(base + "/v1/models?limit=100", {"x-api-key": key, "anthropic-version": "2023-06-01"})
         ids = [m["id"] for m in d.get("data", [])]
+        for m in d.get("data", []):
+            try:
+                created[m["id"]] = dt.datetime.fromisoformat(
+                    str(m.get("created_at")).replace("Z", "+00:00")
+                ).timestamp()
+            except (ValueError, TypeError):
+                pass
     elif pid == "ollama":
         ids = [m["name"] for m in _get(base + "/api/tags", {}).get("models", [])]
     else:
@@ -218,10 +235,15 @@ def fetch_models(vault: Vault, pid: str) -> list[str]:
             _get(base + "/key", {"Authorization": f"Bearer {key}"})
         d = _get(base + "/models", {"Authorization": f"Bearer {key}"})
         ids = [m.get("id", "").removeprefix("models/") for m in d.get("data", [])]
+        created = {
+            m.get("id", "").removeprefix("models/"): float(m["created"])
+            for m in d.get("data", [])
+            if isinstance(m.get("created"), (int, float))
+        }
         if pid == "openai":
             ids = [i for i in ids if i.startswith(("gpt", "o1", "o3", "o4", "chatgpt"))] or ids
-    ids = sorted({i for i in ids if i})
-    save(vault, pid, models=ids)
+    ids = model_rank.rank(pid, sorted({i for i in ids if i}), created)
+    save(vault, pid, models=ids, created={i: created[i] for i in ids if i in created})
     clear_problem(vault, pid)  # the key works again
     return ids
 
