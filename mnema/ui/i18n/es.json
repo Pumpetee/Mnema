@@ -214,7 +214,6 @@
 "Для консорциума нужны хотя бы два ИИ — подключи ещё один": "Para el consorcio necesito al menos dos IA: conecta otra",
 "На этом компьютере": "En este ordenador",
 "Не больше четырёх": "Máximo cuatro",
-"Нужны подписка Claude и установленный Claude Code от Anthropic. Mnema находит его сама — после установки нажми «Проверить снова».": "Necesitas una suscripción a Claude y Claude Code de Anthropic instalado. Mnema lo encuentra sola: después de instalarlo, pulsa «Comprobar de nuevo».",
 "Ключ берётся в Google AI Studio: aistudio.google.com → Get API key.": "La clave se obtiene en Google AI Studio: aistudio.google.com → Get API key.",
 "Один ключ на сотни моделей разных компаний: openrouter.ai/keys.": "Una sola clave para cientos de modelos de distintas empresas: openrouter.ai/keys.",
 "Нужна установленная и запущенная Ollama (ollama.com). Адрес по умолчанию — http://127.0.0.1:11434.": "Necesitas tener Ollama instalada y en ejecución (ollama.com). La dirección por defecto es http://127.0.0.1:11434.",
@@ -2189,7 +2188,6 @@
 "память в приложении Claude через MCP": "memoria en la aplicación de Claude a través de MCP",
 "правила и проекты в редакторе через MCP": "reglas y proyectos en el editor a través de MCP",
 "Другая модель": "Otro modelo",
-"установи Claude Code": "instala Claude Code",
 "Сменить ключ": "Cambiar clave",
 "Указать ключ": "Indicar clave",
 "Указать адрес": "Indicar dirección",
@@ -3329,7 +3327,18 @@
 "Ключ API от OpenAI.": "Clave de API de OpenAI.",
 "Старые и служебные": "Antiguos y de servicio",
 "Ключ и проверка": "Clave y comprobación",
-"Подключение и проверка": "Conexión y comprobación"
+"Подключение и проверка": "Conexión y comprobación",
+"Как установить": "Cómo instalar",
+"Claude Code найден — войди в свой аккаунт Claude": "Claude Code encontrado: inicia sesión en tu cuenta de Claude",
+"Claude Code не найден на этом компьютере": "Claude Code no se encontró en este equipo",
+"Открылось окно Claude Code: войди в аккаунт, потом нажми «Проверить снова»": "Se abrió la ventana de Claude Code: inicia sesión en tu cuenta y luego pulsa «Comprobar de nuevo»",
+"Нужны подписка Claude и Claude Code от Anthropic — отдельная программа или та, что идёт внутри приложения Claude Desktop. Mnema находит её сама. Если Claude Code найден, но не подключён, — нажми «Войти» на плитке и войди своей подпиской.": "Necesitas una suscripción de Claude y Claude Code de Anthropic, ya sea como programa independiente o el que viene dentro de la aplicación Claude Desktop. Mnema lo encuentra sola. Si Claude Code aparece pero no está conectado, pulsa «Iniciar sesión» en la tarjeta e inicia sesión con tu suscripción.",
+"Claude Code на этом компьютере не найден.": "Claude Code no se encontró en este equipo.",
+"Claude Code на этом компьютере не найден. Установи его и нажми «Проверить снова».": "Claude Code no se encontró en este equipo. Instálalo y pulsa «Comprobar de nuevo».",
+"Claude Code найден, но вход в аккаунт не выполнен: нажми «Войти» и войди своей подпиской Claude.": "Claude Code está instalado, pero no has iniciado sesión: pulsa «Iniciar sesión» e inicia sesión con tu suscripción de Claude.",
+"Не открылось окно Claude Code": "No se pudo abrir la ventana de Claude Code",
+". Запусти вручную": ". Ejecútalo manualmente",
+"Открой терминал и запусти": "Abre la terminal y ejecuta"
 },
 "patterns": {
 "{}Новый разговор": "{}Nueva conversación",
@@ -3647,6 +3656,8 @@
 "{}Поспорить с разными ИИ": "{}Debate con distintas IAs",
 "Claude по подписке не ответил: {}. Повтори или выбери другую модель.": "Claude por suscripción no respondió: {}. Inténtalo de nuevo o elige otro modelo.",
 "У подписки Claude кончился лимит{}. {}": "Se agotó el límite de la suscripción de Claude{}. {}",
-"— снова заработает: {}": "— volverá a funcionar: {}"
+"— снова заработает: {}": "— volverá a funcionar: {}",
+"Не открылось окно Claude Code: {}. Запусти вручную: {}": "No se pudo abrir la ventana de Claude Code: {}. Ejecútalo manualmente: {}",
+"Открой терминал и запусти: {}": "Abre la terminal y ejecuta: {}"
 }
 }

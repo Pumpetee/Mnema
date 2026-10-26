@@ -298,16 +298,96 @@ class _LLMBrain:
         return out + [c for c in explicit if c["ref"] not in covered]
 
 
+def _npm_exe(folder: Path) -> Path | None:
+    """The real program behind npm's claude.cmd shim (the shim mangles empty arguments on Windows)."""
+    base = folder / "node_modules" / "@anthropic-ai"
+    for cand in (
+        base / "claude-code" / "bin" / "claude.exe",
+        base / "claude-code" / "node_modules" / "@anthropic-ai" / "claude-code-win32-x64" / "claude.exe",
+        base / "claude-code" / "node_modules" / "@anthropic-ai" / "claude-code-win32-arm64" / "claude.exe",
+    ):
+        if cand.is_file():
+            return cand
+    return None
+
+
+def _newest(folder: Path, name: str) -> Path | None:
+    """Claude Desktop keeps its own Claude Code in claude-code/<version>/: the newest one."""
+    try:
+        found = [d / name for d in folder.iterdir() if (d / name).is_file()]
+    except OSError:
+        return None
+
+    def ver(p: Path):
+        return tuple(int(x) for x in re.findall(r"\d+", p.parent.name)[:4])
+
+    return max(found, key=ver) if found else None
+
+
+def claude_places() -> list[Path]:
+    """Where Claude Code lives besides PATH: a program started from a shortcut often has a shorter PATH than a terminal,
+    and Claude Desktop brings its own copy that is never on PATH at all."""
+    home = Path.home()
+    env = os.environ.get
+    if sys.platform == "win32":
+        appdata = Path(env("APPDATA") or home / "AppData" / "Roaming")
+        local = Path(env("LOCALAPPDATA") or home / "AppData" / "Local")
+        out = [
+            home / ".local" / "bin" / "claude.exe",  # the official installer
+            local / "Microsoft" / "WinGet" / "Links" / "claude.exe",
+            local / "Volta" / "bin" / "claude.exe",
+            home / ".bun" / "bin" / "claude.exe",
+            home / "scoop" / "shims" / "claude.exe",
+            local / "Programs" / "claude" / "claude.exe",
+        ]
+        npm_dirs = [appdata / "npm"] + sorted((appdata / "nvm").glob("v*"), reverse=True)
+        for d in npm_dirs:
+            exe = _npm_exe(d)
+            if exe:
+                out.append(exe)
+        for pkg in sorted((local / "Microsoft" / "WinGet" / "Packages").glob("Anthropic.ClaudeCode*")):
+            out += list(pkg.glob("**/claude.exe"))[:1]
+        desk = _newest(appdata / "Claude" / "claude-code", "claude.exe")
+        if desk:
+            out.append(desk)
+        return out
+    out = [
+        home / ".local" / "bin" / "claude",
+        home / ".claude" / "local" / "claude",
+        home / ".npm-global" / "bin" / "claude",
+        home / ".bun" / "bin" / "claude",
+        home / ".volta" / "bin" / "claude",
+        Path("/opt/homebrew/bin/claude"),
+        Path("/usr/local/bin/claude"),
+        Path("/usr/bin/claude"),
+    ]
+    out += sorted(home.glob(".nvm/versions/node/*/bin/claude"), reverse=True)
+    desk_dir = (
+        home / "Library" / "Application Support" / "Claude" / "claude-code"
+        if sys.platform == "darwin"
+        else home / ".config" / "Claude" / "claude-code"
+    )
+    desk = _newest(desk_dir, "claude")
+    if desk:
+        out.append(desk)
+    return out
+
+
 def claude_exe() -> str | None:
-    """The real executable: npm installs a .cmd shim on Windows, which mangles empty arguments."""
-    exe = shutil.which("claude.exe")
+    """The real Claude Code program: on PATH first, then where installers and Claude Desktop put it."""
+    exe = shutil.which("claude.exe") if sys.platform == "win32" else None
     if exe:
         return exe
     shim = shutil.which("claude")
-    if shim:
-        cand = Path(shim).parent / "node_modules" / "@anthropic-ai" / "claude-code" / "bin" / "claude.exe"
-        if cand.exists():
-            return str(cand)
+    if shim and sys.platform == "win32":
+        real = _npm_exe(Path(shim).parent)
+        if real:
+            return str(real)
+    if shim and not shim.lower().endswith((".cmd", ".bat", ".ps1")):
+        return shim
+    for p in claude_places():
+        if p.is_file():
+            return str(p)
     return shim
 
 

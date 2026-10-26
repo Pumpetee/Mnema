@@ -10,7 +10,9 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -193,6 +195,7 @@ def status(vault: Vault) -> list[dict]:
                 "needs_key": p["key"],
                 "ready": ready and not off and not problem,
                 "connected": ready,
+                "found": bool(claude_exe()) if pid == "claude_code" else ready,
                 "disabled": off,
                 "problem": problem,
                 "key": ("••••" + key[-4:]) if key else "",
@@ -248,6 +251,38 @@ def fetch_models(vault: Vault, pid: str) -> list[str]:
     return ids
 
 
+def claude_login() -> dict:
+    """«Войти»: Claude Code in its own terminal window — it asks for the sign-in on its first start (or type /login)."""
+    exe = claude_exe()
+    if not exe:
+        return {"ok": False, "error": "Claude Code на этом компьютере не найден."}
+    try:
+        if sys.platform == "win32":
+            subprocess.Popen(
+                ["cmd.exe", "/c", "start", "Claude Code", exe], creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)
+            )
+        elif sys.platform == "darwin":
+            subprocess.Popen(
+                [
+                    "osascript",
+                    "-e",
+                    f'tell application "Terminal" to do script "{exe}"',
+                    "-e",
+                    'tell application "Terminal" to activate',
+                ]
+            )
+        else:
+            for term in (["x-terminal-emulator", "-e"], ["gnome-terminal", "--"], ["konsole", "-e"], ["xterm", "-e"]):
+                if shutil.which(term[0]):
+                    subprocess.Popen(term + [exe])
+                    break
+            else:
+                return {"ok": False, "error": f"Открой терминал и запусти: {exe}"}
+    except OSError as e:
+        return {"ok": False, "error": f"Не открылось окно Claude Code: {e}. Запусти вручную: {exe}"}
+    return {"ok": True}
+
+
 def check(vault: Vault, pid: str) -> dict:
     """«Проверить снова»: a real, tiny request. Clears a stale problem or records the current one."""
     from .. import errors as E
@@ -256,8 +291,16 @@ def check(vault: Vault, pid: str) -> dict:
     who = E.provider_name(pid)
     try:
         if pid == "claude_code":
+            if not claude_exe():
+                return {
+                    "ok": False,
+                    "error": "Claude Code на этом компьютере не найден. Установи его и нажми «Проверить снова».",
+                }
             if not claude_signed_in():
-                return {"ok": False, "error": "Claude Code не найден на компьютере или в него не выполнен вход."}
+                return {
+                    "ok": False,
+                    "error": "Claude Code найден, но вход в аккаунт не выполнен: нажми «Войти» и войди своей подпиской Claude.",
+                }
             complete(
                 vault,
                 pid,

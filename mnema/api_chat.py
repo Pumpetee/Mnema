@@ -536,6 +536,8 @@ def post(vault: Vault, path: str, b: dict):
             disabled=bool(b["disabled"]) if "disabled" in b else None,
         )
         return 200, {"providers": PR.status(vault)}
+    if path == "/api/providers/claude_login":  # «Войти»: Claude Code in a terminal, it asks for the sign-in itself
+        return 200, PR.claude_login()
     if path == "/api/providers/check":  # «Проверить снова»: a tiny real request to this AI
         r = PR.check(vault, str(b.get("id", "")))
         return 200, {**r, "providers": PR.status(vault)}

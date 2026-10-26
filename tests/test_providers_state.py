@@ -215,3 +215,63 @@ class ModelOrder(unittest.TestCase):
         ms = st(v, "openai")["models"]
         self.assertEqual([m["id"] for m in ms], ["gpt-5", "gpt-3.5-turbo", "gpt-image-1"])
         self.assertEqual([bool(m.get("old")) for m in ms], [False, True, True])
+
+
+@unittest.skipUnless(sys.platform == "win32", "Windows places")
+class FindClaudeCode(unittest.TestCase):
+    """The tester's case: Claude Code is there, but not on PATH — Mnema must still find it."""
+
+    def setUp(self):
+        self.home = Path(tempfile.mkdtemp())
+        self.env = mock.patch.dict(
+            "os.environ",
+            {
+                "APPDATA": str(self.home / "Roaming"),
+                "LOCALAPPDATA": str(self.home / "Local"),
+                "PATH": "",
+                "USERPROFILE": str(self.home),
+            },
+        )
+        self.env.start()
+        self.h = mock.patch("pathlib.Path.home", lambda: self.home)
+        self.h.start()
+
+    def tearDown(self):
+        self.h.stop()
+        self.env.stop()
+
+    def put(self, rel):
+        p = self.home / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(b"MZ")
+        return str(p)
+
+    def test_nothing_installed(self):
+        from mnema.learn import brains as B
+
+        self.assertIsNone(B.claude_exe())
+
+    def test_inside_claude_desktop_the_newest(self):
+        from mnema.learn import brains as B
+
+        self.put("Roaming/Claude/claude-code/2.1.9/claude.exe")
+        new = self.put("Roaming/Claude/claude-code/2.1.275/claude.exe")
+        self.assertEqual(B.claude_exe(), new)
+
+    def test_npm_without_path(self):
+        from mnema.learn import brains as B
+
+        exe = self.put(
+            "Roaming/npm/node_modules/@anthropic-ai/claude-code/node_modules/@anthropic-ai/claude-code-win32-x64/claude.exe"
+        )
+        self.assertEqual(B.claude_exe(), exe)
+
+    def test_official_installer(self):
+        from mnema.learn import brains as B
+
+        exe = self.put(".local/bin/claude.exe")
+        self.assertEqual(B.claude_exe(), exe)
+        v = Vault(Path(tempfile.mkdtemp()))
+        init_vault(v)
+        s = st(v, "claude_code")
+        self.assertTrue(s["found"])  # found, the sign-in is a separate question

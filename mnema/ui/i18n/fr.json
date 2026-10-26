@@ -147,7 +147,6 @@
 "Для консорциума нужны хотя бы два ИИ — подключи ещё один": "Pour un consortium, il faut au moins deux IA — connecte-en une autre",
 "На этом компьютере": "Sur cet ordinateur",
 "Не больше четырёх": "Quatre maximum",
-"Нужны подписка Claude и установленный Claude Code от Anthropic. Mnema находит его сама — после установки нажми «Проверить снова».": "Il te faut un abonnement Claude et Claude Code d'Anthropic installé. Mnema le trouve toute seule — une fois l'installation terminée, clique sur « Vérifier à nouveau ».",
 "Ключ берётся в Google AI Studio: aistudio.google.com → Get API key.": "La clé se récupère dans Google AI Studio : aistudio.google.com → Get API key.",
 "Один ключ на сотни моделей разных компаний: openrouter.ai/keys.": "Une seule clé pour des centaines de modèles de différentes entreprises : openrouter.ai/keys.",
 "Нужна установленная и запущенная Ollama (ollama.com). Адрес по умолчанию — http://127.0.0.1:11434.": "Il faut qu'Ollama (ollama.com) soit installé et lancé. Adresse par défaut : http://127.0.0.1:11434.",
@@ -2146,7 +2145,6 @@
 "память в приложении Claude через MCP": "la mémoire dans l'appli Claude via MCP",
 "правила и проекты в редакторе через MCP": "règles et projets dans l'éditeur via MCP",
 "Другая модель": "Autre modèle",
-"установи Claude Code": "installe Claude Code",
 "Сменить ключ": "Changer la clé",
 "Указать ключ": "Indiquer la clé",
 "Указать адрес": "Indiquer l'adresse",
@@ -3329,7 +3327,18 @@
 "Ключ API от OpenAI.": "Clé API d'OpenAI.",
 "Старые и служебные": "Anciens et techniques",
 "Ключ и проверка": "Clé et vérification",
-"Подключение и проверка": "Connexion et vérification"
+"Подключение и проверка": "Connexion et vérification",
+"Как установить": "Comment l'installer",
+"Claude Code найден — войди в свой аккаунт Claude": "Claude Code est trouvé — connecte-toi à ton compte Claude",
+"Claude Code не найден на этом компьютере": "Claude Code est introuvable sur cet ordinateur",
+"Открылось окно Claude Code: войди в аккаунт, потом нажми «Проверить снова»": "La fenêtre de Claude Code s'est ouverte : connecte-toi à ton compte, puis clique sur « Vérifier à nouveau »",
+"Нужны подписка Claude и Claude Code от Anthropic — отдельная программа или та, что идёт внутри приложения Claude Desktop. Mnema находит её сама. Если Claude Code найден, но не подключён, — нажми «Войти» на плитке и войди своей подпиской.": "Il te faut un abonnement Claude et Claude Code d'Anthropic — soit le programme autonome, soit celui qui est inclus dans l'application Claude Desktop. Mnema le trouve toute seule. Si Claude Code est trouvé mais pas connecté, clique sur « Se connecter » sur la vignette et connecte-toi avec ton abonnement.",
+"Claude Code на этом компьютере не найден.": "Claude Code est introuvable sur cet ordinateur.",
+"Claude Code на этом компьютере не найден. Установи его и нажми «Проверить снова».": "Claude Code est introuvable sur cet ordinateur. Installe-le, puis clique sur « Vérifier à nouveau ».",
+"Claude Code найден, но вход в аккаунт не выполнен: нажми «Войти» и войди своей подпиской Claude.": "Claude Code est trouvé, mais tu n'es pas connecté à ton compte : clique sur « Se connecter » et connecte-toi avec ton abonnement Claude.",
+"Не открылось окно Claude Code": "La fenêtre de Claude Code ne s'est pas ouverte",
+". Запусти вручную": ". Lance-le manuellement",
+"Открой терминал и запусти": "Ouvre un terminal et lance"
 },
 "patterns": {
 "{}Новый разговор": "{}Nouvelle conversation",
@@ -3647,6 +3656,8 @@
 "{}Поспорить с разными ИИ": "{}Débats avec différentes IA",
 "Claude по подписке не ответил: {}. Повтори или выбери другую модель.": "Claude par abonnement n'a pas répondu : {}. Réessaie ou choisis un autre modèle.",
 "У подписки Claude кончился лимит{}. {}": "L'abonnement Claude a atteint sa limite{}. {}",
-"— снова заработает: {}": "— refonctionnera : {}"
+"— снова заработает: {}": "— refonctionnera : {}",
+"Не открылось окно Claude Code: {}. Запусти вручную: {}": "La fenêtre de Claude Code ne s'est pas ouverte : {}. Lance-le manuellement : {}",
+"Открой терминал и запусти: {}": "Ouvre un terminal et lance : {}"
 }
 }

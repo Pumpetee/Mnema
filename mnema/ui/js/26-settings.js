@@ -1114,13 +1114,20 @@ function provTile(p, n = 0) {
           ? ""
           : p.ready
             ? `<span class="aiok">${tr("работает без ключа")}</span>`
-            : `<span class="hint">${tr("установи Claude Code")}</span>`
+            : p.found
+              ? `<button class="btn sm" data-cclogin>${tr("Войти")}</button><button class="btn g sm" data-chk>${tr("Проверить снова")}</button>`
+              : `<button class="btn g sm" data-ccinstall>${tr("Как установить")}</button><button class="btn g sm" data-chk>${tr("Проверить снова")}</button>`
         : `<button class="btn g sm" data-more>${tr(p.needs_key ? (p.connected ? "Сменить ключ" : "Указать ключ") : "Указать адрес")}</button>`;
   const check = p.problem && !p.disabled ? `<button class="btn sm" data-chk>${tr("Проверить снова")}</button>` : "";
   const off = p.connected
     ? `<button class="btn g sm aioff" data-off="${p.disabled ? 0 : 1}" title="${tr(p.disabled ? "Вернуть этот ИИ в списки моделей" : "Убрать этот ИИ из списков моделей — ключ и настройки останутся")}">${tr(p.disabled ? "Включить" : "Выключить")}</button>`
     : "";
-  const local = p.id === "local" && p.ready ? p.models.map((m) => m.name).join(", ") : "";
+  const local =
+    p.id === "local" && p.ready
+      ? p.models.map((m) => m.name).join(", ")
+      : p.id === "claude_code" && !p.ready && !p.problem && !p.disabled
+        ? tr(p.found ? "Claude Code найден — войди в свой аккаунт Claude" : "Claude Code не найден на этом компьютере")
+        : "";
   const [, c1, c2] = aiLook(p.id, p.name);
   const cls = p.disabled ? "off" : p.problem ? "bad" : "";
   return `<div class="aitile ${p.ready ? "on" : ""} ${cls}" data-p="${p.id}" ${p.id === "local" ? 'id="c-local"' : ""} style="--c1:${c1};--c2:${c2};--d:${n * 0.05}s">${aiStatus(p.ready, tr(provState(p)), cls)}
@@ -1164,6 +1171,16 @@ function bindTiles(fetch = true) {
         await refreshProviders();
         viewSettings(SETCUR);
       }),
+  );
+  $$(".aitile [data-cclogin]").forEach(
+    (b) =>
+      (b.onclick = async () => {
+        const r = await post("/api/providers/claude_login", {});
+        toast(r.ok ? tr("Открылось окно Claude Code: войди в аккаунт, потом нажми «Проверить снова»") : r.error, 9000);
+      }),
+  );
+  $$(".aitile [data-ccinstall]").forEach(
+    (b) => (b.onclick = () => post("/api/open_url", { url: "https://code.claude.com/docs/en/setup" }).catch(() => {})),
   );
   $$(".aitile [data-chk]").forEach(
     (b) =>
@@ -1807,7 +1824,8 @@ function modelMenu(anchor) {
 }
 const PROV_HOW = {
   claude_code: {
-    t: "Нужны подписка Claude и установленный Claude Code от Anthropic. Mnema находит его сама — после установки нажми «Проверить снова».",
+    t: "Нужны подписка Claude и Claude Code от Anthropic — отдельная программа или та, что идёт внутри приложения Claude Desktop. Mnema находит её сама. Если Claude Code найден, но не подключён, — нажми «Войти» на плитке и войди своей подпиской.",
+    u: "https://code.claude.com/docs/en/setup",
   },
   anthropic: {
     t: "Ключ берётся на console.anthropic.com, раздел API Keys. Подписка Claude Pro ключа не даёт: для неё есть «Claude по подписке».",
