@@ -62,12 +62,17 @@ class SwitchOffAndProblems(unittest.TestCase):
     def setUp(self):
         self.v = Vault(Path(tempfile.mkdtemp()))
         init_vault(self.v)
-        self.p = mock.patch.object(PR, "claude_signed_in", lambda: True)
-        self.p.start()
+        self.p = [  # the build machines have no Claude Code: it is put here for these tests
+            mock.patch.object(PR, "claude_signed_in", lambda: True),
+            mock.patch.object(PR, "claude_exe", lambda: "claude"),
+        ]
+        for x in self.p:
+            x.start()
         PR.save(self.v, "ollama", models=["qwen3:8b"])
 
     def tearDown(self):
-        self.p.stop()
+        for x in self.p:
+            x.stop()
 
     def test_switched_off_leaves_the_lists_and_comes_back(self):
         self.assertTrue(st(self.v, "claude_code")["ready"])
