@@ -506,8 +506,14 @@ async function viewSettings(arg) {
   const prof = ag.profile,
     simple = prof.simple,
     s = ls.settings;
+  // many or long choices: an even grid instead of a row that breaks with one lone choice on the second line
+  const segGrid = (choices) => {
+    const ls = Object.values(choices).map((l) => tr(String(l)));
+    if (ls.length > 4) return "many";
+    return ls.length === 4 && ls.join("").length > 60 ? "many two" : "";
+  };
   const seg = (key, choices, val) =>
-    `<div class="seg" data-seg="${key}">${Object.entries(choices)
+    `<div class="seg ${segGrid(choices)}" data-seg="${key}">${Object.entries(choices)
       .map(([k, l]) => `<button data-v="${k}" class="${k === val ? "on" : ""}">${esc(l)}</button>`)
       .join("")}</div>`;
   const allModels = ms.providers
@@ -546,18 +552,23 @@ async function viewSettings(arg) {
   {
     $("#st").innerHTML = `
     ${modelHero(ms, allModels, prof.default_model || ms.default_model)}
-    <div class="card" data-sec="ai" id="c-prov"><h2>${tr("Модели")}<span class="hint">${tr("с какими ИИ говорить в Mnema")}</span></h2><div class="aigrp">${tr("Облачные")}<span class="hint">${tr("работают через интернет, по ключу или подписке")}</span></div><div class="aigrid">${ms.providers
-      .filter((x) => !["local", "ollama"].includes(x.id))
-      .sort((a, b) => tr(a.name).localeCompare(tr(b.name)))
+    <div class="card" data-sec="ai" id="c-prov"><h2>${tr("Модели")}<span class="hint">${tr("с какими ИИ говорить в Mnema")}</span></h2><div class="aigrp aipaid">${tr("Платные")}<span class="hint">${tr("работают через интернет: платишь компании, чей это ИИ")}</span></div><div class="aisub">${tr("По подписке")}<span class="hint">${tr("та, что уже оплачена у компании")}</span></div><div class="aigrid">${ms.providers
+      .filter((x) => x.id === "claude_code")
       .map((x, n) => provTile(x, n))
       .join(
         "",
-      )}</div><div class="aigrp">${tr("На компьютере")}<span class="hint">${tr("бесплатно, без интернета, ничего не уходит наружу")}</span></div><div class="aigrid">${ms.providers
+      )}</div><div class="aisub">${tr("По ключу API")}<span class="hint">${tr("оплата по расходу, отдельно от подписки")}</span></div><div class="aigrid">${ms.providers
+      .filter((x) => !["local", "ollama", "claude_code"].includes(x.id))
+      .sort((a, b) => tr(a.name).localeCompare(tr(b.name)))
+      .map((x, n) => provTile(x, n + 1))
+      .join(
+        "",
+      )}</div><div class="aigrp">${tr("Бесплатные")}<span class="hint">${tr("на этом компьютере, без интернета, ничего не уходит наружу")}</span></div><div class="aigrid">${ms.providers
       .filter((x) => ["local", "ollama"].includes(x.id))
       .map((x, n) => provTile(x, n))
       .join("")}</div></div>
     ${engineCard(eng)}
-    ${scribeCard(scr)}
+    ${((SCR_X = { ...SCR_X, models: allModels, summary: prof.scribe_summary_model || "", keep: !!prof.scribe_keep_audio }), (bindScribeCard.last = scr), scribeCard(scr))}
     <div class="card" data-sec="security" id="seccard"><h2>${tr("Защита данных")}</h2>
      <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.redact !== false ? "on" : ""}" id="secred"></button><div><b>${tr("Скрывать секреты от облачных ИИ")}</b><p>${tr("Номера карт, пароли, ключи, телефоны, паспорта и СНИЛС заменяются метками до отправки, в ответ настоящие значения подставляются на компьютере.")}</p></div></div>
      ${efs ? `<div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${efs.on ? "on" : ""}" id="secefs" ${efs.supported ? "" : "disabled"}></button><div><b>${tr("Шифровать папку памяти")}</b><p>${efs.supported ? tr("Средствами Windows: файлы на диске зашифрованы ключом твоей учётной записи, без входа в неё их не прочитать, даже вынув диск. Для тебя и Mnema всё работает как раньше.") : esc(tr(efs.reason))}</p>${efs.on ? `<button class="btn g sm" id="secbk" style="margin-top:6px">${tr("Сохранить ключ восстановления")}</button>` : ""}</div></div>` : ""}
@@ -817,9 +828,11 @@ async function viewSettings(arg) {
         )
         .join("") || '<p class="hint">Источники выключены.</p>'
     }
-      <div class="set"><b>Записывать без вопроса при уверенности от, %</b><div class="fld" style="margin:0"><input id="auto" type="number" min="50" max="100" value="${Math.round(s.auto_confidence * 100)}"></div></div>
-      <div class="set"><b>Предлагать забыть то, что не пригодилось, через (дней)</b><div class="fld" style="margin:0"><input id="fdays" type="number" min="7" value="${s.forget_after_days}"></div></div>
-      <div class="set"><b>Не учиться на темах и словах</b><div><div class="lchips">${s.never.map((p, i) => `<label class="on">${esc(p)} <b data-nv="${i}">×</b></label>`).join("") || '<span class="hint">пусто</span>'}</div><div class="row" style="margin-top:8px"><input id="nva" class="inp" placeholder="тема или слово"><button class="btn l" id="nvb">Добавить</button></div></div></div>
+      <div class="numgrid">
+        <label class="numt" style="--c1:#6366f1;--c2:#a855f7"><span class="medal2 lit"><span>🎯</span></span><span class="xftx"><b>${tr("Записывать без вопроса")}</b><small>${tr("когда уверена не меньше чем на")}</small></span><span class="numin"><input id="auto" type="number" min="50" max="100" value="${Math.round(s.auto_confidence * 100)}"><em>%</em></span></label>
+        <label class="numt" style="--c1:#f59e0b;--c2:#f97316"><span class="medal2 lit"><span>🧹</span></span><span class="xftx"><b>${tr("Предлагать забыть")}</b><small>${tr("то, что не пригодилось, через")}</small></span><span class="numin"><input id="fdays" type="number" min="7" value="${s.forget_after_days}"><em>${tr("дн.")}</em></span></label>
+        <div class="numt wide" style="--c1:#ef4444;--c2:#f97316"><span class="medal2 ${s.never.length ? "lit" : ""}"><span>🚫</span></span><span class="xftx"><b>${tr("Не учиться на темах и словах")}</b><span class="lchips">${s.never.map((p, i) => `<label class="on">${esc(p)} <b data-nv="${i}">×</b></label>`).join("") || `<small>${tr("пусто — учится на всём")}</small>`}</span><span class="row xfadd"><input id="nva" class="inp" placeholder="${tr("тема или слово")}"><button class="btn g" id="nvb">${tr("Добавить")}</button></span></span></div>
+      </div>
       <div class="set"><b>Чем понимает тексты${hq("brain")}</b><div>${seg("brain", BRAINS, s.brain.kind)}<div class="hint" style="margin-top:6px">${esc(BRAIN_HINT[s.brain.kind])}${s.brain.kind === "auto" && br.using ? ` <b>${tr("Сейчас")}: ${esc(tr({ claude_code: "Claude по подписке", local: "встроенная модель", none: "только явное" }[br.using] || br.using))}</b>` : ""}</div>${br.level === "bad" ? `<div class="brain bad" style="margin-top:8px">${esc(br.message)}</div>` : ""}
         ${s.brain.kind === "api" ? `<div class="fld"><span>Провайдер</span><select id="bprov"><option value="anthropic" ${s.brain.provider === "anthropic" ? "selected" : ""}>Anthropic</option><option value="openai" ${s.brain.provider !== "anthropic" ? "selected" : ""}>Совместимый с OpenAI</option></select></div><div class="fld"><span>Ключ</span><input id="bkey" type="password" value="${esc(s.brain.api_key)}"></div>` : ""}
         ${!["none", "auto"].includes(s.brain.kind) ? `<div class="fld"><span>Модель</span><input id="bmodel" value="${esc(s.brain.model)}" placeholder="${s.brain.kind === "claude_code" ? "по умолчанию" : s.brain.kind === "ollama" ? "например, qwen2.5:14b" : "название модели"}"></div>` : ""}${s.brain.kind === "ollama" || s.brain.kind === "api" ? `<div class="fld"><span>Адрес, если не стандартный</span><input id="bend" value="${esc(s.brain.endpoint)}"></div>` : ""}
@@ -834,7 +847,11 @@ async function viewSettings(arg) {
       <div class="set"><b>${tr("Мои рецепты")}</b><div>${PRM_ST.prompts.length ? `<div class="plist">${PRM_ST.prompts.map((x) => `<div class="pi"><div><b>${esc(x.name)}</b><span>${esc(x.when || "")} · использован ${x.uses} раз</span></div><button class="btn g sm" data-popen="${esc(x.file)}">Открыть</button><button class="btn g sm" data-pdel="${esc(x.file)}">Удалить</button></div>`).join("")}</div>` : '<span class="hint">пока нет — Mnema предложит первый, когда задача повторится</span>'}</div></div></div>
     <div class="card" data-sec="app" id="netcard"><h2>${tr("VPN и прокси")}</h2>
       <p class="hint" style="margin:-4px 0 12px">${tr("Когда ИИ недоступны напрямую. По ключу Mnema подключается сама, держать приложение VPN открытым не нужно. Через VPN идут только запросы Mnema, остальной компьютер работает как раньше.")}</p>
-      <div class="vkrow"><select class="inp" id="vksvc">${VK_SVCS.map((x) => `<option value="${esc(x)}" ${x === (prof.vpn_service || "Hiddify") ? "selected" : ""}>${esc(tr(x))}</option>`).join("")}</select>
+      <div class="vksvcs">${VK_SVCS.map((x, n) => {
+        const [mk, c1, c2] = VK_LOOK[x] || ["•", "#64748b", "#94a3b8"];
+        return `<button class="vksv ${x === (prof.vpn_service || "Hiddify") ? "on" : ""}" data-vks="${esc(x)}" style="--c1:${c1};--c2:${c2};--d:${n * 0.04}s"><span class="medal2"><span>${mk}</span></span><b ${x === "Другой сервис" ? "" : "data-noi18n"}>${esc(tr(x))}</b></button>`;
+      }).join("")}</div>
+      <div class="vkrow"><select class="inp" id="vksvc" hidden>${VK_SVCS.map((x) => `<option value="${esc(x)}" ${x === (prof.vpn_service || "Hiddify") ? "selected" : ""}>${esc(tr(x))}</option>`).join("")}</select>
         <button class="btn" id="vkimp">${ic("copy")}${tr("Импортировать ключ")}</button><button class="btn g" id="vkman">${ic("edit")}${tr("Ввести ключ вручную")}</button></div>
       <div class="hint vkhint" id="vkhint"></div>
       <div class="vkbox" id="vkbox" hidden><textarea class="inp" id="vkkey" rows="3" placeholder="vless://…  vmess://…  trojan://…  ss://…  ${tr("или ссылка подписки")} https://…"></textarea><div class="row" style="margin-top:8px;gap:8px"><button class="btn" id="vkgo">${tr("Подключиться")}</button><span class="hint" id="vkmsg"></span></div></div>
@@ -845,16 +862,17 @@ async function viewSettings(arg) {
       <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.tools !== false ? "on" : ""}" id="actsw"></button><div><b>${tr("Модель может читать и создавать файлы")}</b><p>${tr("Читать, искать, создавать и править файлы, делать PDF, Word и Excel, записывать в память. Программы не запускаются, в интернет ничего не уходит. Любую запись можно откатить: «Память» → «История».")}</p></div></div>
       <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.tools_ask ? "on" : ""}" id="actask-sw"></button><div><b>${tr("Спрашивать разрешение на каждое действие")}</b><p>${tr("Выключено: Mnema делает сразу. Каждая запись всё равно в журнале и откатывается в «Память» → «История».")}</p></div></div>
       <div class="set"><b>${tr("Где можно")}</b><div><div class="actfolders"><div class="actf"><span>${tr("Папка памяти")}</span><code data-noi18n>${esc(ACH.folder || "")}</code></div>${(prof.tool_folders || []).map((f, k) => `<div class="actf"><span>${tr("Рабочая папка")}</span><code data-noi18n>${esc(f)}</code><button class="btn g sm" data-actdel="${k}">${tr("Убрать")}</button></div>`).join("")}</div>
-      <div class="row" style="margin-top:8px"><input id="actnew" class="inp" style="min-width:320px" placeholder="${tr("папка, где можно работать")}">${window.pywebview ? `<button class="btn l" id="actpick">${tr("Выбрать…")}</button>` : ""}<button class="btn" id="actadd">${tr("Добавить")}</button></div></div></div></div>
+      <div class="row" style="margin-top:8px"><input id="actnew" class="inp" style="min-width:320px" placeholder="${tr("папка, где можно работать")}">${window.pywebview ? `<button class="btn l" id="actpick">${tr("Выбрать…")}</button>` : ""}<button class="btn g" id="actadd">${tr("Добавить")}</button></div></div></div></div>
     <div class="card" data-sec="app" id="c-team"><h2>${tr("Дополнительные папки памяти")}${hq("team")}</h2>
-      <div class="row" style="margin:-2px 0 12px"><button class="btn obsbtn" id="obsconnect">${OBS_LOGO}${tr("Подключить Obsidian")}</button></div>
+      <div class="xfgrid"><button class="xft" id="obsconnect" style="--c1:#7c3aed;--c2:#a855f7"><span class="medal2 lit">${OBS_LOGO}</span><span class="xftx"><b>Obsidian</b><small>${tr("Хранилища Obsidian на этом компьютере")}</small><span class="srcst">${ic("plus")}${tr("Подключить Obsidian")}</span></span></button>
+      <div class="xft" style="--c1:#0ea5e9;--c2:#22d3ee"><span class="medal2 lit"><span>📁</span></span><span class="xftx"><b>${tr("Своя папка")}</b><small>${tr("Любая папка с заметками или документами")}</small>
+      <span class="row xfadd"><input id="team" class="inp" placeholder="${tr("папка с заметками или другой памятью")}">${window.pywebview ? `<button class="btn g" id="tpick">${tr("Выбрать…")}</button>` : ""}<button class="btn g" id="tsave">${tr("Добавить")}</button></span></span></div></div>
       <div class="actfolders" id="xfolders">${extraFolders(prof)
         .map(
           (f, k) =>
             `<div class="actf"><span>${tr("Папка")}</span><code data-noi18n>${esc(f)}</code><button class="btn g sm" data-xdel="${k}">${tr("Убрать")}</button></div>`,
         )
-        .join("")}</div>
-      <div class="row" style="margin-top:8px"><input id="team" class="inp" style="min-width:320px" placeholder="${tr("папка с заметками или другой памятью")}">${window.pywebview ? `<button class="btn l" id="tpick">${tr("Выбрать…")}</button>` : ""}<button class="btn" id="tsave">${tr("Добавить")}</button></div></div>
+        .join("")}</div></div>
     <div class="card tgc" data-sec="learn" id="c-tg"><h2>Telegram</h2><p class="hint">${tr("загружаю…")}</p></div>
 `,
     );
@@ -1266,10 +1284,27 @@ function modelLabel(v) {
         : p.name + " · " + m.name;
 }
 const SPK_COLORS = ["#5b5bd6", "#0f8b8d", "#c76a12", "#b8327a"];
+// a speaker looks the same as its AI everywhere (the tiles in Настройки, the menu): the AI's own colour and sign;
+// models of one AI arguing with each other (Sonnet against Opus) differ by the palette and the model's letter
+function consDistinct() {
+  const m = (CHAT.cons && CHAT.cons.members) || [];
+  return new Set(m.map((r) => String(r).split(":")[0])).size === m.length;
+}
 function spkColor(ref) {
   const m = (CHAT.cons && CHAT.cons.members) || [];
   const i = m.indexOf(ref);
+  if (i >= 0 && consDistinct()) return aiLook(String(ref).split(":")[0])[1];
   return SPK_COLORS[(i < 0 ? 0 : i) % SPK_COLORS.length];
+}
+function spkGlyph(ref, name) {
+  const pid = String(ref || "").split(":")[0];
+  if (consDistinct() && AI_LOOK[pid]) return AI_LOOK[pid][0];
+  const last =
+    String(name || "")
+      .trim()
+      .split(/[\s·]+/)
+      .pop() || "?";
+  return last.slice(0, 1).toUpperCase();
 }
 function consName(ref) {
   const [pid, mid] = String(ref).split(/:(.*)/);
@@ -1790,11 +1825,15 @@ function modelMenu(anchor) {
       .map((x) => mrow(p, x))
       .join("");
   const sorted = ready.sort(byName);
-  const cloud = sorted.filter((p) => !LOCAL.includes(p.id)),
+  // paid first — by subscription, then by an API key; then the free ones on this computer
+  const subs = sorted.filter((p) => p.id === "claude_code"),
+    keys = sorted.filter((p) => !LOCAL.includes(p.id) && p.id !== "claude_code"),
     here = sorted.filter((p) => LOCAL.includes(p.id));
+  const sec = (title, list) => (list.length ? `<div class="m3sec">${title}</div>` + list.map(group).join("") : "");
   const cards =
-    (cloud.length ? `<div class="m3sec">${tr("Облачные")}</div>` + cloud.map(group).join("") : "") +
-    (here.length ? `<div class="m3sec">${tr("На компьютере")}</div>` + here.map(group).join("") : "");
+    sec(`${tr("Платные")} · ${tr("по подписке")}`, subs) +
+    sec(`${tr("Платные")} · ${tr("по ключу API")}`, keys) +
+    sec(tr("Бесплатные"), here);
   const add = P.filter((p) => !p.ready)
     .sort(byName)
     .map(
@@ -2009,13 +2048,13 @@ function youCard(prof, ag) {
         <div class="yrow"><div class="ylab">${tr("Обращение")}</div><div class="yopts y2" data-seg="address">${addr
           .map(
             ([k, l, ex]) =>
-              `<button data-v="${k}" class="yt ${(simple.address || "ty") === k ? "on" : ""}"><b>${l}</b><span class="ybub">${esc(ex)}</span></button>`,
+              `<button data-v="${k}" class="yt ${(simple.address || "ty") === k ? "on" : ""}" style="--c1:${k === "ty" ? "#f59e0b" : "#6366f1"};--c2:${k === "ty" ? "#f97316" : "#334155"}"><span class="medal2 ytm"><span>${k === "ty" ? "👋" : "🎩"}</span></span><b>${l}</b><span class="ybub">${esc(ex)}</span></button>`,
           )
           .join("")}</div></div>
         <div class="yrow"><div class="ylab">${tr("Длина ответа")}</div><div class="yopts y3" data-seg="length">${lens
           .map(
             ([k, l, h, n]) =>
-              `<button data-v="${k}" class="yt ${(simple.length || "normal") === k ? "on" : ""}">${lines(n)}<b>${l}</b><small>${h}</small></button>`,
+              `<button data-v="${k}" class="yt ${(simple.length || "normal") === k ? "on" : ""}" style="--c1:${{ short: "#10b981", normal: "#6366f1", long: "#0ea5e9" }[k]};--c2:${{ short: "#14b8a6", normal: "#a855f7", long: "#22d3ee" }[k]}"><span class="ytop2"><span class="medal2 ytm"><span>${{ short: "⚡", normal: "🎯", long: "📚" }[k]}</span></span>${lines(n)}</span><b>${l}</b><small>${h}</small></button>`,
           )
           .join("")}</div></div>
         <div class="yrow"><div class="ylab">${tr("Пол")}<small>${tr("для окончаний: прав или права")}</small></div><div class="seg yseg" data-seg="gender">${[

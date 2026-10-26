@@ -1257,9 +1257,8 @@ i.mini em {
   border-left: 0;
 }
 [dir="rtl"] .msg.ai.sum .md {
-  border-right: 3px solid var(--acc);
-  padding-right: calc(12px * var(--den));
-  padding-left: 0;
+  border-right: 0;
+  padding-right: 0;
 }
 .offer {
   border: 1px solid var(--acc3);
@@ -2971,18 +2970,15 @@ h1 {
 .btn:hover {
   background: #262a33;
 }
-.btn.l {
-  background: var(--acc2);
-  color: var(--acc-d);
-}
-.btn.l:hover {
-  background: var(--acc3);
-}
+/* three kinds of buttons, by meaning (design pass 26.10.2026):
+   .btn — the main action, dark, one per card or window; .btn.g and .btn.l — secondary, outlined; .btn.red — deleting */
+.btn.l,
 .btn.g {
   background: none;
   border: 1px solid var(--line);
   color: var(--ink2);
 }
+.btn.l:hover,
 .btn.g:hover {
   background: var(--soft);
 }
@@ -3017,6 +3013,17 @@ h1 {
   color: var(--ink);
   font-weight: 600;
   box-shadow: var(--sh1);
+}
+.seg.many {
+  /* five or more choices, or four long ones: an even grid, never one lone choice on a second line */
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.seg.many.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.seg.many button {
+  text-align: center;
 }
 .set {
   display: grid;
@@ -3878,6 +3885,115 @@ body.drawer-open .trc {
 .srct.wide .srcst {
   justify-self: start;
 }
+/* every «switch + text» row as a tile (tileToggles in 04-settings-scenes.js): the same look as «Где учиться» */
+.stgrid {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  margin: 4px 0 10px;
+}
+.tg.srct.stile {
+  display: flex !important; /* stronger than the old «.tg.hasmini» grid: a tile is a column */
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 34px 16px 16px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: calc(16px * var(--rad));
+}
+.stile.on {
+  border-color: color-mix(in srgb, var(--c1) 45%, var(--line)) !important;
+}
+.stile > div:not(.medal2):not(.minislot) {
+  display: contents; /* the title, the text and the reaction take their places in the tile */
+}
+.stile .medal2 {
+  order: 0;
+  flex: none;
+  width: 62px;
+  height: 62px;
+  margin: 4px 0 10px;
+}
+/* a lone tile in a wide card: medal on the left, words in the middle, the scene on the right */
+.stgrid.one {
+  grid-template-columns: minmax(0, 1fr);
+}
+.stgrid.one > .tg.srct.stile {
+  display: grid !important;
+  grid-template-columns: 62px minmax(0, 1fr) auto;
+  column-gap: 18px;
+  align-items: start;
+  text-align: left;
+  padding: 34px 18px 16px !important;
+}
+.stgrid.one > .stile .medal2 {
+  grid-column: 1;
+  grid-row: 1 / span 5;
+  margin: 2px 0 0;
+}
+.stgrid.one > .stile > div > * {
+  grid-column: 2;
+  justify-self: start;
+}
+.stgrid.one > .stile .minislot {
+  grid-column: 3;
+  grid-row: 1 / span 5;
+  margin: 0;
+}
+.stile > div > b {
+  order: 1;
+  display: block;
+  font-size: calc(14px * var(--fs));
+  line-height: 1.3;
+}
+.stile > div > p {
+  order: 2;
+  margin: 4px 0 0;
+  font-size: calc(12px * var(--fs));
+  color: var(--ink3);
+  line-height: 1.45;
+}
+.stile > div > .btn,
+.stile > div > .hint {
+  order: 3;
+  margin-top: 8px;
+}
+.stile .minislot {
+  order: 4;
+  justify-self: auto;
+  margin-top: 12px;
+}
+.stile .react {
+  order: 5;
+  margin-top: 10px;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: calc(11.5px * var(--fs));
+  font-weight: 600;
+  background: var(--soft);
+  color: var(--ink3);
+  text-align: left;
+}
+.stile.on .react {
+  background: color-mix(in srgb, var(--c1) 14%, var(--paper));
+  color: var(--c1);
+}
+.stile.on .react b {
+  color: inherit;
+}
+.stile.off-dis {
+  opacity: 0.6;
+  cursor: default;
+}
+.stile .tg {
+  /* a switch inside a tile (Помнить пароль) stays a plain row */
+  order: 3;
+  text-align: left;
+  width: 100%;
+  margin-top: 10px;
+}
+.set > div > .stgrid,
+.set > .stgrid {
+  margin: 0;
+}
 /* who sees what — matrix */
 .accwrap {
   overflow-x: auto;
@@ -4450,6 +4566,17 @@ body.drawer-open .trc {
   flex: 1;
   min-width: 0;
 }
+@media (max-width: 1100px) {
+  /* a narrow window: the speakers stay in one row, scrolled sideways, the table doesn't eat the screen */
+  .ctop .seats {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ctop .seat {
+    flex: none;
+  }
+}
 .seat {
   position: relative;
   display: flex;
@@ -4750,10 +4877,23 @@ body.drawer-open .trc {
 .cbtn.g {
   padding: 0 8px;
 }
-.msg.ai.cmsg > div:last-child {
-  border-left: 3px solid color-mix(in srgb, var(--sc) 60%, transparent);
-  padding-left: 12px;
+/* a speaker's line runs along its words only, not along the hidden row of actions under them */
+.msg.ai.cmsg:not(.sum) > div:last-child {
+  position: relative;
+  padding-inline-start: 15px; /* the line stands where the line of text begins: left, or right in Arabic */
+}
+.msg.ai.cmsg:not(.sum) > div:last-child::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
   border-radius: 2px;
+  background: color-mix(in srgb, var(--sc) 60%, transparent);
+}
+.msg.ai.cmsg:not(.sum) > div:last-child:has(> .acts)::before {
+  bottom: calc(14px + 18px * var(--fs) + 8px * var(--den));
 }
 .av.cav {
   background: linear-gradient(135deg, var(--sc), color-mix(in srgb, var(--sc) 55%, #fff));
@@ -8859,7 +8999,22 @@ body.drawer-open .trc {
   .setnav {
     position: static;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* one row of sections, scrolled sideways — never a second row with the reset mixed in */
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 2px;
+    mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
+  }
+  .setnav button {
+    flex: none;
+    white-space: nowrap;
+  }
+  .setnav .setfoot {
+    flex-direction: row;
+    margin: 0 0 0 auto;
+    padding: 0 0 0 10px;
+    border-top: 0;
+    border-left: 1px solid var(--line2);
   }
 }
 .btn:disabled,
@@ -11323,17 +11478,38 @@ body.noach #achbtn {
 }
 .citem .acts2 {
   position: absolute;
-  right: 6px;
+  inset-inline-end: 6px;
   top: 0;
   bottom: 0;
   align-items: center;
   opacity: 0;
   background: linear-gradient(90deg, transparent, var(--chip) 18%);
-  padding-left: 16px;
+  padding-inline-start: 16px;
   transition: opacity 0.15s;
 }
 .citem.on .acts2 {
   background: linear-gradient(90deg, transparent, var(--paper) 18%);
+}
+[dir="rtl"] .citem .acts2 {
+  background: linear-gradient(270deg, transparent, var(--chip) 18%);
+}
+[dir="rtl"] .citem.on .acts2 {
+  background: linear-gradient(270deg, transparent, var(--paper) 18%);
+}
+/* a text in another script keeps its own direction: English in the Arabic interface reads left to right, its full
+   stop at the end, and the other way round */
+.md p,
+.md li,
+.md h1,
+.md h2,
+.md h3,
+.md blockquote,
+.msg.user .md,
+.msg.user .b,
+.citem .tr,
+.ttl,
+#ctitle {
+  unicode-bidi: plaintext;
 }
 .citem:hover .acts2 {
   opacity: 1;
@@ -11392,7 +11568,9 @@ body.touron .top {
   position: sticky;
   bottom: 0;
   padding-top: 28px;
-  background: linear-gradient(180deg, transparent, var(--bg) 38%);
+  /* solid under the words: the guide scrolling behind never shows through «Начни диалог» */
+  background: linear-gradient(180deg, transparent 0, var(--bg) 24px);
+  box-shadow: 0 40px 0 var(--bg); /* and under them, down to the input field */
   z-index: 2;
 }
 .gline .sw:not(.on),
@@ -12950,6 +13128,25 @@ body.touron .top {
 }
 .srow .sri {
   flex: none !important;
+}
+/* «открыть папку» opposite the memory folder: the same green square as the icon on the left */
+.srow .sropen {
+  flex: none !important;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--ok) 14%, transparent);
+  color: var(--ok);
+  transition: background 0.15s;
+}
+.srow .sropen svg.i {
+  width: 13px;
+  height: 13px;
+}
+.srow:hover .sropen {
+  background: color-mix(in srgb, var(--ok) 26%, transparent);
 }
 .srow span:not(.sri) {
   flex: 1;
@@ -16907,6 +17104,28 @@ body.wlc-on .tour {
   color: var(--ink2);
   font-size: 13px;
 }
+/* «Платные» (по подписке / по ключу API) and «Бесплатные»: on the first run and in Настройки → ИИ и модели */
+.aisub {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 10px 0 8px 2px;
+  font-size: calc(12.5px * var(--fs));
+  font-weight: 600;
+  color: var(--ink2);
+}
+.wpick .wsec {
+  margin: 10px 2px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  text-align: left;
+}
+.wpick .wsec:first-child {
+  margin-top: 0;
+}
 /* the model menu: «Облачные» / «На компьютере», then each AI with its best models and «Все модели» */
 .m3sec {
   padding: 10px 10px 2px;
@@ -18289,4 +18508,852 @@ body.wlc-on .tour {
   font-style: normal;
   color: var(--ok);
   margin-left: 4px;
+}
+
+/* every «choose one of» row as small medal cards (segTiles in 04-settings-scenes.js) — design pass 27.10.2026 */
+.seg.segt {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+.seg.segt.many {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.seg.segt.nomed {
+  max-width: calc(var(--n, 3) * 150px);
+}
+@media (max-width: 900px) {
+  .seg.segt:not(.nomed) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.seg.segt > button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: calc(14px * var(--rad));
+  background: var(--paper);
+  color: var(--ink2);
+  font-size: calc(13.5px * var(--fs));
+  font-weight: 600;
+  text-align: start;
+  line-height: 1.3;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+  animation: srcin 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+  animation-delay: var(--d);
+}
+.seg.segt.nomed > button {
+  justify-content: center;
+  text-align: center;
+  min-height: 44px;
+}
+.seg.segt > button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(16, 18, 23, 0.1);
+}
+.seg.segt > button.on {
+  color: var(--ink);
+  font-weight: 700;
+  border-color: var(--acc);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--acc) 7%, var(--paper)), var(--paper) 80%);
+  box-shadow: 0 0 0 1px var(--acc);
+}
+.seg.segt .segm {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  font-size: 18px;
+}
+.seg.segt > button.on .segm {
+  filter: none;
+  opacity: 1;
+  background: radial-gradient(circle at 35% 30%, #fff9, transparent 60%), linear-gradient(135deg, var(--c1), var(--c2));
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--c1) 40%, transparent);
+  animation: medal 1s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.seg.segt .segl {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* with medals: a small tile — the medal on top, the words under it */
+.seg.segt:not(.nomed) > button {
+  flex-direction: column;
+  justify-content: flex-start;
+  text-align: center;
+  gap: 7px;
+  padding: 12px 8px 11px;
+}
+.yseg.segt {
+  max-width: 760px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+/* the access table: medal per memory part, «видно / скрыто» as real pills */
+.accl > .medal2.accmd {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  margin: 0;
+  font-size: 18px;
+}
+.accl > .medal2.accmd.lit {
+  filter: none;
+  opacity: 1;
+  background: radial-gradient(circle at 35% 30%, #fff9, transparent 60%), linear-gradient(135deg, var(--c1), var(--c2));
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--c1) 38%, transparent);
+}
+.accd {
+  min-width: 78px;
+  height: 28px;
+  border: 1px solid var(--line) !important;
+  background: var(--soft) !important;
+}
+.accd svg.i {
+  color: var(--ink3);
+}
+.accd.hid {
+  border-color: color-mix(in srgb, var(--bad) 40%, transparent) !important;
+  background: color-mix(in srgb, var(--bad) 14%, var(--paper)) !important;
+}
+.accd.hid svg.i {
+  color: var(--bad);
+}
+.accd:not(.hid):hover {
+  border-color: color-mix(in srgb, var(--bad) 40%, var(--line)) !important;
+}
+/* meetings: plan and quality cards with the same medals, lit when chosen */
+.splan .medal2.spi,
+.sq .medal2.sqmd {
+  margin: 0 0 4px;
+  width: 46px;
+  height: 46px;
+  font-size: 22px;
+  line-height: 1;
+}
+.sq .medal2.sqmd {
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+}
+.splans.cmp .splan .medal2.spi {
+  width: 34px;
+  height: 34px;
+  font-size: 17px;
+}
+.splan.on .medal2,
+.sq.on .medal2 {
+  filter: none;
+  opacity: 1;
+  background: radial-gradient(circle at 35% 30%, #fff9, transparent 60%), linear-gradient(135deg, var(--c1), var(--c2));
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--c1) 40%, transparent);
+  animation: medal 1s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.splan.on,
+.sq.on {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 1px var(--acc);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--acc) 7%, var(--paper)), var(--paper) 75%);
+}
+/* folders, numbers and VPN services as medal tiles (design pass 27.10.2026) */
+.xfgrid,
+.numgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 2px 0 12px;
+}
+.numgrid {
+  margin: 14px 0 6px;
+}
+.xft,
+.numt {
+  position: relative;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: calc(16px * var(--rad));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c1) 5%, var(--paper)), var(--paper) 75%);
+  color: var(--ink);
+  text-align: start;
+  font: inherit;
+  animation: srcin 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+}
+button.xft {
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+button.xft:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(16, 18, 23, 0.1);
+}
+.numt.wide {
+  grid-column: 1 / -1;
+}
+.xft .medal2,
+.numt .medal2 {
+  width: 54px;
+  height: 54px;
+  margin: 0;
+  font-size: 26px;
+}
+.xft .medal2.lit,
+.numt .medal2.lit,
+.vksv.on .medal2 {
+  filter: none;
+  opacity: 1;
+  background: radial-gradient(circle at 35% 30%, #fff9, transparent 60%), linear-gradient(135deg, var(--c1), var(--c2));
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--c1) 40%, transparent);
+}
+.xft .medal2 .obslogo {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  filter: drop-shadow(0 1px 1px #0004);
+}
+.xftx {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  grid-column: 2 / -1;
+}
+.numt .xftx {
+  grid-column: 2;
+}
+.xftx > b {
+  font-size: calc(14.5px * var(--fs));
+}
+.xftx > small {
+  font-size: calc(12.5px * var(--fs));
+  color: var(--ink3);
+  line-height: 1.4;
+}
+.xftx > .srcst {
+  margin-top: 6px;
+  background: color-mix(in srgb, var(--c1) 14%, var(--paper));
+  color: var(--c1);
+}
+.xftx > .srcst svg.i {
+  width: 13px;
+  height: 13px;
+}
+.xfadd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+.xfadd .inp {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.numin {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  align-self: center;
+}
+.numin input {
+  width: 74px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: calc(20px * var(--fs));
+  font-weight: 800;
+  text-align: center;
+}
+.numin input:focus {
+  outline: 0;
+  border-color: var(--c1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c1) 20%, transparent);
+}
+.numin em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--ink3);
+}
+.numt .lchips {
+  margin-top: 4px;
+}
+/* folder rows: a small tile each */
+.actfolders {
+  gap: 8px;
+}
+.actf {
+  padding: 8px 10px 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: calc(12px * var(--rad));
+  background: var(--soft);
+}
+.actf::before {
+  content: "📁";
+  font-size: 17px;
+}
+.actf code {
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+  font-size: calc(12.5px * var(--fs));
+  background: none;
+}
+@media (max-width: 700px) {
+  .vksvcs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* VPN services */
+.vksvcs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.vksv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: calc(14px * var(--rad));
+  background: var(--paper);
+  color: var(--ink2);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+  animation: srcin 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+  animation-delay: var(--d);
+}
+.vksv:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(16, 18, 23, 0.1);
+}
+.vksv .medal2 {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 2px #0005;
+}
+.vksv b {
+  font-size: calc(12.5px * var(--fs));
+}
+.vksv.on {
+  color: var(--ink);
+  border-color: var(--acc);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--acc) 7%, var(--paper)), var(--paper) 80%);
+  box-shadow: 0 0 0 1px var(--acc);
+}
+@media (max-width: 900px) {
+  .numgrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .xft,
+  .numt {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  .numt .numin {
+    grid-column: 2;
+  }
+  .xft .medal2,
+  .numt .medal2 {
+    width: 44px;
+    height: 44px;
+    font-size: 21px;
+  }
+}
+/* the portrait: a medal avatar, stats as pills, actions as medal tiles (design pass 27.10.2026) */
+.phero .pav {
+  position: relative;
+  background: radial-gradient(circle at 35% 30%, #fff9, transparent 60%), linear-gradient(135deg, #6366f1, #a855f7);
+}
+.phero .pav::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, #6366f1 60%, transparent);
+  animation: spinr 9s linear infinite;
+}
+.pstats {
+  gap: 8px;
+}
+.pstats span {
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--soft);
+  font-weight: 600;
+}
+.pstats span b {
+  color: var(--ink);
+}
+.pacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.pact {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: calc(14px * var(--rad));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c1) 6%, var(--paper)), var(--paper) 80%);
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+  animation: srcin 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+  animation-delay: var(--d);
+}
+.pact:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--c1) 50%, var(--line));
+  box-shadow: 0 10px 22px rgba(16, 18, 23, 0.1);
+}
+.pact .medal2,
+.yt .medal2.ytm {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  font-size: 19px;
+  filter: none;
+  opacity: 1;
+  background: radial-gradient(circle at 35% 30%, #fff9, transparent 60%), linear-gradient(135deg, var(--c1), var(--c2));
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--c1) 38%, transparent);
+}
+.pact .xftx {
+  gap: 2px;
+}
+.pact .xftx > b {
+  font-size: calc(13.5px * var(--fs));
+  line-height: 1.25;
+}
+.pact .xftx > small {
+  font-size: calc(11.5px * var(--fs));
+}
+/* «Обращение» and «Длина ответа»: the same medal, grey until chosen */
+.yt:not(.on) .medal2.ytm {
+  filter: grayscale(1);
+  opacity: 0.55;
+  background: radial-gradient(circle at 35% 30%, #fff7, transparent 60%), var(--hover);
+  box-shadow: none;
+}
+.yt.on .medal2.ytm {
+  animation: medal 1s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.ytop2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+/* meetings: the way a meeting goes, as four steps with a running line between them (design pass 27.10.2026) */
+.mpres {
+  margin-bottom: 18px;
+}
+.mflow {
+  display: grid;
+  grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1fr;
+  align-items: stretch;
+  margin: 4px 0 0;
+}
+.mfs {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: calc(16px * var(--rad));
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+  animation: srcin 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+  animation-delay: var(--d);
+}
+.mfs:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(16, 18, 23, 0.1);
+}
+.mfs .medal2 {
+  width: 50px;
+  height: 50px;
+  margin: 2px 0 4px;
+  font-size: 24px;
+  filter: none;
+  opacity: 1;
+  background: radial-gradient(circle at 35% 30%, #fff9, transparent 60%), linear-gradient(135deg, var(--c1), var(--c2));
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--c1) 38%, transparent);
+}
+.mfs.on {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 1px var(--acc);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--acc) 8%, var(--paper)), var(--paper) 80%);
+}
+.mfs.on .medal2::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, var(--c1) 60%, transparent);
+  animation: spinr 9s linear infinite;
+}
+.mfs b {
+  font-size: calc(14px * var(--fs));
+}
+.mfs small {
+  font-size: calc(11.5px * var(--fs));
+  color: var(--ink3);
+  line-height: 1.45;
+  white-space: pre-line; /* «Где: …» and «Точность: …» each on its line, named as the settings below */
+}
+.mfpanel .shd .hint {
+  margin-inline-start: 8px;
+}
+.mfn {
+  position: absolute;
+  top: 9px;
+  inset-inline-start: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--soft);
+  color: var(--ink3);
+}
+.mfs.on .mfn {
+  background: var(--acc);
+  color: #fff;
+}
+/* the line between the steps: a dot runs along it, the way the recording goes */
+.mfar {
+  position: relative;
+  align-self: center;
+  height: 2px;
+  margin: 0 4px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 10px);
+}
+.mfar::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -2px;
+  top: -4px;
+  border: 5px solid transparent;
+  border-inline-start: 6px solid var(--line);
+}
+.mfar em {
+  position: absolute;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--acc);
+  box-shadow: 0 0 8px var(--acc);
+  animation: mfrun 2.4s linear infinite;
+}
+[dir="rtl"] .mfar em {
+  animation-name: mfrun-rtl;
+}
+@keyframes mfrun {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 8px);
+    opacity: 0;
+  }
+}
+@keyframes mfrun-rtl {
+  0% {
+    right: 0;
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    right: calc(100% - 8px);
+    opacity: 0;
+  }
+}
+/* the chosen step: what happens there and its settings, joined to the step by a notch */
+.mfpanel {
+  margin-top: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: calc(16px * var(--rad));
+  background: var(--soft);
+  animation: srcin 0.35s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+}
+.mfd {
+  margin: 0 0 12px;
+  font-size: calc(13.5px * var(--fs));
+  line-height: 1.55;
+  color: var(--ink2);
+}
+.mfpanel .shd {
+  margin-top: 14px;
+}
+.mfpanel .scrown {
+  margin-top: 14px;
+}
+@media (max-width: 900px) {
+  .mflow {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mfar {
+    display: none;
+  }
+  .mpres {
+    grid-template-columns: 1fr;
+  }
+}
+/* «Строка ввода»: the sample is clearly a sample that follows the switches */
+.cpvbox {
+  border: 1px solid var(--line);
+  border-radius: calc(16px * var(--rad));
+  background: var(--soft);
+  padding: 12px 14px 14px;
+  margin-bottom: 14px;
+}
+.cpvh {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: calc(11px * var(--fs));
+}
+.cpvh span {
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+.cpvh em {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-style: normal;
+  color: var(--ink3);
+}
+.cpvh em i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ok);
+  animation: hpulse 1.6s ease-in-out infinite;
+}
+.cpvin {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: calc(var(--rows) * 21px + 18px);
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  background: var(--paper);
+  color: var(--ink3);
+  font-size: calc(13px * var(--fs));
+  transition: min-height 0.25s;
+}
+.cpvin kbd {
+  flex: none;
+  font: inherit;
+  font-size: calc(11px * var(--fs));
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink3);
+}
+.cpvbox .cpv {
+  margin: 0;
+  border-radius: 0 0 14px 14px;
+  background: var(--paper);
+}
+.cpv span.cpop {
+  background: color-mix(in srgb, var(--acc) 18%, transparent);
+  color: var(--acc);
+  animation: cpvpop 0.6s cubic-bezier(0.3, 1.7, 0.5, 1);
+}
+.cpv span.m.cpop {
+  background: var(--grad);
+  color: #fff;
+}
+.cpv span.gone {
+  animation: cpvgone 0.7s ease forwards;
+}
+@keyframes cpvpop {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes cpvgone {
+  0% {
+    opacity: 1;
+    background: color-mix(in srgb, var(--bad) 18%, transparent);
+    color: var(--bad);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+    width: 0;
+    padding: 0;
+    margin: 0;
+  }
+}
+/* first start: «Защитить память паролем?» — the password under the chosen card */
+.wlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--soft);
+  text-align: start;
+}
+.wpw {
+  display: flex;
+  gap: 6px;
+}
+.wpw input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: calc(14px * var(--fs));
+}
+.wpw input:focus {
+  outline: 0;
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 18%, transparent);
+}
+.wpwb {
+  flex: none;
+  width: 40px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.wpwb:hover {
+  color: var(--acc);
+  border-color: var(--acc);
+}
+.wpwb svg.i {
+  width: 16px;
+  height: 16px;
+}
+.wpwm {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: -2px 0 2px;
+}
+.wpwm i {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+  transition: background 0.2s;
+}
+.wpwm span {
+  flex: none;
+  min-width: 70px;
+  text-align: end;
+  font-size: calc(11.5px * var(--fs));
+  color: var(--ink3);
+}
+.wpwm.s1 i:nth-child(-n + 1) {
+  background: var(--bad);
+}
+.wpwm.s2 i:nth-child(-n + 2) {
+  background: #f59e0b;
+}
+.wpwm.s3 i:nth-child(-n + 3) {
+  background: #22c55e;
+}
+.wpwm.s4 i {
+  background: var(--ok);
+}
+.wwarn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 0;
+  font-size: calc(12px * var(--fs));
+  color: var(--bad);
+}
+.wwarn svg.i {
+  width: 13px;
+  height: 13px;
+  flex: none;
 }

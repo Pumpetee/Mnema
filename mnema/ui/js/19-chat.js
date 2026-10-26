@@ -904,7 +904,7 @@ function plusMenu(anchor) {
     priv = isPrivate();
   m.innerHTML = `<button data-p="terms" class="${terms ? "on" : ""}">${ic("hint")}<span>Подсказки к терминам</span>${hq("hints")}<i class="sw2"></i></button>
     <div class="sep"></div><div class="mhead">${tr("Попробовать")}</div>
-    <button data-p="roast">${ic("trophy")}<span>${tr("Прожарка")}<small>${tr("несколько ИИ разнесут идею, резюме или текст")}</small></span></button>
+    <button data-p="roast">${ic("fire")}<span>${tr("Прожарка")}<small>${tr("несколько ИИ жёстко и по делу разбирают идею, резюме или текст")}</small></span></button>
     <button data-p="compare">${ic("eye")}<span>${tr("С памятью и без")}<small>${tr("один вопрос — два ответа рядом")}</small></span></button>
     <button data-p="quiz">${ic("check")}<span>${tr("Насколько Mnema тебя знает")}<small>${tr("квиз по твоей памяти")}</small></span></button>
     <button data-p="interview">${ic("user")}<span>${tr("Знакомство")}<small>${tr("пара минут вопросов — и память не пустая")}</small></span></button>
@@ -1059,7 +1059,7 @@ async function renderEmpty() {
     : "";
   if (CHAT.cons) {
     $("#msgs").innerHTML =
-      `<div class="conline seats pre">${CHAT.cons.members.map((r, i) => `<div class="seat" style="--sc:${SPK_COLORS[i % SPK_COLORS.length]};--i:${i}"><span class="sav">${esc(consName(r).slice(0, 1))}</span><b data-noi18n>${esc(consName(r))}</b><small>${i === 0 ? tr("начнёт") : i + 1 + "-й"}</small></div>`).join("")}</div><div class="startline">Задай вопрос — ${CHAT.cons.members.length} ИИ ответят по очереди и обсудят друг с другом${CHAT.cons.rounds > 1 ? ", кругов: " + CHAT.cons.rounds : ""}. Вмешаться можно в любой момент.</div>`;
+      `<div class="conline seats pre">${CHAT.cons.members.map((r, i) => `<div class="seat" style="--sc:${spkColor(r)};--i:${i}"><span class="sav">${esc(spkGlyph(r, consName(r)))}</span><b data-noi18n>${esc(consName(r))}</b><small>${i === 0 ? tr("начнёт") : i + 1 + "-й"}</small></div>`).join("")}</div><div class="startline">Задай вопрос — ${CHAT.cons.members.length} ИИ ответят по очереди и обсудят друг с другом${CHAT.cons.rounds > 1 ? ", кругов: " + CHAT.cons.rounds : ""}. Вмешаться можно в любой момент.</div>`;
     return;
   }
   $("#msgs").innerHTML =
@@ -1321,7 +1321,7 @@ function msgHtml(m, last, i, lastAi) {
       ? `<div class="needweb">${ic("globe")}<div><b>${tr("Тут нужны свежие данные из интернета")}</b><span>${tr("Ответ — по тому, что ИИ знает сам. С поиском будет точнее.")}</span></div><button class="btn sm" data-webredo>${tr("Включить интернет и ответить заново")}</button></div>`
       : "";
   const cav = m.speaker
-    ? `<div class="av cav" style="--sc:${spkColor(m.model)}">${esc(m.speaker.slice(0, 1))}</div>`
+    ? `<div class="av cav" style="--sc:${spkColor(m.model)}">${esc(spkGlyph(m.model, m.speaker))}</div>`
     : '<div class="av"></div>';
   const sumh = m.summary
     ? `<div class="sumh">${ic("trophy")}<b>${tr("Итог обсуждения")}</b><span>${tr("в чём сошлись, в чём разошлись, что советуют")}</span></div>`
@@ -1895,7 +1895,7 @@ function poll() {
         if (av) {
           av.classList.add("cav");
           av.style.setProperty("--sc", spkColor(T.ref));
-          av.textContent = T.speaker.slice(0, 1);
+          av.textContent = spkGlyph(T.ref, T.speaker);
         }
       } else if (sp && T.speaker) sp.lastChild.textContent = T.speaker;
       $(".md", live).innerHTML =

@@ -276,4 +276,136 @@ function decorateToggles(root) {
     sw.parentElement.appendChild(slot);
     attach(set, sw, sw.parentElement, slot);
   });
+  tileToggles(root);
 }
+
+// ---------------------------------------------------------------- one look for every switch (design pass 27.10.2026)
+// Every «switch + text» row becomes a tile like «Где учиться»: a 3D medal in the switch's own colours that lights up
+// when on, a small category label, the switch in the corner, the scene and «Как среагирует» inside. Only the look
+// changes: the switch keeps its id and its handler.
+const TILE_LOOK = {
+  secred: ["🕶️", "#6366f1", "#22d3ee", "Защита"],
+  outred: ["🕶️", "#6366f1", "#22d3ee", "Защита"],
+  secefs: ["🗄️", "#0ea5e9", "#22c55e", "Шифрование"],
+  seccry: ["🔑", "#f59e0b", "#ef4444", "Шифрование"],
+  memsw2: ["🧠", "#22c55e", "#14b8a6", "Память"],
+  selfasksw: ["🙋", "#f59e0b", "#f97316", "Вопросы"],
+  outsw: ["🔭", "#6366f1", "#a855f7", "Источники"],
+  autos: ["🚀", "#0ea5e9", "#6366f1", "Запуск"],
+  pauto: ["📒", "#f59e0b", "#eab308", "Рецепты"],
+  actsw: ["🛠️", "#10b981", "#0ea5e9", "Файлы"],
+  "actask-sw": ["✋", "#f97316", "#ef4444", "Файлы"],
+  englow: ["🧘", "#22c55e", "#0ea5e9", "Компьютер"],
+  scrkeep: ["🎧", "#ec4899", "#f97316", "Запись"],
+};
+function tileToggles(root) {
+  const tiles = [];
+  $$(".tg", root || document).forEach((tg) => {
+    if (tg.classList.contains("stile") || tg.parentElement.closest(".tg, .srct")) return; // a switch inside a tile stays a row
+    const sw = $(":scope > .sw", tg);
+    if (!sw) return;
+    const key = miniKey(sw),
+      [em, c1, c2, tag] = TILE_LOOK[key] || ["⚙️", "#6366f1", "#a855f7", ""];
+    tg.classList.add("srct", "stile");
+    tg.style.setProperty("--c1", c1);
+    tg.style.setProperty("--c2", c2);
+    tg.insertAdjacentHTML(
+      "afterbegin",
+      `${tag ? `<span class="srctag">${esc(tr(tag))}</span>` : ""}<div class="medal2"><span>${em}</span><i class="spark"></i><i class="spark"></i><i class="spark"></i></div>`,
+    );
+    const sync = () => {
+      tg.classList.toggle("on", sw.classList.contains("on"));
+      tg.classList.toggle("off-dis", sw.disabled);
+    };
+    sync();
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ["class", "disabled"] });
+    tg.addEventListener("click", (e) => {
+      if (e.target.closest("button, a, input, select, textarea, label, details")) return;
+      sw.click(); // the whole tile switches, like «Где учиться»
+    });
+    tiles.push(tg);
+  });
+  // neighbours share one grid
+  tiles.forEach((t) => {
+    if (t.parentElement.classList.contains("stgrid")) return;
+    const run = [t];
+    let n = t.nextElementSibling;
+    while (n && n.classList.contains("stile")) {
+      run.push(n);
+      n = n.nextElementSibling;
+    }
+    const grid = document.createElement("div");
+    grid.className = "srcgrid stgrid" + (run.length === 1 ? " one" : "");
+    t.before(grid);
+    run.forEach((x) => grid.appendChild(x));
+  });
+}
+
+// ---------------------------------------------------------------- one look for every «choose one of» row (design pass 27.10.2026)
+// Every segmented choice in the settings becomes a row of small cards with the same 3D medal as the tiles: grey while
+// not chosen, in its own colours when chosen. Only the look changes: the buttons keep their data and their handlers.
+// A watcher dresses new rows too, so a card drawn again after a click keeps the look.
+const SEG_GREY = ["#64748b", "#94a3b8"];
+const SEG_AUTONOMY = {
+  observe: ["👀", ...SEG_GREY],
+  approve: ["🙋", "#f59e0b", "#f97316"],
+  mixed: ["🎯", "#6366f1", "#a855f7"],
+  quiet: ["🚀", "#10b981", "#22d3ee"],
+};
+const SEG_LOOK = {
+  autonomy: SEG_AUTONOMY,
+  brain: {
+    auto: ["🧠", "#6366f1", "#a855f7"],
+    none: ["✍️", ...SEG_GREY],
+    local: ["💻", "#10b981", "#14b8a6"],
+    claude_code: ["✳️", "#d97757", "#f0a37f"],
+    api: ["🔑", "#f59e0b", "#eab308"],
+    ollama: ["🦙", "#0ea5e9", "#6366f1"],
+  },
+  gender: { m: ["👨", "#0ea5e9", "#6366f1"], f: ["👩", "#ec4899", "#f97316"], "": ["🙂", ...SEG_GREY] },
+  onclose: { ask: ["❓", "#6366f1", "#a855f7"], tray: ["📥", "#0ea5e9", "#22d3ee"], quit: ["🚪", "#ef4444", "#f97316"] },
+  pmode: { off: ["💤", ...SEG_GREY], second: ["🔁", "#6366f1", "#a855f7"], every: ["📝", "#f59e0b", "#f97316"] },
+  mode: {
+    system: ["🖥️", "#0ea5e9", "#6366f1"],
+    light: ["☀️", "#f59e0b", "#eab308"],
+    dark: ["🌙", "#6366f1", "#334155"],
+    custom: ["🎨", "#ec4899", "#a855f7"],
+  },
+  base: { light: ["☀️", "#f59e0b", "#eab308"], dark: ["🌙", "#6366f1", "#334155"] },
+  tone: { warm: ["🔥", "#f97316", "#ef4444"], cool: ["❄️", "#0ea5e9", "#22d3ee"], neutral: ["⚪", ...SEG_GREY] },
+  send: { enter: ["⏎", "#6366f1", "#a855f7"], ctrl: ["⌨️", "#0ea5e9", "#6366f1"] },
+  pm: {
+    system: ["🖥️", "#0ea5e9", "#6366f1"],
+    off: ["➡️", ...SEG_GREY],
+    http: ["🌐", "#10b981", "#0ea5e9"],
+    socks5: ["🧦", "#f59e0b", "#f97316"],
+  },
+};
+function segKey(sg) {
+  const k = sg.dataset.seg || sg.dataset.cseg || sg.dataset.th || (sg.classList.contains("pxmode") ? "pm" : "");
+  return k.startsWith("mode:") ? "autonomy" : k;
+}
+function segTiles(root) {
+  $$(".seg", root || document).forEach((sg) => {
+    if (sg.classList.contains("sm") || sg.dataset.pseg !== undefined || !sg.closest("#st, .modal")) return;
+    const look = SEG_LOOK[segKey(sg)] || {};
+    sg.classList.add("segt");
+    const n = $$(":scope > button", sg).length;
+    sg.style.setProperty("--n", n > 4 ? 3 : n);
+    $$(":scope > button", sg).forEach((b, n) => {
+      if (b.dataset.segt) return;
+      b.dataset.segt = "1";
+      const v = b.dataset.v !== undefined ? b.dataset.v : b.dataset.pm || "";
+      const lk = look[v];
+      b.style.setProperty("--d", `${n * 0.04}s`);
+      b.innerHTML = `${lk ? `<span class="medal2 segm" style="--c1:${lk[1]};--c2:${lk[2]}"><span>${lk[0]}</span></span>` : ""}<span class="segl">${b.innerHTML}</span>`;
+      if (lk) b.style.setProperty("--c1", lk[1]);
+    });
+    sg.classList.toggle("nomed", !$(".segm", sg));
+  });
+}
+new MutationObserver((ms) => {
+  for (const m of ms)
+    for (const n of m.addedNodes)
+      if (n.nodeType === 1 && (n.matches(".seg") || n.querySelector(".seg"))) segTiles(n.parentElement || n);
+}).observe(document.documentElement, { childList: true, subtree: true });

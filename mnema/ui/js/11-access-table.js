@@ -21,6 +21,19 @@ const ACC_DENY = [
   ["health", "heart", "Здоровье", "карточка Здоровье и всё с #health"],
   ["private", "eyeoff", "Личное", "карточка Личное и всё с #private"],
 ];
+// the row medals: lit while at least one AI gets this part (or, for the cut topics, while it is cut from someone)
+const ACC_MED = {
+  profile: ["👤", "#6366f1", "#a855f7"],
+  rules: ["📋", "#0ea5e9", "#6366f1"],
+  projects: ["🗂️", "#f59e0b", "#f97316"],
+  cards: ["🗃️", "#10b981", "#14b8a6"],
+  people: ["👥", "#ec4899", "#a855f7"],
+  decisions: ["📌", "#ef4444", "#f97316"],
+  inbox: ["📥", "#0ea5e9", "#22d3ee"],
+  money: ["💰", "#ef4444", "#f97316"],
+  health: ["❤️", "#ef4444", "#ec4899"],
+  private: ["🕶️", "#ef4444", "#a855f7"],
+};
 function accMatrix(cl) {
   const head = `<div class="ach0"></div>${cl
     .map((c, i) => {
@@ -30,8 +43,12 @@ function accMatrix(cl) {
      <button class="sw sm ${c.enabled ? "on" : ""}" data-acc="enabled" data-ci="${i}" title="${tr(c.enabled ? "Получает память" : "Не получает ничего")}"></button></div>`;
     })
     .join("")}`;
-  const row = (k, icn, t, d, cells, cls = "") =>
-    `<div class="accl ${cls}"><span class="ai ${ACC_DENY.some((x) => x[0] === k) ? "dn" : ""}">${ic(icn)}</span><div><b>${tr(t)}</b><small>${tr(d)}</small></div></div>${cells}`;
+  const row = (k, icn, t, d, cells, cls = "") => {
+    const [em, c1, c2] = ACC_MED[k] || ["•", "#64748b", "#94a3b8"],
+      deny = ACC_DENY.some((x) => x[0] === k),
+      lit = cl.some((c) => c.enabled && (deny ? c.deny_tags.includes(k) : c.scopes.includes(k)));
+    return `<div class="accl ${cls}"><span class="medal2 accmd ${lit ? "lit" : ""}" style="--c1:${c1};--c2:${c2}"><span>${em}</span></span><div><b>${tr(t)}</b><small>${tr(d)}</small></div></div>${cells}`;
+  };
   const sc = ACC_ROWS.map(([k, icn, t, d]) =>
     row(
       k,
@@ -55,7 +72,7 @@ function accMatrix(cl) {
       cl
         .map((c, i) => {
           const hid = c.deny_tags.includes(k);
-          return `<button class="accd ${hid ? "hid" : ""} ${c.enabled ? "" : "dis"}" data-acc="deny" data-k="${k}" data-ci="${i}" title="${tr(hid ? "Вырезается" : "Уходит, если часть памяти разрешена")}">${hid ? ic("lock") + "<b>" + tr("скрыто") + "</b>" : "<em>" + tr("видно") + "</em>"}</button>`;
+          return `<button class="accd ${hid ? "hid" : ""} ${c.enabled ? "" : "dis"}" data-acc="deny" data-k="${k}" data-ci="${i}" title="${tr(hid ? "Вырезается" : "Уходит, если часть памяти разрешена")}">${hid ? ic("lock") + "<b>" + tr("скрыто") + "</b>" : ic("eye") + "<em>" + tr("видно") + "</em>"}</button>`;
         })
         .join(""),
     ),

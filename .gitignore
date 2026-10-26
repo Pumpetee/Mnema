@@ -28,3 +28,5 @@ tools/qa/*.log
 
 # made by tools/package.py from the icon drawing
 packaging/mnema.png
+tools/qa/design/
+tools/qa/design-before/

@@ -68,18 +68,20 @@ with sync_playwright() as p:
     page.wait_for_timeout(800)
     groups = page.locator(".m3sec").all_inner_texts()
     check(
-        "в меню моделей группа «Облачные» (группа «На компьютере» — когда есть модель на компьютере)",
-        groups and "ОБЛАЧ" in groups[0].upper(),
+        "в меню моделей сначала «Платные» (по подписке, по ключу API), потом «Бесплатные»",
+        groups and "ПЛАТН" in groups[0].upper(),
         groups,
     )
     subs = page.locator(".m3row em").all_inner_texts()
     seen = list(dict.fromkeys(subs))
+    order = page.evaluate(
+        "(() => [...new Set([...document.querySelectorAll('.m3row')].map(r => r.dataset.m.split(':')[0]))])()"
+    )
+    rank = {"claude_code": 0, "local": 2, "ollama": 2}
     check(
-        "облачные — по алфавиту, а не по тому, кто их сделал",
-        page.evaluate(
-            "(() => { const n = [...document.querySelectorAll('.m3row')].map(r => r.dataset.m.split(':')[0]); return n.join(','); })()"
-        ).startswith("openai"),
-        seen,
+        "сначала подписка, потом ключи API, бесплатные в конце",
+        order == sorted(order, key=lambda x: rank.get(x, 1)),
+        order,
     )
     page.screenshot(path=str(SHOTS / "mnema-130-models.png"))
     page.keyboard.press("Escape")
@@ -88,7 +90,11 @@ with sync_playwright() as p:
     page.wait_for_timeout(3000)
     clean(page)
     g = page.locator(".aigrp").all_inner_texts()
-    check("в настройках ИИ те же две группы", len(g) == 2, g)
+    check(
+        "в настройках ИИ разделы «Платные» и «Бесплатные»",
+        len(g) == 2 and "Платные" in g[0] and "Бесплатные" in g[1],
+        g,
+    )
     errs = [x for x in log if "error" in str(x).lower()]
     check("ошибок в консоли нет", not errs, errs[:3])
     b.close()

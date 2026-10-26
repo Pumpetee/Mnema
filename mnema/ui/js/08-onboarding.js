@@ -2,10 +2,11 @@
 async function welcomeFlow() {
   if ($(".wlc") || window.__wlc) return;
   window.__wlc = 1;
-  const [ag, ms, lc] = await Promise.all([
+  const [ag, ms, lc, cry] = await Promise.all([
     api("/api/agent").catch(() => ({ profile: {} })),
     api("/api/models").catch(() => ({ providers: [] })),
     api("/api/local").catch(() => null),
+    api("/api/crypto").catch(() => null),
   ]);
   const name = (ag.profile || {}).owner_name || "",
     ready = ms.providers.filter((p) => p.ready && p.id !== "local"),
@@ -21,6 +22,7 @@ async function welcomeFlow() {
   let i = 0,
     memChoice = MEM.on, // a new memory folder starts off; the owner turns it on here
     dl = false,
+    lock = { on: false, pw: "", pw2: "", remember: true, show: false, busy: false, err: "" }, // «Защитить паролем»
     choice = claude ? "claude" : "local"; // what the owner talks to first; either card can be picked
   const finish = async () => {
     await post("/api/local/offer", { state: "done" }).catch(() => {});
@@ -98,33 +100,66 @@ async function welcomeFlow() {
         "С памятью ИИ знают, кто ты и над чем работаешь, а Mnema учится по ходу разговора. Без неё — обычный чат: ничего не запоминается, всё остальное работает. Поменять можно в любой момент.",
       ),
     },
+    ...(cry && !cry.on
+      ? [
+          {
+            lock: true,
+            t: tr("Защитить память паролем?"),
+            p: tr(
+              "Как в KeePass: заметки и разговоры шифруются на диске по AES-256, ключ получается из твоего пароля. Без пароля их не прочитать, даже скопировав папку. Шифрование открытое и проверенное, код Mnema открыт.",
+            ),
+          },
+        ]
+      : []),
     {
       pick: true,
       t: tr("С каким ИИ говорить?"),
       p: claude
-        ? tr("Облачный ИИ уже подключён — можно начинать. Бесплатный ИИ на компьютере пригодится как запасной.")
-        : tr("Бесплатный ИИ работает прямо на компьютере, без ключей и подписок. Других ИИ можно подключить потом."),
+        ? tr("Платный ИИ уже подключён — можно начинать. Бесплатный на компьютере пригодится как запасной.")
+        : tr(
+            "Бесплатный ИИ работает прямо на компьютере, без ключей и подписок. Платные — по подписке или ключу API — можно подключить потом.",
+          ),
     },
   ];
   const draw = () => {
     const s = S[i];
     pop.innerHTML = `<div class="card"><button class="wskip" data-skip>${tr("Пропустить")}</button><div class="wslide" key="${i}">
-      ${s.pick || s.mem ? "" : `<div class="wart">${s.art}</div>`}
+      ${s.pick || s.mem || s.lock ? "" : `<div class="wart">${s.art}</div>`}
       ${s.case ? `<div class="wcase">${tr("Кейс")} ${s.case} ${tr("из")} ${S.filter((x) => x.case).length}</div>` : ""}<h2>${s.case === 1 && name ? esc(name) + ", " + s.t.charAt(0).toLowerCase() + s.t.slice(1) : s.t}</h2><p>${s.p}</p>
       ${
         s.mem
           ? `<div class="wpick"><div class="wopt ${memChoice ? "on" : ""}" data-mem="1"><span class="wic ${memChoice ? "ok" : ""}">${ic(memChoice ? "check" : "user")}</span><div><b>${tr("Включить память")}</b><small>${tr("ИИ знают тебя, Mnema учится и запоминает")}</small></div></div><div class="wopt ${memChoice ? "" : "on"}" data-mem="0"><span class="wic ${memChoice ? "" : "ok"}">${ic(memChoice ? "eyeoff" : "check")}</span><div><b>${tr("Без памяти")}</b><small>${tr("обычный чат, ничего не запоминается")}</small></div></div></div>`
           : ""
       }
+      ${s.lock ? lockStep(lock) : ""}
       ${
         s.pick
-          ? `<div class="wpick">${claude ? `<div class="wopt ${choice === "claude" ? "on" : ""}" id="wcl"><span class="wic ${choice === "claude" ? "ok" : ""}">${ic(choice === "claude" ? "check" : "chat")}</span><div><b data-noi18n>${esc(claude.name)}</b><small>${tr("уже подключён")}</small></div></div>` : ""}
-        ${pick ? `<div class="wopt ${choice === "local" ? "on" : ""}" id="wloc"><span class="wic ${choice === "local" ? "ok" : ""}">${ic(choice === "local" ? "check" : "folder")}</span><div><b>${tr("Бесплатный ИИ на компьютере")}</b><small>${esc(pick.name)} · ${fmtSize(pick.size)}${pick.eta ? " · ≈ " + fmtEta(pick.eta) : ""}</small><div class="wbar" hidden><i></i></div></div><button class="btn ${claude ? "l" : ""} sm" id="wdl">${pick.installed ? tr("Уже скачан") : tr("Скачать")}</button></div>` : ""}
+          ? `<div class="wpick">${claude ? `<div class="wsec">${tr("Платные")} · ${tr(claude.id === "claude_code" ? "по подписке" : "по ключу API")}</div><div class="wopt ${choice === "claude" ? "on" : ""}" id="wcl"><span class="wic ${choice === "claude" ? "ok" : ""}">${ic(choice === "claude" ? "check" : "chat")}</span><div><b data-noi18n>${esc(claude.name)}</b><small>${tr("уже подключён")}</small></div></div>` : ""}
+        ${pick ? `<div class="wsec">${tr("Бесплатные")}</div><div class="wopt ${choice === "local" ? "on" : ""}" id="wloc"><span class="wic ${choice === "local" ? "ok" : ""}">${ic(choice === "local" ? "check" : "folder")}</span><div><b>${tr("Бесплатный ИИ на компьютере")}</b><small>${esc(pick.name)} · ${fmtSize(pick.size)}${pick.eta ? " · ≈ " + fmtEta(pick.eta) : ""}</small><div class="wbar" hidden><i></i></div></div><button class="btn ${claude ? "l" : ""} sm" id="wdl">${pick.installed ? tr("Уже скачан") : tr("Скачать")}</button></div>` : ""}
         <a href="#" class="wmore" id="wmore">${tr("Другие модели и ключи…")}</a></div>`
           : ""
       }</div>
       <div class="wfoot"><div class="wdots">${S.map((_, k) => `<b class="${k === i ? "on" : k < i ? "done" : ""}"></b>`).join("")}</div>${i ? `<button class="btn g" data-back>${tr("Назад")}</button>` : ""}<button class="btn" data-next>${i === S.length - 1 ? tr("Начать") : tr("Дальше")}</button></div></div>`;
-    $("[data-next]", pop).onclick = () => {
+    $("[data-next]", pop).onclick = async () => {
+      if (S[i].lock && lock.on && !lock.busy) {
+        lock.err =
+          lock.pw.length < 8 ? "Пароль — не короче 8 знаков" : lock.pw !== lock.pw2 ? "Пароли не совпадают" : "";
+        if (lock.err) return draw();
+        lock.busy = true;
+        draw();
+        try {
+          await post("/api/crypto", { action: "on", password: lock.pw, remember: lock.remember });
+          S.splice(i, 1); // done: the step is not shown again on «Назад»
+          lock.pw = lock.pw2 = "";
+          toast(tr("Память зашифрована"));
+        } catch (err) {
+          lock.err = err.message;
+          lock.busy = false;
+          return draw();
+        }
+        lock.busy = false;
+        return draw();
+      }
       if (i < S.length - 1) {
         i++;
         draw();
@@ -149,6 +184,7 @@ async function welcomeFlow() {
           if (document.body.contains(pop)) draw();
         });
       };
+    bindLockStep(pop, lock, draw);
     $$("[data-mem]", pop).forEach(
       (x) =>
         (x.onclick = () => {
@@ -219,6 +255,76 @@ async function welcomeFlow() {
     setTimeout(tick, 1000);
   };
   draw();
+}
+// «Защитить память паролем?» on the first start: no password (default) or Mnema's own encryption, set right here
+function pwScore(pw) {
+  let s = 0;
+  if (pw.length >= 8) s++;
+  if (pw.length >= 12) s++;
+  if (pw.length >= 16) s++;
+  if (/[a-zа-яё]/.test(pw) && /[A-ZА-ЯЁ]/.test(pw)) s++;
+  if (/\d/.test(pw) && /[^\wа-яё]/i.test(pw)) s++;
+  return Math.min(4, Math.max(pw ? 1 : 0, s - 1));
+}
+function newPassword() {
+  const abc = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789-_!@#%";
+  const r = crypto.getRandomValues(new Uint32Array(20));
+  return Array.from(r, (x) => abc[x % abc.length]).join("");
+}
+function lockStep(L) {
+  const sc = pwScore(L.pw),
+    lab = ["", "слабый", "так себе", "хороший", "надёжный"][sc];
+  return `<div class="wpick"><div class="wopt ${L.on ? "" : "on"}" data-lock="0"><span class="wic ${L.on ? "" : "ok"}">${ic(L.on ? "folder" : "check")}</span><div><b>${tr("Без пароля")}</b><small>${tr("обычные файлы, их видят Obsidian и другие программы")}</small></div></div>
+    <div class="wopt ${L.on ? "on" : ""}" data-lock="1"><span class="wic ${L.on ? "ok" : ""}">${ic(L.on ? "check" : "lock")}</span><div><b>${tr("Зашифровать паролем")}</b><small>${tr("AES-256, без пароля память не открыть")}</small></div></div>
+    ${
+      L.on
+        ? `<div class="wlock"><div class="wpw"><input id="wpw1" type="${L.show ? "text" : "password"}" autocomplete="new-password" placeholder="${tr("Пароль, не короче 8 знаков")}" value="${esc(L.pw)}"><button class="wpwb" data-pwshow title="${tr(L.show ? "Скрыть" : "Показать")}">${ic(L.show ? "eyeoff" : "eye")}</button><button class="wpwb" data-pwgen title="${tr("Придумать надёжный")}">${ic("redo")}</button></div>
+        <div class="wpwm s${sc}"><i></i><i></i><i></i><i></i><span>${L.pw ? tr(lab) : ""}</span></div>
+        <div class="wpw"><input id="wpw2" type="${L.show ? "text" : "password"}" autocomplete="new-password" placeholder="${tr("Ещё раз")}" value="${esc(L.pw2)}"></div>
+        <label class="ulrem"><input type="checkbox" id="wpwrem" ${L.remember ? "checked" : ""}> ${tr("Помнить на этом компьютере — не спрашивать при каждом запуске")}</label>
+        <p class="wwarn">${ic("x")}${tr("Забудешь пароль — память не вернуть. Запиши его в менеджер паролей.")}</p>
+        ${L.err ? `<div class="ulerr">${esc(tr(L.err))}</div>` : ""}${L.busy ? `<div class="hint">${tr("Шифрую…")}</div>` : ""}</div>`
+        : ""
+    }</div>`;
+}
+function bindLockStep(pop, L, draw) {
+  $$("[data-lock]", pop).forEach(
+    (x) =>
+      (x.onclick = () => {
+        L.on = x.dataset.lock === "1";
+        L.err = "";
+        draw();
+        if (L.on) setTimeout(() => $("#wpw1", pop) && $("#wpw1", pop).focus(), 30);
+      }),
+  );
+  const inp = (id, k) => {
+    const e = $("#" + id, pop);
+    if (!e) return;
+    e.oninput = () => {
+      L[k] = e.value;
+      if (k === "pw") {
+        const m = $(".wpwm", pop),
+          sc = pwScore(L.pw);
+        m.className = "wpwm s" + sc;
+        $("span", m).textContent = L.pw ? tr(["", "слабый", "так себе", "хороший", "надёжный"][sc]) : "";
+      }
+    };
+  };
+  inp("wpw1", "pw");
+  inp("wpw2", "pw2");
+  if ($("#wpwrem", pop)) $("#wpwrem", pop).onchange = (e) => (L.remember = e.target.checked);
+  if ($("[data-pwshow]", pop))
+    $("[data-pwshow]", pop).onclick = () => {
+      L.show = !L.show;
+      draw();
+    };
+  if ($("[data-pwgen]", pop))
+    $("[data-pwgen]", pop).onclick = () => {
+      L.pw = L.pw2 = newPassword();
+      L.show = true;
+      L.err = "";
+      draw();
+    };
 }
 // ---------------------------------------------------------------- may Mnema look outside itself; then what exactly
 async function sourcesAsk() {

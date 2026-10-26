@@ -1,5 +1,16 @@
 // ---------------------------------------------------------------- a VPN key: Mnema connects through it itself (vpnkey.py, Xray inside)
 const VK_SVCS = ["Hiddify", "Happ", "v2rayN", "V2Box", "NekoBox", "Streisand", "Outline", "Другой сервис"];
+// the service tiles: a letter medal in the service's own colours
+const VK_LOOK = {
+  Hiddify: ["Hi", "#0ea5e9", "#6366f1"],
+  Happ: ["Ha", "#f59e0b", "#f97316"],
+  v2rayN: ["v2", "#10b981", "#14b8a6"],
+  V2Box: ["V2", "#6366f1", "#a855f7"],
+  NekoBox: ["Ne", "#ec4899", "#a855f7"],
+  Streisand: ["St", "#ef4444", "#f97316"],
+  Outline: ["Ou", "#14b8a6", "#0ea5e9"],
+  "Другой сервис": ["…", "#64748b", "#94a3b8"],
+};
 async function bindVpnKey(prof) {
   const box = $("#netcard");
   if (!box) return;
@@ -19,6 +30,14 @@ async function bindVpnKey(prof) {
   };
   showHint();
   svc.onchange = showHint;
+  $$(".vksv", box).forEach(
+    (b) =>
+      (b.onclick = () => {
+        svc.value = b.dataset.vks;
+        $$(".vksv", box).forEach((x) => x.classList.toggle("on", x === b));
+        showHint();
+      }),
+  );
   const draw = (d) => {
     stat.innerHTML =
       d.on && d.error

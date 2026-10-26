@@ -5,6 +5,11 @@ const ENG_MODES = {
   balance: ["Баланс", "Золотая середина. Подходит большинству"],
   max: ["Максимум", "Вся память в запросе, длинные ответы, все ядра. Дороже и тяжелее"],
 };
+const ENG_LOOK = {
+  eco: ["🍃", "#22c55e", "#14b8a6", 1],
+  balance: ["⚖️", "#6366f1", "#22d3ee", 2],
+  max: ["🚀", "#f97316", "#ef4444", 3],
+};
 const LEARN_STEPS = [5, 10, 15, 30, 60, 120, 240, 720, 1440];
 function fmtN(n) {
   return Number(n || 0).toLocaleString(locale());
@@ -32,11 +37,12 @@ function engineCard(e) {
     LEARN_STEPS.indexOf(e.learn) < 0 ? LEARN_STEPS.findIndex((x) => x >= e.learn) : LEARN_STEPS.indexOf(e.learn),
   );
   return `<div id="engwrap"><div class="card" data-sec="engine" id="engcard"><h2>Движок${hq("engine")}</h2>
-   <div class="presets engmodes">${Object.entries(ENG_MODES)
-     .map(
-       ([k, [t, s]]) =>
-         `<button data-em="${k}" class="${e.mode === k ? "on" : ""}"><b>${t}</b><span>${s}</span></button>`,
-     )
+   <div class="yprs engmodes">${Object.entries(ENG_MODES)
+     .map(([k, [t, s]], n) => {
+       // the same cards as «Характер»: a medal in the mode's colours, the name, what it does and how heavy it is
+       const [em, c1, c2, lvl] = ENG_LOOK[k];
+       return `<button data-em="${k}" class="ypr ${e.mode === k ? "on" : ""}" style="--c1:${c1};--c2:${c2};--d:${n * 0.06}s"><span class="medal2"><span>${em}</span><i class="spark"></i><i class="spark"></i><i class="spark"></i></span><span class="yprt"><b>${tr(t)}</b><span>${tr(s)}</span><span class="ylvl">${tr("Нагрузка")}<i>${[1, 2, 3].map((x) => `<em class="${x <= lvl ? "f" : ""}"></em>`).join("")}</i></span></span>${e.mode === k ? `<span class="yok">${ic("check")}</span>` : ""}</button>`;
+     })
      .join("")}</div>
    ${e.mode === "custom" ? `<div class="hint" style="margin-top:8px">${tr("Сейчас своя настройка: ползунки сдвинуты вручную.")}</div>` : ""}
    <div class="engmeter"><div>${tr("В этом месяце облачные ИИ потратили")} <b>${fmtN(u.cloud)}</b> ${tr("токенов")}${e.month ? ` ${tr("из")} ${fmtN(e.month)}` : ""}. ${tr("На компьютере")} — ${fmtN(u.local)}, ${tr("бесплатно")}.</div>${e.month ? `<div class="engbar ${pct >= 90 ? "hot" : ""}"><i style="width:${pct}%"></i></div>` : ""}</div>
@@ -191,31 +197,143 @@ const SCRIBE_HINT = {
   partial: "Короткие записи — здесь, длинные сразу в облачный Whisper. Каждый раз сообщает, куда отдал.",
   cloud: "Быстро, запись уходит облачному Whisper и оплачивается по твоему ключу. Нет ключа — расшифровывает здесь.",
 };
+// the meetings card: the way a meeting goes — recording → transcript → summary → memory — drawn as four steps.
+// Each step says what happens and holds its own settings; the presets set the whole way at once.
+let SCR_X = { models: [], summary: "", keep: false, step: "text" };
+const SCR_PRESETS = [
+  ["private", "🔒", "#10b981", "#14b8a6", "Приватно", [["Где", "Бесплатно на компьютере"], ["Кто подводит", "модель на компьютере"], ["Хранить аудио", "нет"]]],
+  ["balance", "⚖️", "#6366f1", "#a855f7", "Баланс", [["Где", "Сам решает"], ["Точность", "Авто"]]],
+  ["fast", "⚡", "#f59e0b", "#f97316", "Быстро", [["Где", "Облачный Whisper"], ["", "≈ $0.36 за час записи"]]],
+];
+// the same names as on the cards below the steps, so the step and its settings read alike
+const SCR_WHERE = {
+  local: "Бесплатно на компьютере",
+  auto: "Сам решает",
+  partial: "Длинные — в облако",
+  cloud: "Облачный Whisper",
+};
+function scribePreset(c) {
+  return { local: "private", auto: "balance", cloud: "fast" }[c.mode] || "";
+}
+function scribeFlow(c) {
+  const q = (SQ.find((x) => x[0] === c.quality) || SQ[0])[1];
+  const hour = c.rtf ? Math.max(1, Math.round(c.rtf * 60)) : 0;
+  const mod = SCR_X.models.find((m) => m.v === SCR_X.summary);
+  const text =
+    `${tr("Где")}: ${tr(SCR_WHERE[c.mode] || "")}` +
+    (c.mode !== "cloud" ? `
+${tr("Точность")}: ${tr(q)}` : "") +
+    (hour && c.mode !== "cloud" ? `
+${tr("час записи ≈")} ${hour} ${tr("мин")}` : "");
+  const steps = [
+    ["rec", "🎙️", "#ec4899", "#f97316", "Запись", `${tr("Хранить аудио")}: ${SCR_X.keep ? tr("да") : tr("нет")}`],
+    ["text", "📝", "#0ea5e9", "#6366f1", "Расшифровка", text],
+    ["sum", "✨", "#6366f1", "#a855f7", "Итоги", `${tr("Кто подводит")}: ${mod ? mod.l : tr("модель текущего чата")}`],
+    ["mem", "🧠", "#10b981", "#14b8a6", "Память", tr("учится на твоих словах")],
+  ];
+  return `<div class="mflow">${steps
+    .map(
+      ([k, em, c1, c2, t, v], n) =>
+        `${n ? `<i class="mfar"><em></em></i>` : ""}<button class="mfs ${SCR_X.step === k ? "on" : ""}" data-mfs="${k}" style="--c1:${c1};--c2:${c2};--d:${n * 0.08}s"><span class="mfn">${n + 1}</span><span class="medal2"><span>${em}</span></span><b>${tr(t)}</b><small>${esc(v)}</small></button>`,
+    )
+    .join("")}</div>`;
+}
+function scribeStep(c) {
+  const s = SCR_X.step;
+  if (s === "rec")
+    return `<p class="mfd">${tr("Mnema пишет микрофон и звук компьютера двумя дорожками: в расшифровке сразу видно, где ты, а где собеседник, без угадывания по голосу. Можно не записывать, а загрузить готовый файл: mp3, m4a, wav, видео. Всё ложится в папку памяти «80 Meetings», в папку с датой и названием встречи.")}</p>
+   <div class="tg" style="padding:6px 0 0;border:0"><button class="sw ${SCR_X.keep ? "on" : ""}" id="scrkeep"></button><div><b>${tr("Хранить аудио")}</b><p>${tr("Выключено: остаётся только текст, запись удаляется. Включено: файл встречи лежит рядом с расшифровкой.")}</p></div></div>`;
+  if (s === "text")
+    return `<p class="mfd">${tr("Речь превращается в текст. На компьютере работает Whisper: бесплатно, запись никуда не уходит. Облачный Whisper быстрее и не грузит компьютер, но платный и получает запись. Тишину, выдуманные фразы и эхо из колонок Mnema вырезает сама.")}</p>
+   <div class="shd"><b>${tr("Где")}</b><span class="hint">${tr("где расшифровывать")}</span></div>${scribePlans(c, c.mode, false, true)}
+   ${c.mode !== "cloud" ? `<div class="shd"><b>${tr("Точность")}</b><span class="hint">${tr("на компьютере")}</span></div>${scribeQuality(c.quality)}` : ""}
+   <details class="scrown"><summary>${tr("Облачный Whisper: свой адрес и ключ")}${c.cloud_ready ? ` · ✓ ${tr("готов")}: ${tr(c.cloud_from)}` : ""}</summary><div class="row" style="margin-top:6px"><input class="inp" id="scrbase" placeholder="https://…/v1" value="${esc(c.base || "")}" style="min-width:260px"><input class="inp" id="scrmodel" placeholder="whisper-1" value="${esc(c.model || "")}" style="width:150px"><input class="inp" id="scrkey" type="password" placeholder="${tr("ключ")}" style="width:200px"><button class="btn g sm" id="scrsave">${tr("Сохранить")}</button></div></details>`;
+  if (s === "sum")
+    return `<p class="mfd">${tr("Готовая расшифровка уходит одним сообщением выбранной модели: о чём встреча, что решили, какие задачи и за кем. Итоги приходят новым разговором в чате — там же можно попросить письмо участникам или план. Локальная модель — бесплатно и без интернета.")}</p>
+   <div class="shd"><b>${tr("Кто подводит")}</b><span class="hint">${tr("итоги встречи")}</span></div><select class="inp" id="scrsum" style="max-width:420px"><option value="">${tr("модель текущего чата")}</option>${SCR_X.models.map((m) => `<option value="${esc(m.v)}" ${m.v === SCR_X.summary ? "selected" : ""}>${esc(m.l)}</option>`).join("")}</select>`;
+  return `<p class="mfd">${tr("Из встречи Mnema учится на твоих словах: решения, сроки, договорённости. Слова собеседника — только контекст, за тебя они не записываются. Насколько смело записывать — как в остальном обучении.")}</p>
+   <button class="btn g sm" id="scrlearn">${ic("book")}${tr("Настройки обучения")}</button>`;
+}
 function scribeCard(c) {
   if (!c) return "";
+  const pr = scribePreset(c);
   return `<div class="card" data-sec="meetings" id="scrcard"><h2>${tr("Записи встреч")}${hq("scribe")}</h2>
-   <div class="shd"><b>${tr("Чем расшифровывать")}</b></div>
-   ${scribePlans(c, c.mode, false, true)}
-   ${c.mode !== "cloud" ? `<div class="shd"><b>${tr("Точность на компьютере")}</b></div>${scribeQuality(c.quality)}` : ""}
-   <div class="shd"><b>${tr("Облачный Whisper")}</b>${c.cloud_ready ? `<span class="pill">✓ ${tr("готов")}: ${tr(c.cloud_from)}</span>` : ""}</div>
-   <details class="scrown"><summary>${tr("Свой адрес и ключ")}</summary><div class="row" style="margin-top:6px"><input class="inp" id="scrbase" placeholder="https://…/v1" value="${esc(c.base || "")}" style="min-width:260px"><input class="inp" id="scrmodel" placeholder="whisper-1" value="${esc(c.model || "")}" style="width:150px"><input class="inp" id="scrkey" type="password" placeholder="${tr("ключ")}" style="width:200px"><button class="btn l sm" id="scrsave">${tr("Сохранить")}</button></div></details></div>`;
+   <p class="hint" style="margin:-4px 0 12px">${tr("Как встреча становится итогами и памятью. Нажми на шаг — ниже его настройки.")}</p>
+   <div class="shd"><b>${tr("Готовые настройки")}</b></div><div class="yprs mpres">${SCR_PRESETS.map(
+     ([k, em, c1, c2, t, d], n) =>
+       `<button class="ypr ${pr === k ? "on" : ""}" data-mpre="${k}" style="--c1:${c1};--c2:${c2};--d:${n * 0.06}s"><span class="medal2"><span>${em}</span><i class="spark"></i><i class="spark"></i><i class="spark"></i></span><span class="yprt"><b>${tr(t)}</b><span>${d.map(([a, b]) => (a ? `${tr(a)}: ${tr(b)}` : tr(b))).join(" · ")}</span></span>${pr === k ? `<span class="yok">${ic("check")}</span>` : ""}</button>`,
+   ).join("")}</div>
+   <div class="shd"><b>${tr("Как идёт встреча")}</b></div>${scribeFlow(c)}
+   <div class="mfpanel" data-step="${SCR_X.step}">${scribeStep(c)}</div></div>`;
 }
 function bindScribeCard() {
   const c = $("#scrcard");
   if (!c) return;
+  tileToggles(c); // «Хранить аудио» looks like every other switch
+  const cur = () => bindScribeCard.last;
+  const redraw = (d) => {
+    if (d) bindScribeCard.last = d;
+    if (!cur()) return;
+    c.outerHTML = scribeCard(cur());
+    bindScribeCard();
+  };
   const set = async (patch) => {
     try {
-      const d = await post("/api/scribe/settings", patch);
-      c.outerHTML = scribeCard(d);
-      bindScribeCard();
+      redraw(await post("/api/scribe/settings", patch));
     } catch (e) {
       toast(e.message);
     }
   };
+  const agent = async (patch) => {
+    try {
+      await post("/api/agent", patch);
+    } catch (e) {
+      toast(e.message);
+    }
+  };
+  $$("[data-mfs]", c).forEach(
+    (b) =>
+      (b.onclick = () => {
+        SCR_X.step = b.dataset.mfs;
+        redraw();
+      }),
+  );
+  $$("[data-mpre]", c).forEach(
+    (b) =>
+      (b.onclick = async () => {
+        const k = b.dataset.mpre;
+        if (k === "private") {
+          const loc = SCR_X.models.find((m) => m.v.startsWith("local:") || m.v.startsWith("ollama:"));
+          if (loc) {
+            SCR_X.summary = loc.v;
+            await agent({ scribe_summary_model: loc.v });
+          }
+          SCR_X.keep = false;
+          await agent({ scribe_keep_audio: false });
+        }
+        await set(k === "private" ? { mode: "local" } : k === "fast" ? { mode: "cloud" } : { mode: "auto", model: "auto" });
+        toast(tr("Сохранено"));
+      }),
+  );
   $$("[data-plan]", c).forEach((b) => (b.onclick = () => set({ mode: b.dataset.plan })));
   $$("[data-sq]", c).forEach((b) => (b.onclick = () => set({ model: b.dataset.sq })));
-  $("#scrsave", c).onclick = () =>
-    set({ base: $("#scrbase", c).value, cloud_model: $("#scrmodel", c).value, key: $("#scrkey", c).value });
+  if ($("#scrsave", c))
+    $("#scrsave", c).onclick = () =>
+      set({ base: $("#scrbase", c).value, cloud_model: $("#scrmodel", c).value, key: $("#scrkey", c).value });
+  if ($("#scrkeep", c))
+    $("#scrkeep", c).onclick = async () => {
+      SCR_X.keep = !SCR_X.keep;
+      await agent({ scribe_keep_audio: SCR_X.keep });
+      redraw();
+    };
+  if ($("#scrsum", c))
+    $("#scrsum", c).onchange = async (e) => {
+      SCR_X.summary = e.target.value;
+      await agent({ scribe_summary_model: SCR_X.summary });
+      toast(tr("Сохранено"));
+      redraw();
+    };
+  if ($("#scrlearn", c)) $("#scrlearn", c).onclick = () => viewSettings("learn");
 }
 // ---------------------------------------------------------------- free sync
 function syncLast(l) {

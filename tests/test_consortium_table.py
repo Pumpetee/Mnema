@@ -105,6 +105,24 @@ class TestRoundTable(unittest.TestCase):
         wait(cid)
         self.assertEqual([m["speaker"] for m in self.ai(cid)], ["Claude Sonnet", "Claude Opus", "Claude Haiku"])
 
+    def test_stop_in_the_last_word_is_a_pause_not_the_end(self):
+        def hook(n, model, meta):
+            if n == 3:  # the one summing up
+                CO.control(self.v, meta["chat"], "pause")
+
+        self.talk.hook = hook
+        r = CH.send(self.v, "Вопрос", sync=True, learn=False, consortium={"members": M3, "rounds": 1})
+        cid = r["chat"]
+        self.assertEqual(CH.load_chat(self.v, cid)["consortium"]["state"]["status"], "paused")
+        self.assertTrue(self.ai(cid)[-1].get("cut"))
+        self.talk.hook = None
+        CO.control(self.v, cid, "resume")
+        wait(cid)
+        ai = self.ai(cid)
+        self.assertEqual(ai[-1]["speaker"], "Claude Haiku")  # he finishes what he was cut in
+        self.assertTrue(ai[-1].get("summary") and not ai[-1].get("cut"))
+        self.assertEqual(CH.load_chat(self.v, cid)["consortium"]["state"]["status"], "done")
+
     def test_stopped_before_a_word_the_same_one_speaks_on_resume(self):
         def hook(n, model, meta):
             if n == 1:

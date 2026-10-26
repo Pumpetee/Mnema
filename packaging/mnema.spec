@@ -62,9 +62,36 @@ cli = Analysis([os.path.join(SPECPATH, "mnema_cli.py")], pathex=[ROOT],
 app_pyz = PYZ(app.pure)
 cli_pyz = PYZ(cli.pure)
 
+def win_version(file_name, description):
+    """Version resources of a Windows program: product name Mnema and the version, the same in every build."""
+    if sys.platform != "win32":
+        return None
+    from PyInstaller.utils.win32.versioninfo import (
+        FixedFileInfo, StringFileInfo, StringStruct, StringTable, VarFileInfo, VarStruct, VSVersionInfo)
+    sys.path.insert(0, ROOT)
+    from mnema import __version__
+
+    nums = tuple(int(x) for x in (__version__.split(".") + ["0", "0", "0"])[:3]) + (0,)
+    return VSVersionInfo(
+        ffi=FixedFileInfo(filevers=nums, prodvers=nums),
+        kids=[
+            StringFileInfo([StringTable("040904B0", [
+                StringStruct("ProductName", "Mnema"),
+                StringStruct("FileDescription", description),
+                StringStruct("FileVersion", __version__),
+                StringStruct("ProductVersion", __version__),
+                StringStruct("OriginalFilename", file_name),
+                StringStruct("LegalCopyright", "AGPL-3.0"),
+            ])]),
+            VarFileInfo([VarStruct("Translation", [0x0409, 1200])]),
+        ],
+    )
+
+
 app_exe = EXE(app_pyz, app.scripts, [], exclude_binaries=True, name="Mnema", icon=icon, console=False,
-              version=None, upx=False)
-cli_exe = EXE(cli_pyz, cli.scripts, [], exclude_binaries=True, name="mnema-cli", icon=icon, console=True, upx=False)
+              version=win_version("Mnema.exe", "Mnema"), upx=False)
+cli_exe = EXE(cli_pyz, cli.scripts, [], exclude_binaries=True, name="mnema-cli", icon=icon, console=True,
+              version=win_version("mnema-cli.exe", "Mnema command line"), upx=False)
 
 coll = COLLECT(app_exe, app.binaries, app.datas, cli_exe, cli.binaries, cli.datas, name="Mnema", upx=False)
 

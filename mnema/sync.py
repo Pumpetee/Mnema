@@ -66,6 +66,12 @@ def local_files(root: Path) -> dict[str, str]:
             if wanted(rel):
                 try:
                     out[rel] = _h(p.read_bytes())
+                except PermissionError:  # encrypted with a key not open here: listed as it is, never taken as gone
+                    try:
+                        with open(p, "rb") as fh:
+                            out[rel] = _h(fh.read())
+                    except OSError:
+                        pass
                 except OSError:
                     pass
     return out
@@ -206,6 +212,63 @@ def target_of(vault: Vault, t: dict):
     return FolderTarget(str(Path(base) / SUB) if kind in ("gdrive", "dropbox") else base)
 
 
+class Sealed:
+    """A target for a memory encrypted by Mnema: what leaves this computer is the encrypted file, never the plain text.
+
+    Mnema reads its encrypted files as plain text (crypt hooks Path.read_bytes), so without this a synced copy of an
+    encrypted memory would land in Google Drive or on a station as plain text. Files the encryption leaves open (pictures,
+    PDF, the settings Mnema needs before the password) go as they are. A station lists hashes of what it stores — the
+    encrypted bytes — so the hash of the plain text each one stands for is kept here, next to the sync state."""
+
+    def __init__(self, tgt, vault: Vault, tid: str):
+        from . import crypt
+
+        self.t, self.c, self.root = tgt, crypt, vault.root
+        self.kid = (crypt.config(vault.root) or {}).get("id", "")
+        self.mapf = vault.service / "sync" / f"{tid}.sealed.json"
+        try:
+            self.map = json.loads(self.mapf.read_text(encoding="utf-8")) if self.mapf.exists() else {}
+        except (OSError, ValueError):
+            self.map = {}
+
+    def ready(self):
+        return self.t.ready()
+
+    def _sealable(self, rel: str) -> bool:
+        return bool(self.c.in_scope(self.root / rel))
+
+    def list(self) -> dict[str, str]:
+        out = {}
+        for rel, h in self.t.list().items():
+            m = self.map.get(rel)
+            out[rel] = m[1] if m and m[0] == h else h  # a station's hash of the encrypted copy → the plain one
+        return out
+
+    def get(self, rel: str) -> bytes:
+        data = self.t.get(rel)
+        if self.c.is_encrypted_bytes(data):
+            plain = self.c.decrypt_bytes(data, rel)  # another password on the other side → Locked, said in the result
+            self.map[rel] = [_h(data), _h(plain)]
+            return plain
+        return data
+
+    def put(self, rel: str, data: bytes) -> None:
+        if self._sealable(rel) and not self.c.is_encrypted_bytes(data):
+            enc = self.c.encrypt_bytes(self.kid, data)
+            self.t.put(rel, enc)
+            self.map[rel] = [_h(enc), _h(data)]
+        else:
+            self.t.put(rel, data)
+
+    def delete(self, rel: str) -> None:
+        self.t.delete(rel)
+        self.map.pop(rel, None)
+
+    def save(self) -> None:
+        self.mapf.parent.mkdir(parents=True, exist_ok=True)
+        self.mapf.write_text(json.dumps(self.map), encoding="utf-8")
+
+
 def _state_file(vault: Vault, tid: str) -> Path:
     return vault.service / "sync" / f"{tid}.json"
 
@@ -240,7 +303,6 @@ def conflict_name(rel: str, when: dt.datetime) -> str:
 
 def sync_target(vault: Vault, t: dict, now: dt.datetime | None = None) -> dict:
     """Three-way sync with one target. Returns what happened."""
-    from .journal import log_event, save_copy
 
     tgt = target_of(vault, t)
     res = {
@@ -260,6 +322,26 @@ def sync_target(vault: Vault, t: dict, now: dt.datetime | None = None) -> dict:
     if not ok:
         res["error"] = why
         return res
+    from . import crypt
+
+    if crypt.enabled(vault.root):
+        if crypt.locked(vault.root):
+            res["error"] = "память зашифрована и ещё не открыта паролем"
+            return res
+        tgt = Sealed(tgt, vault, t.get("id", "x"))
+    try:
+        _pass(vault, tgt, t, res, now)
+    except crypt.Locked:
+        res["error"] = "в облаке память, зашифрованная другим паролем"
+    finally:
+        if isinstance(tgt, Sealed):
+            tgt.save()
+    return res
+
+
+def _pass(vault: Vault, tgt, t: dict, res: dict, now: dt.datetime | None) -> None:
+    from .journal import log_event, save_copy
+
     sf = _state_file(vault, t.get("id", "x"))
     state = json.loads(sf.read_text(encoding="utf-8")) if sf.exists() else {}
     loc, rem = local_files(vault.root), tgt.list()
@@ -357,7 +439,6 @@ def sync_target(vault: Vault, t: dict, now: dt.datetime | None = None) -> dict:
         from .memory import generate_now
 
         generate_now(vault)
-    return res
 
 
 def run(vault: Vault, only: str = "") -> list[dict]:

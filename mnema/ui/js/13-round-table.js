@@ -111,7 +111,7 @@ function drawTable() {
         : nx
           ? tr("следующий")
           : "";
-    return `<div class="seat ${sp ? "sp" : ""} ${nx ? "nx" : ""} ${ask ? "ask" : ""}" style="--sc:${SPK_COLORS[i % SPK_COLORS.length]};--i:${i}"><span class="sav">${esc(nm.slice(0, 1))}${sp ? '<i class="ring"></i><i class="ring r2"></i>' : ""}</span><b data-noi18n>${esc(nm)}</b><small>${sp ? TYPING : ""}${lab}</small>${c.members.length > 2 && !live ? `<button class="sx" data-rm="${esc(r)}" title="${tr("Убрать из обсуждения")}">×</button>` : ""}</div>`;
+    return `<div class="seat ${sp ? "sp" : ""} ${nx ? "nx" : ""} ${ask ? "ask" : ""}" style="--sc:${spkColor(r)};--i:${i}"><span class="sav">${esc(spkGlyph(r, nm))}${sp ? '<i class="ring"></i><i class="ring r2"></i>' : ""}</span><b data-noi18n>${esc(nm)}</b><small>${sp ? TYPING : ""}${lab}</small>${c.members.length > 2 && !live ? `<button class="sx" data-rm="${esc(r)}" title="${tr("Убрать из обсуждения")}">×</button>` : ""}</div>`;
   };
   const segs = Array.from(
     { length: t.total },

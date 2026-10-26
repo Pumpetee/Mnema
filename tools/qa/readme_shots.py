@@ -623,6 +623,40 @@ with sync_playwright() as p:
     close_modals()
     page.unroute("**/api/obsidian")
 
+    # 15. meetings: the way a meeting goes, four steps with their settings, the presets above
+    page.set_viewport_size({"width": 1440, "height": 2200})  # the whole card in the window, nothing cut
+    page.goto(base + "#settings/meetings")
+    page.wait_for_timeout(2500)
+    clean(page)
+    card = page.locator("#scrcard")
+    card.scroll_into_view_if_needed()
+    page.wait_for_timeout(900)
+    card.screenshot(path=str(OUT / "meetings.png"))
+    print("saved meetings", flush=True)
+    page.set_viewport_size({"width": 1440, "height": 900})
+
+    # 16. the first start offers a password for the memory (shown, not applied: the demo stays as it is)
+    page.goto(base + "#chat")
+    page.wait_for_timeout(2000)
+    page.evaluate(
+        "window.__wlc = 0; document.querySelectorAll('.wlc').forEach(e => e.remove()); setTimeout(() => welcomeFlow(), 0)"
+    )
+    page.wait_for_timeout(1500)
+    for _ in range(12):
+        if page.locator(".wlc #wpw1, .wlc [data-lock]").count():
+            break
+        page.locator(".wlc [data-next]").click()
+        page.wait_for_timeout(400)
+    page.locator(".wlc [data-lock='1']").click()
+    page.wait_for_timeout(300)
+    page.locator(".wlc [data-pwgen]").click()
+    page.wait_for_timeout(600)
+    page.screenshot(path=str(OUT / "lock.png"))
+    print("saved lock", flush=True)
+    page.evaluate(
+        "document.querySelectorAll('.wlc').forEach(e => e.remove()); document.body.classList.remove('wlc-on')"
+    )
+
     # 0. the first picture: the conversation that knows you, filling the window
     week = next(c for c in CH.list_chats(v) if c["title"] == T("План недели", "Week plan"))
     page.set_viewport_size({"width": 1280, "height": 860})

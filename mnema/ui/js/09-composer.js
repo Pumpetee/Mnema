@@ -65,16 +65,22 @@ function applyComposer() {
     inp.style.minHeight = c.rows > 1 ? c.rows * 22 + "px" : "";
   }
 }
+let COMP_LAST = null; // the switch just flipped: its button pops in the sample, or fades out of it
 function compCard(id) {
-  const c = compCfg();
+  const c = compCfg(),
+    last = COMP_LAST;
+  COMP_LAST = null;
   return `<div class="card" data-sec="app" id="${id || "compcard"}"><h2>${tr("Строка ввода")}<span class="hint">${tr("что под полем и в каком порядке")}</span></h2>
+   <div class="cpvbox"><div class="cpvh"><span>${tr("Пример")}</span><em><i></i>${tr("меняется сразу, когда включаешь и выключаешь кнопки ниже")}</em></div>
+   <div class="cpvin" style="--rows:${c.rows}"><span>${esc(c.placeholder || tr("Напиши что угодно — я помню тебя и учусь по ходу"))}</span><kbd>${c.send === "enter" ? "Enter" : "Ctrl+Enter"} ↵</kbd></div>
    <div class="cpv">${c.order
-     .filter((k) => !c.off.includes(k))
+     .filter((k) => !c.off.includes(k) || (last && last.k === k))
      .map((k) => {
-       const it = COMP_ITEMS.find((x) => x[0] === k);
-       return `<span class="${k === "micb" ? "m" : ""}">${ic(it[1])}${c.labels && ["termchip", "privchip", "conschip"].includes(k) ? `<em>${tr(it[2])}</em>` : ""}</span>`;
+       const it = COMP_ITEMS.find((x) => x[0] === k),
+         fx = last && last.k === k ? (c.off.includes(k) ? "gone" : "cpop") : "";
+       return `<span class="${k === "micb" ? "m" : ""} ${fx}">${ic(it[1])}${c.labels && ["termchip", "privchip", "conschip"].includes(k) ? `<em>${tr(it[2])}</em>` : ""}</span>`;
      })
-     .join("")}<b class="sendpv">${SEND_ICON}</b></div>
+     .join("")}<b class="sendpv">${SEND_ICON}</b></div></div>
    <div class="clist2">${c.order
      .map((k) => {
        const it = COMP_ITEMS.find((x) => x[0] === k);
@@ -112,6 +118,7 @@ function bindCompCard(card, redraw) {
       (b.onclick = () => {
         const c = compCfg(),
           k = b.dataset.cs;
+        COMP_LAST = { k };
         save({ off: c.off.includes(k) ? c.off.filter((x) => x !== k) : [...c.off, k] });
       }),
   );

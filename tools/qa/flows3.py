@@ -79,7 +79,9 @@ with sync_playwright() as p:
     page.click("#cmgo")
     page.wait_for_timeout(1500)
     page.wait_for_selector("[data-ca=pause]", timeout=5000)
-    page.click("[data-ca=pause]")
+    # pressed at once: the table is redrawn when the speaker changes, and a click that waits for a still button
+    # may land seconds later, when the whole discussion is over
+    page.evaluate("document.querySelector('[data-ca=pause]').click()")
     page.wait_for_timeout(3000)
     c = cur_chat(page)
     st = (c.get("consortium") or {}).get("state") or {}

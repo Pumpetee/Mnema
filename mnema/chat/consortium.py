@@ -632,6 +632,10 @@ def run(
         answer = speak(ref, r, names, rounds, final)
         if g.get("pause") and not answer:  # stopped before a word: on «Продолжить» the same one speaks
             continue
+        if g.get("pause") and final:  # the last word cut: a pause, not the end — «Продолжить» lets him finish
+            _save_state(vault, cid, status="paused", round=r, next=i)
+            g["status"] = "paused"
+            return
         if final and not answer and not g["stop"] and not g.get("pause"):
             alt = next((m for m in members if m != ref and m not in g.get("dropped", [])), None)
             if alt:  # the one summing up failed: another one does it

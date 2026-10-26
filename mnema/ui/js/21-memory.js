@@ -233,7 +233,18 @@ async function memPortrait() {
       <div class="pabout">${tr("Это твой портрет. Mnema подставляет его каждому ИИ, с которым ты говоришь, — чтобы тот сразу знал, кто ты и как с тобой работать.")}</div>
       ${intro.length ? `<div class="who">${intro.map(inline).join("<br>")}</div>` : building ? `<div class="pnone pbuild">${tr("Собираю портрет из того, что уже знаю о тебе…")}</div>` : `<div class="pnone">${tr("Пока Mnema почти ничего о тебе не знает. Портрет заполнится сам по ходу разговоров — или пройди «Знакомство»: пара минут, и она будет знать главное.")}</div>`}
       <div class="pstats"><span>${ic("book")}<b data-count="${all.length}">0</b> ${tr("фактов")}</span><span>${ic("check")}<b data-count="${learned}">0</b> ${tr("выучено само")}</span>${ms.updated ? `<span>${ic("redo")}${tr("обновлено")} ${ago(ms.updated)}</span>` : ""}</div>
-      <div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap"><button class="btn sm" data-int>${ic("user")}${tr("Знакомство")}</button><button class="btn l sm" data-quiz>${ic("check")}${tr("Насколько Mnema меня знает")}</button><button class="btn l sm" data-cmp>${ic("eye")}${tr("С памятью и без")}</button><button class="btn g sm" data-tell>${ic("chat")}${tr("Рассказать о себе")}</button><button class="btn g sm" data-edit="70 Memory/Profile.md">${ic("edit")}${tr("Поправить самому")}</button></div></div></div>
+      <div class="pacts">${[
+        ["data-int", "👋", "#6366f1", "#a855f7", "Знакомство", "пара минут вопросов"],
+        ["data-quiz", "🎯", "#10b981", "#14b8a6", "Насколько Mnema меня знает", "проверь её на себе"],
+        ["data-cmp", "🔍", "#0ea5e9", "#6366f1", "С памятью и без", "один вопрос, два ответа"],
+        ["data-tell", "💬", "#f59e0b", "#f97316", "Рассказать о себе", "своими словами"],
+        ['data-edit="70 Memory/Profile.md"', "✏️", "#ec4899", "#a855f7", "Поправить самому", "открыть портрет"],
+      ]
+        .map(
+          ([a, em, c1, c2, t, s], n) =>
+            `<button class="pact" ${a} style="--c1:${c1};--c2:${c2};--d:${n * 0.05}s"><span class="medal2"><span>${em}</span></span><span class="xftx"><b>${tr(t)}</b><small>${tr(s)}</small></span></button>`,
+        )
+        .join("")}</div></div></div>
    ${memMap(topics, name)}
    <div class="mtiles">${topics.map(topicTile).join("")}</div>`;
   $$("[data-tell]").forEach((b) => (b.onclick = tellAboutMe));
