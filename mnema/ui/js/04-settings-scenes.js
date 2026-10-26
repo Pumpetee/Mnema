@@ -363,7 +363,11 @@ const SEG_LOOK = {
     ollama: ["🦙", "#0ea5e9", "#6366f1"],
   },
   gender: { m: ["👨", "#0ea5e9", "#6366f1"], f: ["👩", "#ec4899", "#f97316"], "": ["🙂", ...SEG_GREY] },
-  onclose: { ask: ["❓", "#6366f1", "#a855f7"], tray: ["📥", "#0ea5e9", "#22d3ee"], quit: ["🚪", "#ef4444", "#f97316"] },
+  onclose: {
+    ask: ["❓", "#6366f1", "#a855f7"],
+    tray: ["📥", "#0ea5e9", "#22d3ee"],
+    quit: ["🚪", "#ef4444", "#f97316"],
+  },
   pmode: { off: ["💤", ...SEG_GREY], second: ["🔁", "#6366f1", "#a855f7"], every: ["📝", "#f59e0b", "#f97316"] },
   mode: {
     system: ["🖥️", "#0ea5e9", "#6366f1"],

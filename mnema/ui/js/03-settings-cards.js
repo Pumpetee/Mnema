@@ -201,9 +201,40 @@ const SCRIBE_HINT = {
 // Each step says what happens and holds its own settings; the presets set the whole way at once.
 let SCR_X = { models: [], summary: "", keep: false, step: "text" };
 const SCR_PRESETS = [
-  ["private", "🔒", "#10b981", "#14b8a6", "Приватно", [["Где", "Бесплатно на компьютере"], ["Кто подводит", "модель на компьютере"], ["Хранить аудио", "нет"]]],
-  ["balance", "⚖️", "#6366f1", "#a855f7", "Баланс", [["Где", "Сам решает"], ["Точность", "Авто"]]],
-  ["fast", "⚡", "#f59e0b", "#f97316", "Быстро", [["Где", "Облачный Whisper"], ["", "≈ $0.36 за час записи"]]],
+  [
+    "private",
+    "🔒",
+    "#10b981",
+    "#14b8a6",
+    "Приватно",
+    [
+      ["Где", "Бесплатно на компьютере"],
+      ["Кто подводит", "модель на компьютере"],
+      ["Хранить аудио", "нет"],
+    ],
+  ],
+  [
+    "balance",
+    "⚖️",
+    "#6366f1",
+    "#a855f7",
+    "Баланс",
+    [
+      ["Где", "Сам решает"],
+      ["Точность", "Авто"],
+    ],
+  ],
+  [
+    "fast",
+    "⚡",
+    "#f59e0b",
+    "#f97316",
+    "Быстро",
+    [
+      ["Где", "Облачный Whisper"],
+      ["", "≈ $0.36 за час записи"],
+    ],
+  ],
 ];
 // the same names as on the cards below the steps, so the step and its settings read alike
 const SCR_WHERE = {
@@ -221,10 +252,14 @@ function scribeFlow(c) {
   const mod = SCR_X.models.find((m) => m.v === SCR_X.summary);
   const text =
     `${tr("Где")}: ${tr(SCR_WHERE[c.mode] || "")}` +
-    (c.mode !== "cloud" ? `
-${tr("Точность")}: ${tr(q)}` : "") +
-    (hour && c.mode !== "cloud" ? `
-${tr("час записи ≈")} ${hour} ${tr("мин")}` : "");
+    (c.mode !== "cloud"
+      ? `
+${tr("Точность")}: ${tr(q)}`
+      : "") +
+    (hour && c.mode !== "cloud"
+      ? `
+${tr("час записи ≈")} ${hour} ${tr("мин")}`
+      : "");
   const steps = [
     ["rec", "🎙️", "#ec4899", "#f97316", "Запись", `${tr("Хранить аудио")}: ${SCR_X.keep ? tr("да") : tr("нет")}`],
     ["text", "📝", "#0ea5e9", "#6366f1", "Расшифровка", text],
@@ -311,7 +346,9 @@ function bindScribeCard() {
           SCR_X.keep = false;
           await agent({ scribe_keep_audio: false });
         }
-        await set(k === "private" ? { mode: "local" } : k === "fast" ? { mode: "cloud" } : { mode: "auto", model: "auto" });
+        await set(
+          k === "private" ? { mode: "local" } : k === "fast" ? { mode: "cloud" } : { mode: "auto", model: "auto" },
+        );
         toast(tr("Сохранено"));
       }),
   );

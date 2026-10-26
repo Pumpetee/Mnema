@@ -53,7 +53,12 @@ function scribePlans(sc, mode, compact, bare) {
       ],
     ],
   ];
-  const LOOK = { local: ["#10b981", "#14b8a6"], auto: ["#6366f1", "#a855f7"], partial: ["#f59e0b", "#f97316"], cloud: ["#0ea5e9", "#6366f1"] };
+  const LOOK = {
+    local: ["#10b981", "#14b8a6"],
+    auto: ["#6366f1", "#a855f7"],
+    partial: ["#f59e0b", "#f97316"],
+    cloud: ["#0ea5e9", "#6366f1"],
+  };
   const ul = (rows) =>
     `<ul>${rows.map(([i, x]) => `<li>${ic({ "💰": "coin", "⏱": "clock", "🔒": "lock", "☁️": "cloud" }[i])}<span>${x}</span></li>`).join("")}</ul>`;
   return `<div class="splans ${compact ? "cmp" : ""}">${P.map(
@@ -65,7 +70,12 @@ function scribePlans(sc, mode, compact, bare) {
   ).join("")}</div>${compact ? `<div class="spdet">${ul((P.find((x) => x[0] === mode) || P[0])[5])}</div>` : ""}
     ${(mode === "cloud" || mode === "partial") && !sc.cloud_ready ? `<div class="snokey">${ic("x")}${tr("Для облака нужен ключ OpenAI или свой адрес — без него расшифрую на компьютере бесплатно.")}</div>` : ""}`;
 }
-const SQ_MED = { auto: ["🤖", "#6366f1", "#a855f7"], small: ["⚡", "#f59e0b", "#eab308"], medium: ["🎯", "#10b981", "#14b8a6"], "large-v3": ["🏆", "#ec4899", "#a855f7"] };
+const SQ_MED = {
+  auto: ["🤖", "#6366f1", "#a855f7"],
+  small: ["⚡", "#f59e0b", "#eab308"],
+  medium: ["🎯", "#10b981", "#14b8a6"],
+  "large-v3": ["🏆", "#ec4899", "#a855f7"],
+};
 const SQ = [
   ["auto", "Авто", "сама выберет: «Точнее», если уже скачана", 0, 0, ""],
   ["small", "Быстрее", "для чистого звука и одного голоса", 2, 4, "464 МБ"],
