@@ -42,10 +42,19 @@ def _provider_message(body: str) -> str:
     return str(err or (d.get("message") if isinstance(d, dict) else "") or "")
 
 
+def bad_key(code: int, msg: str) -> bool:
+    """Gemini answers a wrong key with 400 «API key not valid», not 401."""
+    return (
+        code == 400
+        and bool(re.search(r"api.?key|api_key_invalid", msg))
+        and bool(re.search(r"invalid|not valid|valid api key|expired", msg))
+    )
+
+
 def http(code: int, body: str, who: str, model: str = "") -> str:
     msg = _provider_message(body).lower()
     quota = any(w in msg for w in ("quota", "billing", "credit", "insufficient", "balance", "payment"))
-    if code in (401, 403) and not quota:
+    if code in (401, 403) and not quota or bad_key(code, msg):
         return f"{who} не принял ключ: проверь, что он скопирован целиком и не отозван, или создай новый — {KEYS}."
     if code == 402 or quota:
         return (
@@ -115,12 +124,12 @@ def no_network(e: BaseException) -> bool:
 
 def account_problem(e: BaseException) -> bool:
     """The key, the money or the program itself: asking again in the next round will not help."""
-    from .chat.providers import NotSent
+    from .chat.providers import AccountProblem, NotSent
 
-    if isinstance(e, NotSent):
+    if isinstance(e, (NotSent, AccountProblem)):
         return True
     if isinstance(e, urllib.error.HTTPError):
-        if e.code in (401, 402, 403):
+        if e.code in (401, 402, 403) or bad_key(e.code, _provider_message(_body(e)).lower()):
             return True
         if e.code == 429:
             msg = _provider_message(_body(e)).lower()

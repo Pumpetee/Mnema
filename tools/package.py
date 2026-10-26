@@ -423,6 +423,11 @@ def build_linux(skip_tests: bool) -> Path:
         print(r.stdout[-3000:], r.stderr[-3000:])
         raise SystemExit("AppImage не собрался")
     shutil.rmtree(appdir, ignore_errors=True)
+    zs = img.name + ".zsync"  # appimagetool writes it into the folder it was started from, not next to the AppImage
+    for where in (Path.cwd(), ROOT, appdir.parent):
+        if (where / zs).exists() and where / zs != img.with_name(zs):
+            shutil.move(str(where / zs), str(img.with_name(zs)))
+            break
     if not img.with_name(img.name + ".zsync").exists():
         say("AppImage без .zsync: обновление через AppImageUpdate не заработает")
     sha_file(img)

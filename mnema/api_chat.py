@@ -292,7 +292,7 @@ def _brain_status(b: dict, kind: str, vault: Vault | None = None) -> dict:
     if kind == "claude_code":
         from .learn.brains import claude_signed_in
 
-        ok = claude_signed_in()
+        ok = claude_signed_in() and any(p["id"] == "claude_code" and p["ready"] for p in PR.status(vault))
         return {
             "kind": kind,
             "ok": ok,
@@ -528,8 +528,17 @@ def post(vault: Vault, path: str, b: dict):
         CH.delete_chat(vault, str(b.get("id", "")))
         return 200, {"ok": True}
     if path == "/api/providers":
-        PR.save(vault, str(b.get("id", "")), endpoint=b.get("endpoint"), key=b.get("key"))
+        PR.save(
+            vault,
+            str(b.get("id", "")),
+            endpoint=b.get("endpoint"),
+            key=b.get("key"),
+            disabled=bool(b["disabled"]) if "disabled" in b else None,
+        )
         return 200, {"providers": PR.status(vault)}
+    if path == "/api/providers/check":  # «Проверить снова»: a tiny real request to this AI
+        r = PR.check(vault, str(b.get("id", "")))
+        return 200, {**r, "providers": PR.status(vault)}
     if path == "/api/providers/models":
         try:
             ids = PR.fetch_models(vault, str(b.get("id", "")))
@@ -537,10 +546,10 @@ def post(vault: Vault, path: str, b: dict):
             from . import errors as E
 
             pid = str(b.get("id", ""))
-            return 200, {
-                "ok": False,
-                "error": E.human(e, PR.PROVIDERS.get(pid, {}).get("name", pid), vpn=E.vpn_name(vault)),
-            }
+            msg = E.human(e, E.provider_name(pid), vpn=E.vpn_name(vault))
+            if E.account_problem(e):  # a refused key is not «подключено»
+                PR.note_problem(vault, pid, msg)
+            return 200, {"ok": False, "error": msg, "providers": PR.status(vault)}
         return 200, {"ok": True, "models": ids, "providers": PR.status(vault)}
     if path == "/api/telegram":  # the owner's chats through the Telegram API, read only: login, code, password, forget
         from .learn import tg_api
@@ -624,6 +633,9 @@ def post(vault: Vault, path: str, b: dict):
                 "memory_asked",
             )
         }
+        for k in ("default_model", "last_model", "scribe_model", "scribe_summary_model"):
+            if "[object" in str(patch.get(k) or ""):  # a broken pick from the page is never remembered
+                patch.pop(k)
         prof = P.save(vault, patch) if patch else P.load(vault)
         if "extra_folders" in patch:  # a folder just added is read in the background
             from . import extra

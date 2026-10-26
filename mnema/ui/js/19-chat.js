@@ -1798,7 +1798,14 @@ async function sendMsg() {
   const pr = (CHAT.providers || []).find((x) => x.id === String(CHAT.model || "").split(":")[0]);
   if (!CHAT.cons && (!CHAT.model || (CHAT.providers && (!pr || !pr.ready)))) {
     // no model yet: say what to do and open the list where one is connected — the text stays in the field
-    toast(tr("Сначала выбери, с каким ИИ говорить: скачай бесплатную модель на компьютер или укажи ключ"), 7000);
+    toast(
+      pr && pr.problem && !pr.disabled
+        ? pr.problem
+        : pr && pr.disabled
+          ? tr("Этот ИИ выключен. Выбери другой слева вверху или включи его — Настройки → ИИ и модели.")
+          : tr("Сначала выбери, с каким ИИ говорить: скачай бесплатную модель на компьютер или укажи ключ"),
+      7000,
+    );
     if ($("#model") && !$(".mmenu")) modelMenu($("#model"));
     return;
   }
@@ -1978,6 +1985,7 @@ function poll() {
       clearInterval(CHAT.polling);
       CHAT.polling = null;
       T.done = true;
+      if (st.error) refreshProviders().catch(() => {}); // an AI out of money or signed out leaves the list at once
     }
     if (!T.raf) T.raf = requestAnimationFrame(frame);
   }, 200);

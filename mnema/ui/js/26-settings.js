@@ -1070,7 +1070,7 @@ const AI_LOOK = {
   local: ["💻", "#0ea5e9", "#22c55e"],
   claude_code: ["C", "#d97757", "#f4a582"],
   anthropic: ["A", "#b45309", "#e0915f"],
-  openai: ["O", "#10a37f", "#4fd1a5"],
+  openai: ["◎", "#10a37f", "#4fd1a5"],
   gemini: ["✦", "#4285f4", "#9b8cf5"],
   openrouter: ["R", "#475569", "#94a3b8"],
   ollama: ["🦙", "#374151", "#9ca3af"],
@@ -1099,21 +1099,33 @@ function modelHero(ms, allModels, cur) {
     <div class="aihl">${aiMedal(pid, p.name, "on")}<div><small>${tr("Сейчас отвечает")}</small><b>${esc(opt.l.split(" · ").pop() || p.name || "")}</b><span>${esc(p.name || "")}${p.note ? ` · ${esc(p.note)}` : ""}</span></div></div>
     <div class="aihr"><label for="defm">${tr("Модель по умолчанию")}${hq("models")}</label><select class="inp" id="defm">${allModels.map((o) => `<option value="${esc(o.v)}" ${o.v === cur ? "selected" : ""}>${esc(o.l)}</option>`).join("")}</select><small>${tr("Подключено")}: ${ready} ${tr("из")} ${ms.providers.length}. ${tr("В разговоре модель меняется сверху слева.")}</small></div></div>`;
 }
-const aiStatus = (on, txt) => `<span class="aist">${on ? "<i></i>" : ""}${txt}</span>`;
+const aiStatus = (on, txt, cls = "") => `<span class="aist ${cls}">${on ? "<i></i>" : ""}${txt}</span>`;
+// one word for the state of an AI: works, switched off by the owner, set up but not working (and why), not set up
+const provState = (p) =>
+  p.disabled ? "выключено" : p.problem ? "не работает" : p.ready ? "подключено" : "не подключено";
 function provTile(p, n = 0) {
-  const act =
-    p.id === "local"
+  const on = p.connected && !p.disabled;
+  const act = p.disabled
+    ? ""
+    : p.id === "local"
       ? `<button class="btn g sm" data-lm>${tr(p.ready ? "Другая модель" : "Выбрать и скачать")}</button>`
       : p.id === "claude_code"
-        ? p.ready
-          ? `<span class="aiok">${tr("работает без ключа")}</span>`
-          : `<span class="hint">${tr("установи Claude Code")}</span>`
-        : `<button class="btn g sm" data-more>${tr(p.needs_key ? (p.ready ? "Сменить ключ" : "Указать ключ") : "Указать адрес")}</button>`;
+        ? p.problem
+          ? ""
+          : p.ready
+            ? `<span class="aiok">${tr("работает без ключа")}</span>`
+            : `<span class="hint">${tr("установи Claude Code")}</span>`
+        : `<button class="btn g sm" data-more>${tr(p.needs_key ? (p.connected ? "Сменить ключ" : "Указать ключ") : "Указать адрес")}</button>`;
+  const check = p.problem && !p.disabled ? `<button class="btn sm" data-chk>${tr("Проверить снова")}</button>` : "";
+  const off = p.connected
+    ? `<button class="btn g sm aioff" data-off="${p.disabled ? 0 : 1}" title="${tr(p.disabled ? "Вернуть этот ИИ в списки моделей" : "Убрать этот ИИ из списков моделей — ключ и настройки останутся")}">${tr(p.disabled ? "Включить" : "Выключить")}</button>`
+    : "";
   const local = p.id === "local" && p.ready ? p.models.map((m) => m.name).join(", ") : "";
   const [, c1, c2] = aiLook(p.id, p.name);
-  return `<div class="aitile ${p.ready ? "on" : ""}" data-p="${p.id}" ${p.id === "local" ? 'id="c-local"' : ""} style="--c1:${c1};--c2:${c2};--d:${n * 0.05}s">${aiStatus(p.ready, tr(p.ready ? "подключено" : "не подключено"))}
-    ${aiMedal(p.id, p.name)}<b>${esc(p.name)}</b><small>${esc(local || p.note)}</small>
-    <div class="aift">${act}</div>
+  const cls = p.disabled ? "off" : p.problem ? "bad" : "";
+  return `<div class="aitile ${p.ready ? "on" : ""} ${cls}" data-p="${p.id}" ${p.id === "local" ? 'id="c-local"' : ""} style="--c1:${c1};--c2:${c2};--d:${n * 0.05}s">${aiStatus(p.ready, tr(provState(p)), cls)}
+    ${aiMedal(p.id, p.name)}<b>${esc(p.name)}</b><small class="${p.problem && on ? "aiprob" : ""}" ${p.problem && on ? `title="${esc(p.problem)}"` : ""}>${esc(p.problem && on ? p.problem.split(/(?<=[.!])\s/)[0] : local || p.note)}</small>
+    <div class="aift">${check}${act}${off}</div>
     ${p.id === "local" || p.id === "claude_code" ? "" : `<div class="more" hidden>${p.needs_key ? `<input class="inp" type="password" placeholder="${tr("ключ")}" value="${esc(p.key)}" data-k>` : `<input class="inp" placeholder="http://127.0.0.1:11434" value="${esc(p.endpoint)}" data-e>`}<button class="btn sm" data-pk>${tr("Сохранить и найти модели")}</button><button class="btn g sm" data-less>${tr("Отмена")}</button></div>`}</div>`;
 }
 function outTile(k, name, note, on, n = 0) {
@@ -1143,6 +1155,28 @@ function bindTiles(fetch = true) {
       }),
   );
   $$(".aitile [data-lm]").forEach((b) => (b.onclick = () => localModal()));
+  $$(".aitile [data-off]").forEach(
+    (b) =>
+      (b.onclick = async () => {
+        const id = b.closest(".aitile").dataset.p;
+        b.disabled = true;
+        await post("/api/providers", { id, disabled: b.dataset.off === "1" });
+        await refreshProviders();
+        viewSettings(SETCUR);
+      }),
+  );
+  $$(".aitile [data-chk]").forEach(
+    (b) =>
+      (b.onclick = async () => {
+        const id = b.closest(".aitile").dataset.p;
+        b.disabled = true;
+        b.textContent = tr("проверяю…");
+        const r = await post("/api/providers/check", { id });
+        toast(r.ok ? tr("Работает") : r.error);
+        await refreshProviders();
+        viewSettings(SETCUR);
+      }),
+  );
   if (fetch)
     api("/api/connect")
       .then((st) => {
@@ -1192,7 +1226,8 @@ function bindProv() {
         b.disabled = false;
         b.textContent = "Сохранить и найти модели";
         toast(r.ok ? `Нашла моделей: ${r.models.length}` : "Не вышло: " + r.error);
-        if (r.ok) viewSettings(SETCUR);
+        await refreshProviders();
+        viewSettings(SETCUR);
       }),
   );
 }
@@ -1648,8 +1683,8 @@ function provOf(v) {
   return tr(
     {
       claude_code: "Claude по подписке",
-      anthropic: "Anthropic · свой ключ",
-      openai: "OpenAI",
+      anthropic: "Claude · ключ API",
+      openai: "ChatGPT · ключ API",
       gemini: "Google Gemini",
       openrouter: "OpenRouter",
       ollama: "Ollama · на компьютере",
@@ -1788,9 +1823,12 @@ const PROV_HOW = {
   claude_code: {
     t: "Нужны подписка Claude и установленный Claude Code от Anthropic. Mnema находит его сама — после установки нажми «Проверить снова».",
   },
-  anthropic: { t: "Ключ берётся в кабинете разработчика Anthropic, раздел API Keys." },
+  anthropic: {
+    t: "Ключ берётся на console.anthropic.com, раздел API Keys. Подписка Claude Pro ключа не даёт: для неё есть «Claude по подписке».",
+    u: "https://console.anthropic.com/settings/keys",
+  },
   openai: {
-    t: "Ключ берётся на platform.openai.com/api-keys — «Create new secret key».",
+    t: "Ключ берётся на platform.openai.com/api-keys — «Create new secret key». Подписка ChatGPT Plus ключа не даёт: API оплачивается отдельно, по расходу.",
     u: "https://platform.openai.com/api-keys",
   },
   gemini: {
@@ -1816,13 +1854,25 @@ async function connectModal(pid) {
   const how = PROV_HOW[pid] || { t: "" };
   const draw = (models, msg) => {
     const list = models || p.models;
-    pop.innerHTML = `<div class="card"><h2>${esc(p.name)} <span class="hint">${p.ready ? "подключено" : "не подключено"}</span></h2>
+    pop.innerHTML = `<div class="card"><h2>${esc(p.name)} <span class="hint">${provState(p)}</span></h2>
+    ${p.problem && !p.disabled ? `<div class="aiprob">${esc(p.problem)}</div>` : ""}
+    ${p.disabled ? `<div class="how">${tr("Этот ИИ выключен: его нет в списках моделей. Ключ и настройки сохранены.")} <button class="btn sm" id="pon">${tr("Включить")}</button></div>` : ""}
     <div class="how">${esc(how.t)}${how.u ? ` <a href="#" id="openu" style="color:var(--acc)">Открыть сайт</a>` : ""}</div>
     ${pid === "claude_code" ? "" : p.needs_key ? `<div class="fld"><span>Ключ API хранится в защищённом хранилище системы, не в папке памяти</span><input id="pkey" type="password" placeholder="${p.key ? "сохранён " + esc(p.key) : "вставь ключ"}"></div>` : `<div class="fld"><span>Адрес</span><input id="pend" value="${esc(p.endpoint)}" placeholder="http://127.0.0.1:11434"></div>`}
     <div class="row" style="margin-top:10px"><button class="btn" id="pgo">${pid === "claude_code" ? "Проверить снова" : "Проверить и найти модели"}</button><span class="hint" id="pmsg">${esc(msg || "")}</span></div>
-    ${list.length ? `<div class="fld" style="margin-top:12px"><span>Выбери модель (${list.length})</span><input id="pq" placeholder="поиск"></div><div class="mlist" id="pml">${list.map((x) => `<button data-pm="${esc(x.id || x)}">${esc(x.name || x)}</button>`).join("")}</div>` : ""}
+    ${list.length ? `<div class="fld" style="margin-top:12px"><span>Выбери модель (${list.length})</span><input id="pq" placeholder="поиск"></div><div class="mlist" id="pml">${list.map((x) => `<button data-pm="${esc(typeof x === "string" ? x : x.id)}">${esc(typeof x === "string" ? x : x.name)}</button>`).join("")}</div>` : ""}
     <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn g sm" id="pclose">Закрыть</button></div></div>`;
     $("#pclose", pop).onclick = () => pop.remove();
+    if ($("#pon", pop))
+      $("#pon", pop).onclick = async () => {
+        await post("/api/providers", { id: pid, disabled: false });
+        await refreshProviders();
+        Object.assign(
+          p,
+          CHAT.providers.find((x) => x.id === pid),
+        );
+        draw(null, "Включено");
+      };
     if ($("#openu", pop))
       $("#openu", pop).onclick = (e) => {
         e.preventDefault();
@@ -1853,10 +1903,11 @@ async function connectModal(pid) {
             endpoint: e ? e.value : undefined,
           });
         if (pid === "claude_code") {
+          const r = await post("/api/providers/check", { id: pid });
           await refreshProviders();
           const q = CHAT.providers.find((x) => x.id === pid);
           Object.assign(p, q);
-          draw(null, q.ready ? "Claude Code найден — выбери модель" : "Claude Code пока не найден");
+          draw(null, r.ok ? "Claude отвечает — выбери модель" : "Не вышло: " + r.error);
         } else {
           const r = await post("/api/providers/models", { id: pid });
           await refreshProviders();

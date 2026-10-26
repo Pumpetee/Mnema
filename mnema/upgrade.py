@@ -75,7 +75,8 @@ def old_layout(p: Path) -> bool:
 def free_memory_path() -> Path:
     """Where new memory goes by default: ~/Mnema, unless the first build's memory or a program folder (a portable
     Mnema unpacked into the home folder) lies there — an old program folder is deleted on the next install."""
-    base = Path.home() / "Mnema"
+    own = os.environ.get("MNEMA_HOME")  # a separate Mnema (a test run, a second profile) never offers the main memory
+    base = Path(own).parent / "Mnema" if own else Path.home() / "Mnema"
     if old_layout(base) or is_app_dir(base):
         base = base.with_name("Mnema Memory")
     return base

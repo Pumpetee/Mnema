@@ -15570,6 +15570,35 @@ button.lmx:focus-visible,
   }
 }
 
+/* switched off by the owner — faded; set up but not working — amber, with the reason under the name */
+.aitile.off > :not(.aift) {
+  opacity: 0.55;
+}
+.aitile .aist.bad {
+  color: var(--warn, #b45309);
+  font-weight: 650;
+}
+.aitile.bad {
+  border-color: color-mix(in srgb, var(--warn, #d97706) 45%, var(--line));
+}
+.aiprob {
+  color: var(--warn, #b45309) !important;
+  font-size: calc(12px * var(--fs));
+  line-height: 1.4;
+}
+div.aiprob {
+  margin: 4px 0 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--warn, #d97706) 10%, var(--paper));
+}
+.aitile .aift {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.aitile .aioff {
+  color: var(--ink3);
+}
 /* the key field opens in place of the medal: the tile keeps its height, nothing around moves */
 .aitile.editing > :not(.more):not(.aist):not(b) {
   display: none;

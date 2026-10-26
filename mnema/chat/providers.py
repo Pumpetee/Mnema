@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import tempfile
 import threading
@@ -38,15 +39,15 @@ PROVIDERS = {
         "key": False,
     },
     "anthropic": {
-        "name": "Anthropic",
-        "note": "Свой ключ API.",
+        "name": "Claude · ключ API",
+        "note": "Ключ API от Anthropic.",
         "client": "claude",
         "key": True,
         "base": "https://api.anthropic.com",
     },
     "openai": {
-        "name": "OpenAI",
-        "note": "Свой ключ API.",
+        "name": "ChatGPT",
+        "note": "Ключ API от OpenAI.",
         "client": "chatgpt",
         "key": True,
         "base": "https://api.openai.com/v1",
@@ -93,11 +94,20 @@ def load(vault: Vault) -> dict:
 
 
 def save(
-    vault: Vault, pid: str, models: list | None = None, endpoint: str | None = None, key: str | None = None
+    vault: Vault,
+    pid: str,
+    models: list | None = None,
+    endpoint: str | None = None,
+    key: str | None = None,
+    disabled: bool | None = None,
 ) -> dict:
+    """disabled: the owner switched this AI off — it leaves every list of models, its key and models stay."""
     if pid not in PROVIDERS:
         raise ValueError("нет такого провайдера")
     data = load(vault)
+    if disabled is not None:
+        data[pid]["disabled"] = bool(disabled)
+        data[pid].pop("problem", None)  # switched back on — tried afresh
     if models is not None:
         data[pid]["models"] = [m for m in models if isinstance(m, str) and m.strip()][:200]
     if endpoint is not None:
@@ -117,7 +127,38 @@ def base_of(vault: Vault, pid: str) -> str:
     return (load(vault)[pid].get("endpoint") or PROVIDERS[pid].get("base", "")).rstrip("/")
 
 
+LIMIT_RETRY = 30 * 60  # a reached limit is tried again in half an hour; a refused key or account waits for «Проверить»
+
+
+def problem_of(data: dict, pid: str) -> str:
+    pr = data.get(pid, {}).get("problem") or {}
+    if not pr.get("text"):
+        return ""
+    if pr.get("kind") == "limit" and time.time() - float(pr.get("at") or 0) > LIMIT_RETRY:
+        return ""
+    return str(pr["text"])
+
+
+def note_problem(vault: Vault, pid: str, text: str, kind: str = "account") -> None:
+    """The AI is connected but does not work: no money, the subscription ended, the key was refused, a limit.
+    The tile says so and the AI leaves the lists of models until it is checked again."""
+    if pid not in PROVIDERS or pid in ("local", "ollama"):
+        return
+    data = load(vault)
+    data[pid]["problem"] = {"text": text[:400], "kind": kind, "at": time.time()}
+    vault.service.mkdir(parents=True, exist_ok=True)
+    write_json(_cfg_file(vault), data, indent=2)
+
+
+def clear_problem(vault: Vault, pid: str) -> None:
+    data = load(vault)
+    if pid in data and data[pid].pop("problem", None) is not None:
+        write_json(_cfg_file(vault), data, indent=2)
+
+
 def status(vault: Vault) -> list[dict]:
+    """ready — the AI can answer now: connected, not switched off, no known problem with the account.
+    connected — set up at all (a key, a sign-in, a model), whatever its state."""
     data = load(vault)
     out = []
     for pid, p in PROVIDERS.items():
@@ -134,13 +175,17 @@ def status(vault: Vault) -> list[dict]:
                 if pid == "claude_code"
                 else [{"id": m, "name": m} for m in data[pid]["models"]]
             )
+        off, problem = bool(data[pid].get("disabled")), problem_of(data, pid) if ready else ""
         out.append(
             {
                 "id": pid,
                 "name": p["name"],
                 "note": p["note"],
                 "needs_key": p["key"],
-                "ready": ready,
+                "ready": ready and not off and not problem,
+                "connected": ready,
+                "disabled": off,
+                "problem": problem,
                 "key": ("••••" + key[-4:]) if key else "",
                 "endpoint": data[pid].get("endpoint", ""),
                 "models": models,
@@ -169,13 +214,44 @@ def fetch_models(vault: Vault, pid: str) -> list[str]:
     elif pid == "ollama":
         ids = [m["name"] for m in _get(base + "/api/tags", {}).get("models", [])]
     else:
+        if pid == "openrouter":  # its list of models is public: the key is checked on its own
+            _get(base + "/key", {"Authorization": f"Bearer {key}"})
         d = _get(base + "/models", {"Authorization": f"Bearer {key}"})
         ids = [m.get("id", "").removeprefix("models/") for m in d.get("data", [])]
         if pid == "openai":
             ids = [i for i in ids if i.startswith(("gpt", "o1", "o3", "o4", "chatgpt"))] or ids
     ids = sorted({i for i in ids if i})
     save(vault, pid, models=ids)
+    clear_problem(vault, pid)  # the key works again
     return ids
+
+
+def check(vault: Vault, pid: str) -> dict:
+    """«Проверить снова»: a real, tiny request. Clears a stale problem or records the current one."""
+    from .. import errors as E
+
+    clear_problem(vault, pid)
+    who = E.provider_name(pid)
+    try:
+        if pid == "claude_code":
+            if not claude_signed_in():
+                return {"ok": False, "error": "Claude Code не найден на компьютере или в него не выполнен вход."}
+            complete(
+                vault,
+                pid,
+                "haiku",
+                "",
+                [{"role": "user", "text": "Ответь одним словом: да"}],
+                meta={"purpose": "проверка подключения"},
+            )
+        else:
+            fetch_models(vault, pid)
+    except Exception as e:
+        msg = E.human(e, who, vpn=E.vpn_name(vault))
+        if E.account_problem(e) and not isinstance(e, NotSent):
+            note_problem(vault, pid, msg, getattr(e, "kind", "account"))
+        return {"ok": False, "error": msg}
+    return {"ok": True}
 
 
 # ---------------------------------------------------------------- streaming
@@ -183,6 +259,61 @@ def fetch_models(vault: Vault, pid: str) -> list[str]:
 
 class NotSent(RuntimeError):
     """Nothing left the computer: no program, no key, no model chosen."""
+
+
+class AccountProblem(RuntimeError):
+    """The AI answered, but the account cannot be used: a limit, no money, the subscription ended, signed out.
+    kind: limit | money | login."""
+
+    def __init__(self, text: str, kind: str = "money"):
+        super().__init__(text)
+        self.kind = kind
+
+
+AFTER = "Пока выбери другую модель слева вверху или выключи Claude по подписке — Настройки → ИИ и модели."
+
+
+def claude_problem(text: str) -> AccountProblem | RuntimeError:
+    """What Claude Code says when it cannot answer — in the owner's words. Its own messages are English and terse:
+    «Claude AI usage limit reached|1761400000», «You've hit your limit · resets 5pm», «Credit balance is too low»,
+    «Invalid API key · Please run /login», «OAuth token has expired»."""
+    t = (text or "").strip()
+    low = t.lower()
+    if re.search(
+        r"usage limit|limit reached|hit your (usage )?limit|out of (extra )?usage|weekly limit|rate.?limit", low
+    ):
+        when = ""
+        m = re.search(r"\|(\d{10})\b", t)
+        if m:
+            when = " — снова заработает в " + time.strftime("%H:%M", time.localtime(int(m.group(1))))
+        else:
+            m = re.search(r"resets?\s+(?:at\s+)?([^·|()\n]{1,24})", t, re.I)
+            if m:
+                when = f" — снова заработает: {m.group(1).strip()}"
+        return AccountProblem(f"У подписки Claude кончился лимит{when}. {AFTER}", "limit")
+    if re.search(
+        r"/login|oauth|token (has )?expired|invalid api key|not (logged|signed) in|please log ?in|"
+        r"authenticat|unauthori[sz]ed|\b401\b",
+        low,
+    ):
+        return AccountProblem(
+            "Claude Code вышел из аккаунта или вход устарел: открой Claude Code и войди заново (команда /login). "
+            + AFTER,
+            "login",
+        )
+    if re.search(
+        r"credit balance|billing|subscription|payment|upgrade|no longer|does not have access|"
+        r"doesn't have access|not have access|disabled|\b402\b|\b403\b",
+        low,
+    ):
+        return AccountProblem(
+            "Подписка Claude не активна или на счёте нет денег. Продли её у Anthropic. " + AFTER, "money"
+        )
+    if re.search(r"overloaded|\b529\b|\b5\d\d\b|internal server error", low):
+        return RuntimeError("Claude сейчас перегружен. Повтори через минуту или выбери другую модель слева вверху.")
+    return RuntimeError(
+        f"Claude по подписке не ответил: {t[:200] or 'без объяснений'}. Повтори или выбери другую модель."
+    )
 
 
 def _never_connected(e: BaseException) -> bool:
@@ -272,9 +403,11 @@ def stream(
     if usage is not None and red and red.values:
         usage["redacted"] = red.summary()
     inner = _stream_raw(vault, pid, model, system, messages, stop, usage)
+    got = False
     try:
         for piece in red.restore_stream(inner) if red and red.values else inner:
             sent()
+            got = True
             yield piece
         sent()
     except NotSent:
@@ -285,7 +418,20 @@ def stream(
     except Exception as e:
         if not _never_connected(e):
             sent()
+        _remember_problem(vault, pid, e)
         raise
+    if got and problem_of(load(vault), pid):
+        clear_problem(vault, pid)
+
+
+def _remember_problem(vault: Vault, pid: str, e: BaseException) -> None:
+    from .. import errors as E
+
+    try:
+        if E.account_problem(e):
+            note_problem(vault, pid, E.human(e, E.provider_name(pid)), getattr(e, "kind", "account"))
+    except Exception:
+        pass
 
 
 def _stream_raw(
@@ -392,10 +538,21 @@ def _stream_raw(
                             + int(u.get("cache_creation_input_tokens") or 0),
                         }
                     )
+                    res = str(d.get("result") or "")
                     if d.get("is_error"):
-                        raise RuntimeError(str(d.get("result") or "ошибка Claude")[:300])
-                    if not got and d.get("result"):
-                        yield d["result"]
+                        raise claude_problem(res)
+                    if not got and res:
+                        e2 = claude_problem(res) if len(res) < 300 else None
+                        if isinstance(e2, AccountProblem):  # the limit notice arrives as an ordinary answer
+                            raise e2
+                        yield res
+                elif (
+                    d.get("type") == "assistant" and not got and (d.get("message") or {}).get("model") == "<synthetic>"
+                ):
+                    parts = (d.get("message") or {}).get("content") or []
+                    note = " ".join(str(x.get("text") or "") for x in parts if isinstance(x, dict))
+                    if isinstance(claude_problem(note), AccountProblem):
+                        raise claude_problem(note)
         finally:
             p.wait(timeout=30)
             try:
@@ -405,7 +562,7 @@ def _stream_raw(
         if watch["killed"]:
             raise RuntimeError("Claude не отвечает. Проверь интернет или прокси: Настройки → Прокси")
         if p.returncode not in (0, None) and not got:
-            raise RuntimeError(p.stderr.read().decode("utf-8", "replace")[:300] or "Claude Code завершился с ошибкой")
+            raise claude_problem(p.stderr.read().decode("utf-8", "replace")[:300] or "Claude Code завершился с ошибкой")
         return
 
     if pid == "local":

@@ -286,9 +286,11 @@ def default_model(vault: Vault) -> str:
         for p in PR.status(vault)
     ):
         return last
-    if prof.get("default_model"):
-        return prof["default_model"]
-    for p in PR.status(vault):
+    st = PR.status(vault)
+    pick = prof.get("default_model") or ""
+    if pick and any(p["id"] == pick.partition(":")[0] and p["ready"] for p in st):
+        return pick  # the default only while its AI works: switched off or out of money — the next one answers
+    for p in st:
         if p["ready"] and p["models"]:
             return f"{p['id']}:{p['models'][0]['id']}"
     return ""  # nothing connected yet: the chat says so instead of pretending Claude is there
