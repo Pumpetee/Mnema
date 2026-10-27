@@ -60,6 +60,7 @@ L = {
     "en": {
         "file": "README.md",
         "langs_intro": "Mnema speaks nine languages. The interface, the help and the AI's answers follow the one you pick, even when you write in another. This README and the Mnema guide exist in each of them.",
+        "qr": "Scan to open the repository",
         "guide_btn": "Mnema guide",
         "guide_msg": "every screen and setting",
         "badges": ["read only", "read only", "encryption", "your files"],
@@ -174,6 +175,7 @@ L = {
     "ru": {
         "file": "README.ru.md",
         "langs_intro": "Mnema говорит на девяти языках. Интерфейс, подсказки и ответы ИИ идут на выбранном, даже если пишешь на другом. Этот README и справочник Mnema есть на каждом из них.",
+        "qr": "Наведи камеру, чтобы открыть репозиторий",
         "guide_btn": "Справочник Mnema",
         "guide_msg": "каждый экран и настройка",
         "badges": ["только чтение", "только чтение", "шифрование", "твои файлы"],
@@ -378,6 +380,11 @@ def build(lang: str) -> str:
     )
     out.append(
         f'<a href="docs/guide/{lang}.md"><img src="{badge(c["guide_btn"], c["guide_msg"], "8b5cf6", "gitbook", "for-the-badge")}" alt="{c["guide_btn"]}"></a>\n'
+    )
+    # the code to the repository: for a screen at a conference (docs/img/brand/qr.svg, tools/qr_build.py)
+    out.append(
+        f'<a href="https://github.com/{REPO}"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/{REPO}"></a>'
+        f"<br><sub>{c['qr']} · github.com/{REPO}</sub>\n"
     )
     out.append("</div>\n")
     out.append(f"## {c['langs']}\n\n{c['langs_intro']}\n\n{lang_table(lang)}")

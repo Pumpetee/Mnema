@@ -12,6 +12,8 @@
 
 <a href="docs/guide/hi.md"><img src="https://img.shields.io/badge/Mnema%20%E0%A4%97%E0%A4%BE%E0%A4%87%E0%A4%A1-%E0%A4%B9%E0%A4%B0%20%E0%A4%B8%E0%A5%8D%E0%A4%95%E0%A5%8D%E0%A4%B0%E0%A5%80%E0%A4%A8%20%E0%A4%94%E0%A4%B0%20%E0%A4%B9%E0%A4%B0%20%E0%A4%B8%E0%A5%87%E0%A4%9F%E0%A4%BF%E0%A4%82%E0%A4%97-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnema गाइड"></a>
 
+<a href="https://github.com/Pumpetee/Mnema"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnema"></a><br><sub>रिपॉज़िटरी खोलने के लिए स्कैन करें · github.com/Pumpetee/Mnema</sub>
+
 </div>
 
 ## भाषाएँ

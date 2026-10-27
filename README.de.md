@@ -12,6 +12,8 @@
 
 <a href="docs/guide/de.md"><img src="https://img.shields.io/badge/Mnema--Anleitung-jeder%20Bildschirm%20und%20jede%20Einstellung-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnema-Anleitung"></a>
 
+<a href="https://github.com/Pumpetee/Mnema"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnema"></a><br><sub>Scannen, um das Repository zu öffnen · github.com/Pumpetee/Mnema</sub>
+
 </div>
 
 ## Sprachen

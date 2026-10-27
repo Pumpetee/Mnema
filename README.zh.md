@@ -12,6 +12,8 @@
 
 <a href="docs/guide/zh.md"><img src="https://img.shields.io/badge/Mnema%20%E6%8C%87%E5%8D%97-%E6%AF%8F%E4%B8%AA%E7%95%8C%E9%9D%A2%E5%92%8C%E8%AE%BE%E7%BD%AE-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnema 指南"></a>
 
+<a href="https://github.com/Pumpetee/Mnema"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnema"></a><br><sub>扫码打开仓库 · github.com/Pumpetee/Mnema</sub>
+
 </div>
 
 ## 语言

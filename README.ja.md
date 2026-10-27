@@ -12,6 +12,8 @@
 
 <a href="docs/guide/ja.md"><img src="https://img.shields.io/badge/Mnema%E3%82%AC%E3%82%A4%E3%83%89-%E3%81%99%E3%81%B9%E3%81%A6%E3%81%AE%E7%94%BB%E9%9D%A2%E3%81%A8%E8%A8%AD%E5%AE%9A-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnemaガイド"></a>
 
+<a href="https://github.com/Pumpetee/Mnema"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnema"></a><br><sub>スキャンしてリポジトリを開く · github.com/Pumpetee/Mnema</sub>
+
 </div>
 
 ## 言語
