@@ -40,7 +40,7 @@ LIMITS = {
     "learn": (5, 1440),
     "month": (0, 100_000_000),
 }
-FREE = {"local", "ollama"}  # runs on this computer: no tokens to pay for
+FREE = {"local", "ollama", "strata"}  # runs on this computer: no tokens to pay for
 
 
 def get(vault: Vault) -> dict:

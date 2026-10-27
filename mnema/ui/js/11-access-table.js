@@ -5,6 +5,8 @@ const ACC_COLS = {
   chatgpt: ["◎", "#10a37f", "облако", "Чат Mnema с ключом OpenAI"],
   gemini: ["✦", "#4f7cf7", "облако", "Чат Mnema с ключом Gemini"],
   openrouter: ["⇄", "#7c5cf0", "облако", "Чат Mnema через OpenRouter — любые модели по одному ключу"],
+  deepseek: ["🐋", "#4d6bfe", "облако", "Чат Mnema с ключом DeepSeek"],
+  yandex: ["Я", "#fc3f1d", "облако", "Чат Mnema с YandexGPT через Yandex Cloud"],
   cursor: ["▲", "#334155", "облако", "Cursor через MCP"],
 };
 const ACC_ROWS = [

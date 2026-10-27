@@ -300,7 +300,7 @@ DEFS = [
     ),
     ("novel", "rare", "rare", "📚", "Роман", "Сообщение длиннее 5000 знаков", 1, _count("long_msg"), True),
     ("polyglot", "rare", "rare", "🗣️", "Полиглот", "Попробуй 3 языка интерфейса", 3, _size("langs"), True),
-    ("babel", "rare", "legendary", "🗼", "Вавилон", "Побывай во всех 10 языках", 10, _size("langs"), True),
+    ("babel", "rare", "legendary", "🗼", "Вавилон", "Побывай во всех 9 языках", 9, _size("langs"), True),
     ("four", "rare", "rare", "🎩", "Совет четырёх", "Консорциум из четырёх ИИ", 4, _count("cons_max_members"), True),
     (
         "endless",

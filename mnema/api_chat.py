@@ -58,6 +58,7 @@ def get(vault: Vault, path: str, q: dict):
 
         return 200, {"prompts": PRM.all_prompts(vault), **PRM.settings(vault)}
     if path == "/api/models":
+        PR.find_strata(vault)  # once per start: a Strata already running on this computer shows up by itself
         return 200, {"providers": PR.status(vault), "default_model": CH.default_model(vault)}
     if path == "/api/agent":
         prof = P.load(vault)
@@ -534,6 +535,7 @@ def post(vault: Vault, path: str, b: dict):
             endpoint=b.get("endpoint"),
             key=b.get("key"),
             disabled=bool(b["disabled"]) if "disabled" in b else None,
+            folder=b.get("folder"),
         )
         return 200, {"providers": PR.status(vault)}
     if path == "/api/providers/claude_login":  # «Войти»: Claude Code in a terminal, it asks for the sign-in itself

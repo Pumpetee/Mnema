@@ -545,7 +545,10 @@ function family(model) {
       openai: "ChatGPT",
       gemini: "Gemini",
       openrouter: "OpenRouter",
+      deepseek: "DeepSeek",
+      yandex: "YandexGPT",
       ollama: "Ollama",
+      strata: "Strata",
     }[pid] || ""
   );
 }
@@ -1271,12 +1274,21 @@ function fileButtons(html) {
     })
     .replace(/(<button class="btn sm fopen"[^>]*>[\s\S]*?<\/button>)<\/code>/g, "</code>$1"); // after the code, not in it
 }
+// the quoted answer above a message: one line of plain text, no Markdown marks, no empty lines
+function quoteLine(s) {
+  return String(s || "")
+    .replace(/\s*\n\s*/g, " ")
+    .replace(/[*_#>`|]+/g, "")
+    .replace(/:?-{3,}:?/g, "") // table rules
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
 function msgHtml(m, last, i, lastAi) {
   if (m.hidden) return "";
   if (m.kind === "action")
     return `<div class="actline ${m.refused || m.failed ? "bad" : ""}">${ic(m.refused || m.failed ? "x" : "check")}<span data-noi18n>${actText(m)}</span>${m.path && !m.failed && OPENABLE.test(m.path) ? `<button class="btn sm" data-fopen="${esc(m.path)}">${ic("file")}${tr("Открыть")}</button>` : ""}${m.path ? `<button class="btn g sm" data-reveal="${esc(m.path)}">${tr("Показать в папке")}</button>` : ""}</div>`;
   if (m.role === "user")
-    return `<div class="msg user">${m.quote ? `<div class="uq">${esc(m.quote)}</div>` : ""}${(m.files || []).length ? `<div class="fchips">${m.files.map((f) => `<span class="chipf" title="${f.kind === "text" ? "прочитан на этом компьютере" : ""}">${ic("file")}${esc(f.name)}${f.info && f.info.pages ? ` · ${f.info.pages} стр.` : f.info && f.info.sheets ? ` · листов ${f.info.sheets}` : f.info && f.info.slides ? ` · слайдов ${f.info.slides}` : ""}</span>`).join("")}</div>` : ""}<div class="b">${esc(m.text)}</div></div>`;
+    return `<div class="msg user">${m.quote ? `<div class="uq">${ic("reply")}<span>${esc(quoteLine(m.quote))}</span></div>` : ""}${(m.files || []).length ? `<div class="fchips">${m.files.map((f) => `<span class="chipf" title="${f.kind === "text" ? "прочитан на этом компьютере" : ""}">${ic("file")}${esc(f.name)}${f.info && f.info.pages ? ` · ${f.info.pages} стр.` : f.info && f.info.sheets ? ` · листов ${f.info.sheets}` : f.info && f.info.slides ? ` · слайдов ${f.info.slides}` : ""}</span>`).join("")}</div>` : ""}<div class="b">${esc(m.text)}</div></div>`;
   const srcs = (m.sources || []).length
     ? `<div class="srcs">${m.sources.map((s, k) => `<a href="${esc(s.url)}" target="_blank" title="${esc(s.url)}"><b>${k + 1}</b><span>${esc(s.title || s.url)}</span></a>`).join("")}</div>`
     : "";

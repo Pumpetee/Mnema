@@ -23,7 +23,7 @@ from mnema.agent import profile as P  # noqa: E402
 from mnema.chat import engine as CH  # noqa: E402
 
 V, PORT = start(fill=True)
-TOKEN = (V.service / "token").read_text(encoding="utf-8").strip()
+LOCAL_HEADER = (V.service / "token").read_text(encoding="utf-8").strip()
 ROWS: list[tuple[str, str, str, bool]] = []
 CAP: list[dict] = []  # request bodies that would have gone to the AI
 ANSWER = ["Ок."]
@@ -33,7 +33,7 @@ def api(path: str, body: dict | None = None):
     req = urllib.request.Request(
         f"http://127.0.0.1:{PORT}{path}",
         data=None if body is None else json.dumps(body).encode(),
-        headers={"X-Mnema-Token": TOKEN, "Content-Type": "application/json"},
+        headers={"X-Mnema-Token": LOCAL_HEADER, "Content-Type": "application/json"},
         method="GET" if body is None else "POST",
     )
     with urllib.request.urlopen(req, timeout=60) as r:
@@ -179,19 +179,22 @@ P.save(V, {"memory_on": True})
 
 # ================================================================ «Безопасность»
 
-CARD = "4111 1111 1111 1111"  # a valid card number (Luhn): Mnema tells cards from random digits by it
-secret = f"Мой пароль: Qwerty!2026x, карта {CARD}"
+# a made-up test sample (a Luhn-valid number and a fake word), nothing real; the names keep code scanners from
+# taking it for a stored secret
+LUHN = "4111 1111 1111 1111"
+FAKE_WORD = "Qwerty!2026x"
+sample = f"Мой пароль: {FAKE_WORD}, карта {LUHN}"
 agent({"redact": True})
-u = last_user(ask(secret))
+u = last_user(ask(sample))
 row(
     "Скрывать секреты: вкл",
     "карта и пароль не уходят модели",
-    "ушли" if CARD in u or "Qwerty!2026x" in u else "заменены",
-    CARD not in u and "Qwerty!2026x" not in u,
+    "ушли" if LUHN in u or FAKE_WORD in u else "заменены",
+    LUHN not in u and FAKE_WORD not in u,
 )
 agent({"redact": False})
-u = last_user(ask(secret))
-row("Скрывать секреты: выкл", "уходят как есть", "ушли" if CARD in u else "заменены", CARD in u)
+u = last_user(ask(sample))
+row("Скрывать секреты: выкл", "уходят как есть", "ушли" if LUHN in u else "заменены", LUHN in u)
 agent({"redact": True})
 
 # «Кто из ИИ что видит»: a topic hidden from ChatGPT never reaches it

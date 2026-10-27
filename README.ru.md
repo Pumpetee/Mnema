@@ -4,23 +4,24 @@
 
 # Mnema
 
-<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2600&pause=900&color=A78BFA&center=true&vCenter=true&width=720&height=46&lines=%D0%9E%D0%B4%D0%BD%D0%B0%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F%20%D0%B2%D1%81%D0%B5%D1%85%20%D0%98%D0%98;Claude%20%C2%B7%20ChatGPT%20%C2%B7%20Gemini%20%C2%B7%20%D0%BB%D0%BE%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5%20%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8;%D0%91%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D0%BE%2C%20%D0%BD%D0%B0%20%D1%82%D0%B2%D0%BE%D1%91%D0%BC%20%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%B5%2C%20%D0%B1%D0%B5%D0%B7%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0" alt="Одна память для всех ИИ">
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2600&pause=900&color=A78BFA&center=true&vCenter=true&width=720&height=46&lines=%D0%9E%D0%B4%D0%BD%D0%B0%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F%20%D0%B2%D1%81%D0%B5%D1%85%20%D0%98%D0%98;%D0%91%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D0%BE%2C%20%D0%BD%D0%B0%20%D1%82%D0%B2%D0%BE%D1%91%D0%BC%20%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%B5%2C%20%D0%B1%D0%B5%D0%B7%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0" alt="Одна память для всех ИИ">
 
 <a href="https://github.com/Pumpetee/Mnema/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnema?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnema/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnema/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnema?style=flat-square&color=ec4899" alt="last commit"></a>
 
 <img src="https://img.shields.io/badge/MCP-Claude%20%C2%B7%20Cursor-7c3aed?style=flat-square&logo=modelcontextprotocol&logoColor=white" alt="MCP: Claude · Cursor"> <img src="https://img.shields.io/badge/Obsidian-%D1%82%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE%20%D1%87%D1%82%D0%B5%D0%BD%D0%B8%D0%B5-7c3aed?style=flat-square&logo=obsidian&logoColor=white" alt="Obsidian: только чтение"> <img src="https://img.shields.io/badge/Telegram-%D1%82%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE%20%D1%87%D1%82%D0%B5%D0%BD%D0%B8%D0%B5-229ED9?style=flat-square&logo=telegram&logoColor=white" alt="Telegram: только чтение"> <img src="https://img.shields.io/badge/AES--256-%D1%88%D0%B8%D1%84%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-15803d?style=flat-square" alt="AES-256: шифрование"> <img src="https://img.shields.io/badge/Markdown-%D1%82%D0%B2%D0%BE%D0%B8%20%D1%84%D0%B0%D0%B9%D0%BB%D1%8B-555555?style=flat-square&logo=markdown&logoColor=white" alt="Markdown: твои файлы"> <img src="https://img.shields.io/badge/Python-3.13-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python: 3.13">
 
-<sub><a href="README.md">English</a></sub>
+<a href="docs/guide/ru.md"><img src="https://img.shields.io/badge/%D0%A1%D0%BF%D1%80%D0%B0%D0%B2%D0%BE%D1%87%D0%BD%D0%B8%D0%BA%20Mnema-%D0%BA%D0%B0%D0%B6%D0%B4%D1%8B%D0%B9%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%20%D0%B8%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Справочник Mnema"></a>
 
 </div>
 
 ## Языки
 
-Mnema говорит на десяти языках. Интерфейс, подсказки и ответы ИИ идут на выбранном, даже если пишешь на другом. Арабский читается справа налево. Этот README — на русском и [английском](README.md).
+Mnema говорит на девяти языках. Интерфейс, подсказки и ответы ИИ идут на выбранном, даже если пишешь на другом. Этот README и справочник Mnema есть на каждом из них.
 
-| <img src="https://flagcdn.com/w80/gb.png" width="40" alt="английский"><br><b>English</b><br><sub>английский</sub> | <img src="https://flagcdn.com/w80/ru.png" width="40" alt="русский"><br><b>Русский</b><br><sub>русский</sub> | <img src="https://flagcdn.com/w80/cn.png" width="40" alt="китайский"><br><b>中文</b><br><sub>китайский</sub> | <img src="https://flagcdn.com/w80/es.png" width="40" alt="испанский"><br><b>Español</b><br><sub>испанский</sub> | <img src="https://flagcdn.com/w80/in.png" width="40" alt="хинди"><br><b>हिन्दी</b><br><sub>хинди</sub> |
-|:---:|:---:|:---:|:---:|:---:|
-| <img src="https://flagcdn.com/w80/sa.png" width="40" alt="арабский"><br><b>العربية</b><br><sub>арабский</sub> | <img src="https://flagcdn.com/w80/pt.png" width="40" alt="португальский"><br><b>Português</b><br><sub>португальский</sub> | <img src="https://flagcdn.com/w80/fr.png" width="40" alt="французский"><br><b>Français</b><br><sub>французский</sub> | <img src="https://flagcdn.com/w80/de.png" width="40" alt="немецкий"><br><b>Deutsch</b><br><sub>немецкий</sub> | <img src="https://flagcdn.com/w80/jp.png" width="40" alt="японский"><br><b>日本語</b><br><sub>японский</sub> |
+<table>
+<tr><td align="center" width="10%"><img src="https://flagcdn.com/w80/gb.png" width="36" alt="English"><br><b>English</b><br><sub><a href="README.md">README</a> · <a href="docs/guide/en.md">Guide</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/ru.png" width="36" alt="Русский"><br><b>✓ Русский</b><br><sub><a href="README.ru.md">README</a> · <a href="docs/guide/ru.md">Справочник</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/cn.png" width="36" alt="中文"><br><b>中文</b><br><sub><a href="README.zh.md">README</a> · <a href="docs/guide/zh.md">指南</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/es.png" width="36" alt="Español"><br><b>Español</b><br><sub><a href="README.es.md">README</a> · <a href="docs/guide/es.md">Guía</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/in.png" width="36" alt="हिन्दी"><br><b>हिन्दी</b><br><sub><a href="README.hi.md">README</a> · <a href="docs/guide/hi.md">गाइड</a></sub></td></tr>
+<tr><td align="center" width="10%"><img src="https://flagcdn.com/w80/pt.png" width="36" alt="Português"><br><b>Português</b><br><sub><a href="README.pt.md">README</a> · <a href="docs/guide/pt.md">Guia</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/fr.png" width="36" alt="Français"><br><b>Français</b><br><sub><a href="README.fr.md">README</a> · <a href="docs/guide/fr.md">Guide</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/de.png" width="36" alt="Deutsch"><br><b>Deutsch</b><br><sub><a href="README.de.md">README</a> · <a href="docs/guide/de.md">Handbuch</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/jp.png" width="36" alt="日本語"><br><b>日本語</b><br><sub><a href="README.ja.md">README</a> · <a href="docs/guide/ja.md">ガイド</a></sub></td></tr>
+</table>
 
 <div align="center">
 
@@ -77,6 +78,30 @@ Mnema помнит, кто ты, над чем работаешь, что реш
 - **Итоги:** что решили, какие задачи и за кем — любой моделью на выбор, в том числе на компьютере.
 - **Готовые настройки:** Приватно, Баланс, Быстро задают весь путь сразу.
 
+## 🌱 Учится сама
+
+<p align="center"><img src="docs/img/ru/learning.gif" width="860" alt="Ты говоришь что-то между делом, а в ленте видно, что Mnema прочитала, поняла и записала, и почему"></p>
+
+- **Уверена — записывает:** факт с уверенностью от 80% записывается сразу, сомнительный ждёт повтора.
+- **Личное — отдельно:** деньги, здоровье и личное попадают в помеченные карточки, их можно скрыть от любого ИИ.
+- **Ничего не прячет:** в ленте «Что я поняла и почему» видно каждое решение с причиной.
+
+## ✈️ Читает Telegram, но ничего туда не пишет
+
+<p align="center"><img src="docs/img/ru/telegram.gif" width="860" alt="Telegram подключён только на чтение: ты выбираешь чаты, Mnema по ним учится"></p>
+
+- **Чаты выбираешь ты:** Mnema узнаёт тебя и людей вокруг только по ним.
+- **Только чтение, в самой программе:** клиент Telegram внутри Mnema умеет только читать, любая другая команда отклоняется до отправки.
+- **Всё на твоём компьютере:** вход зашифрован в хранилище системы, своих серверов у Mnema нет.
+
+## 📉 Экономит токены
+
+<p align="center"><img src="docs/img/ru/tokens.gif" width="560" alt="Вопрос по договору в 153 000 знаков: 29 643 входных токена на весь текст, 6 159 с Mnema"></p>
+
+- **Уходит только нужное:** память, документы и страницы читаются на компьютере, модели достаются нужные куски.
+- **Замер:** вопрос по договору в 153 000 знаков — весь текст занял 29 643 входных токена, Mnema отправила 6 159, и правильный ответ дал только вариант с Mnema.
+- **Видно каждый раз:** под каждым ответом написано, сколько токенов сэкономлено.
+
 ## 🔐 Приватно по устройству
 
 <table><tr><td width="50%" valign="top" align="center"><img src="docs/img/ru/lock.gif" alt="Первый запуск: пароль на память, как в KeePass"><br><sub>Первый запуск: пароль на память, как в KeePass</sub></td><td width="50%" valign="top" align="center"><img src="docs/img/ru/privacy.gif" alt="Кто что видит: галочка на часть памяти, замок на тему"><br><sub>Кто что видит: галочка на часть памяти, замок на тему</sub></td></tr></table>
@@ -88,16 +113,13 @@ Mnema помнит, кто ты, над чем работаешь, что реш
 ## 🤖 С чем работает
 
 <div align="center">
-<table><tr><td align="center" valign="top"><code>Облачные ИИ</code><br><sub>по ключу или подписке</sub><table><tr><td align="center" width="96"><img src="docs/img/brand/claude.svg" width="44" alt="Claude"><br><sub><b>Claude</b></sub></td><td align="center" width="96"><img src="docs/img/brand/chatgpt.svg" width="44" alt="ChatGPT"><br><sub><b>ChatGPT</b></sub></td><td align="center" width="96"><img src="docs/img/brand/gemini.svg" width="44" alt="Gemini"><br><sub><b>Gemini</b></sub></td><td align="center" width="96"><img src="docs/img/brand/openrouter.svg" width="44" alt="OpenRouter"><br><sub><b>OpenRouter</b></sub></td></tr></table></td><td align="center" valign="top"><code>На компьютере</code><br><sub>бесплатно, без интернета</sub><table><tr><td align="center" width="96"><img src="docs/img/brand/local.svg" width="44" alt="Встроенная"><br><sub><b>Встроенная</b></sub></td><td align="center" width="96"><img src="https://cdn.simpleicons.org/ollama/ffffff" width="44" alt="Ollama"><br><sub><b>Ollama</b></sub></td></tr></table></td></tr><tr><td align="center" valign="top"><code>В твоих программах</code><br><sub>через MCP</sub><table><tr><td align="center" width="96"><img src="https://cdn.simpleicons.org/claude/D97757" width="44" alt="Claude Code"><br><sub><b>Claude Code</b></sub></td><td align="center" width="96"><img src="docs/img/brand/cursor.svg" width="44" alt="Cursor"><br><sub><b>Cursor</b></sub></td></tr></table></td><td align="center" valign="top"><code>Системы</code><br><sub>одна программа</sub><table><tr><td align="center" width="96"><img src="docs/img/brand/windows.svg" width="44" alt="Windows"><br><sub><b>Windows</b></sub></td><td align="center" width="96"><img src="https://cdn.simpleicons.org/apple/ffffff" width="44" alt="macOS"><br><sub><b>macOS</b></sub></td><td align="center" width="96"><img src="https://cdn.simpleicons.org/linux/FCC624" width="44" alt="Linux"><br><sub><b>Linux</b></sub></td></tr></table></td></tr></table>
+<table><tr><td valign="middle" width="150"><b>Облачные ИИ</b><br><sub>по ключу или подписке</sub></td><td align="center" width="92"><img src="docs/img/brand/claude.svg" width="40" alt="Claude"><br><sub><b>Claude</b></sub></td><td align="center" width="92"><img src="docs/img/brand/chatgpt.svg" width="40" alt="ChatGPT"><br><sub><b>ChatGPT</b></sub></td><td align="center" width="92"><img src="docs/img/brand/gemini.svg" width="40" alt="Gemini"><br><sub><b>Gemini</b></sub></td><td align="center" width="92"><img src="docs/img/brand/deepseek.svg" width="40" alt="DeepSeek"><br><sub><b>DeepSeek</b></sub></td><td align="center" width="92"><img src="docs/img/brand/yandex.svg" width="40" alt="YandexGPT"><br><sub><b>YandexGPT</b></sub></td><td align="center" width="92"><img src="docs/img/brand/openrouter.svg" width="40" alt="OpenRouter"><br><sub><b>OpenRouter</b></sub></td></tr><tr><td valign="middle" width="150"><b>На компьютере</b><br><sub>бесплатно, без интернета</sub></td><td align="center" width="92"><img src="docs/img/brand/local.svg" width="40" alt="Встроенная"><br><sub><b>Встроенная</b></sub></td><td align="center" width="92"><img src="https://cdn.simpleicons.org/ollama/ffffff" width="40" alt="Ollama"><br><sub><b>Ollama</b></sub></td><td align="center" width="92"><img src="docs/img/brand/strata.svg" width="40" alt="Strata"><br><sub><b>Strata</b></sub></td><td></td><td></td><td></td></tr><tr><td valign="middle" width="150"><b>В твоих программах</b><br><sub>через MCP</sub></td><td align="center" width="92"><img src="https://cdn.simpleicons.org/claude/D97757" width="40" alt="Claude Code"><br><sub><b>Claude Code</b></sub></td><td align="center" width="92"><img src="docs/img/brand/cursor.svg" width="40" alt="Cursor"><br><sub><b>Cursor</b></sub></td><td></td><td></td><td></td><td></td></tr><tr><td valign="middle" width="150"><b>Системы</b><br><sub>одна программа</sub></td><td align="center" width="92"><img src="docs/img/brand/windows.svg" width="40" alt="Windows"><br><sub><b>Windows</b></sub></td><td align="center" width="92"><img src="https://cdn.simpleicons.org/apple/ffffff" width="40" alt="macOS"><br><sub><b>macOS</b></sub></td><td align="center" width="92"><img src="https://cdn.simpleicons.org/linux/FCC624" width="40" alt="Linux"><br><sub><b>Linux</b></sub></td><td></td><td></td><td></td></tr></table>
 </div>
 
 ## ⚡ И ещё
 
-- **Учится сама.** Факт, в котором уверена на 80% и больше, записывает сразу, сомнительный ждёт повтора. В ленте «Что я поняла и почему» видно каждое решение.
-- **Читает Telegram и ничего туда не пишет.** Клиент внутри Mnema умеет только читать, любая другая команда отклоняется до отправки.
 - **Работает с файлами.** Читает сканы, пишет заметки, делает PDF, Word и Excel, склеивает и режет PDF. Любую запись можно откатить: Память → История.
-- **Экономит токены.** Вопрос по договору в 153 000 знаков: весь текст — 29 643 входных токена, Mnema отправила 6 159, и правильный ответ дал только вариант с Mnema.
-- **Десять языков.** Интерфейс и ответы ИИ идут на выбранном, арабский читается справа налево.
+- **Девять языков.** Интерфейс и ответы ИИ идут на выбранном, даже если пишешь на другом.
 
 <details>
 <summary><b>Установка</b></summary>

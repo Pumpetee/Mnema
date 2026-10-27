@@ -1,0 +1,446 @@
+<div align="center">
+
+<img src="../img/brand/logo.svg" width="72" alt="Mnema">
+
+# Mnema-Handbuch
+
+Wie Mnema funktioniert, Bildschirm für Bildschirm und Einstellung für Einstellung. Mnema beantwortet Fragen über sich selbst aus genau diesem Text.
+
+<sub><a href="en.md">English</a> · <a href="ru.md">Русский</a> · <a href="zh.md">中文</a> · <a href="es.md">Español</a> · <a href="hi.md">हिन्दी</a> · <a href="pt.md">Português</a> · <a href="fr.md">Français</a> · <b>Deutsch</b> · <a href="ja.md">日本語</a></sub>
+
+<sub><a href="../../README.de.md">README</a></sub>
+
+</div>
+
+## Inhalt
+
+- [Was ist Mnema](#was-ist-mnema)
+- [Gedächtnis ein- oder ausgeschaltet](#gedächtnis-ein--oder-ausgeschaltet)
+- [Memory-Ordner](#memory-ordner)
+- [Zusätzliche Gedächtnisordner](#zusätzliche-gedächtnisordner)
+- [Wie ein Fakt gespeichert wird](#wie-ein-fakt-gespeichert-wird)
+- [Tab „Gedächtnis"](#tab-gedächtnis)
+- [Porträt](#porträt)
+- [Zusammenfassung von 10 Now und das Inhaltsverzeichnis](#zusammenfassung-von-10-now-und-das-inhaltsverzeichnis)
+- [Wie Mnema lernt](#wie-mnema-lernt)
+- [Lernquellen](#lernquellen)
+- [Lernmodi](#lernmodi)
+- [Wie Mnema Texte versteht](#wie-mnema-texte-versteht)
+- [Wie Mnema entscheidet: speichern oder nachfragen](#wie-mnema-entscheidet-speichern-oder-nachfragen)
+- [Lernfeed und Rückfrage im Gespräch](#lernfeed-und-rückfrage-im-gespräch)
+- [Chat und Modelle](#chat-und-modelle)
+- [Sitzungen](#sitzungen)
+- [Wie sie antwortet](#wie-sie-antwortet)
+- [Was das Modell in jeder Nachricht weiß](#was-das-modell-in-jeder-nachricht-weiß)
+- [Dateien und Dokumente, auch PDF](#dateien-und-dokumente-auch-pdf)
+- [Internet](#internet)
+- [Genauer oder sparsamer](#genauer-oder-sparsamer)
+- [Fragen per Schaltfläche, zweiter Durchgang, Zitat](#fragen-per-schaltfläche-zweiter-durchgang-zitat)
+- [Wiederkehrende Aufgaben](#wiederkehrende-aufgaben)
+- [Begriffs-Hinweise](#begriffs-hinweise)
+- [Konsortium](#konsortium)
+- [Dateiaktionen](#dateiaktionen)
+- [Gespräch ohne Lernen](#gespräch-ohne-lernen)
+- [Stimme und Meetings](#stimme-und-meetings)
+- [Integriertes Modell auf dem Computer](#integriertes-modell-auf-dem-computer)
+- [Engine: Token und Last](#engine-token-und-last)
+- [Wer welche KI sieht](#wer-welche-ki-sieht)
+- [Was den Computer verlässt](#was-den-computer-verlässt)
+- [Speicher mit Passwort verschlüsseln](#speicher-mit-passwort-verschlüsseln)
+- [Verlauf und Rückgängig-Machen](#verlauf-und-rückgängig-machen)
+- [Andere KIs verbinden](#andere-kis-verbinden)
+- [Proxy und VPN](#proxy-und-vpn)
+- [Fenster, Infobereich, Installation](#fenster-infobereich-installation)
+- [Zahnrad, Design, Sprache, Erfolge](#zahnrad-design-sprache-erfolge)
+- [Mehrere Gedächtnisse](#mehrere-gedächtnisse)
+- [Telegram](#telegram)
+- [Karte „Gedächtnis" unten links](#karte-gedächtnis-unten-links)
+- [Was Mnema nicht kann](#was-mnema-nicht-kann)
+
+## Was ist Mnema
+
+Mnema ist ein Gedächtnisprogramm für jede KI. Es merkt sich, wer du bist, woran du arbeitest, welche Entscheidungen du getroffen hast und wie man mit dir sprechen soll, und bringt das in das Gespräch mit jedem Modell ein: Claude, ChatGPT, Gemini, dem integrierten Modell auf deinem Computer, Cursor und Agenten. Das Gedächtnis ist ein Ordner mit gewöhnlichen Markdown-Dateien auf deinem Computer. Du kannst ihn in jedem Editor öffnen (auch in Obsidian) – und auch ohne Mnema. Mnema hat weder eine Cloud noch ein Konto. Das Programm besteht aus einem Fenster (Chat, Gedächtnis, Einstellungen) und einem Symbol im Infobereich der Taskleiste (unter macOS in der Menüleiste). Es läuft unter Windows 10 und 11, macOS 11 und neuer (Apple Silicon und Intel) sowie Linux (64-Bit, Ubuntu 22.04 und neuer und ähnliche Distributionen). Die persönliche Version ist kostenlos und Open Source (Lizenz AGPL-3.0), die Version für Unternehmen gibt es separat.
+
+## Gedächtnis ein- oder ausgeschaltet
+
+Das Gedächtnis ist der Hauptschalter von Mnema: Du findest den Schalter im Bereich „Gedächtnis" unten links im Chat (derselbe sitzt unter Einstellungen → Lernen → „Gedächtnis"). Solange das Gedächtnis ausgeschaltet ist, leuchtet der Punkt auf dem Zahnrad oben rechts gelb. Ein neues Gedächtnis, das auf dem ersten Bildschirm angelegt wird, startet ausgeschaltet: Im Tutorial gibt es den Schritt „Gedächtnis aktivieren?" (standardmäßig „Ohne Gedächtnis"), und wenn das Tutorial nicht angezeigt wurde, erscheint dieselbe Frage in einem eigenen Fenster. Ein Gedächtnis, das schon vor der Einführung des Schalters existierte, bleibt eingeschaltet.
+
+Ausgeschaltet ist es ein ganz normaler Chat mit jeder KI: Das Modell weiß nichts über den Besitzer, Mnema merkt sich nichts (es findet kein Lernen statt, „Merk dir das" schreibt nichts auf, die Aktion „Ins Gedächtnis schreiben" wird abgelehnt), und Claude Code, Claude Desktop und Cursor erhalten keinen Zugriff auf das Gedächtnis und können nichts hineinschreiben. Alles andere funktioniert weiter: beliebige Modelle, Konsortium, Dokumente und die Token-Ersparnis dabei, Internet, Meetings, lokale Modelle sowie Dateiaktionen in Arbeitsordnern (der Gedächtnisordner ist für Aktionen gesperrt). Der Tab „Gedächtnis" zeigt den Bildschirm „Gedächtnis ausgeschaltet" mit den Schaltflächen „Gedächtnis aktivieren" und „Gespeichertes ansehen". Die Lerneinstellungen und „Welche KI was sieht" sind abgeblendet, versehen mit dem Hinweis „Gedächtnis ausgeschaltet" und der Schaltfläche „Aktivieren". Die Schaltfläche „Nicht lernen" im Chat ist inaktiv, und die Statuszeile zeigt „Gedächtnis ausgeschaltet · normaler Chat, nichts wird gespeichert".
+
+## Memory-Ordner
+
+Dein Gedächtnis liegt in dem Ordner, den du beim ersten Start ausgewählt hast. Darin findest du:
+
+| Ordner oder Datei | Inhalt |
+|---|---|
+| 00 Inbox/Inbox.md | nicht einsortierte Fakten |
+| 10 Now.md | Übersicht für heute: wer du bist, aktive Projekte, letzte Ereignisse, neue Fakten der letzten 14 Tage, Status älter als 30 Tage zur Überprüfung. Wird automatisch erstellt und nicht von Hand bearbeitet |
+| 20 Projects/<Name>/_Project.md | Projekt-Hub: Status (active, paused, closed), Ziel, Startdatum, Schlüsselwörter, Verlauf. Die Projektdokumente liegen daneben |
+| 30 People/<Name>.md | Personenkarte |
+| 60 Events/JJJJ-MM.md | Entscheidungen und Statuswechsel nach Monaten, die neuesten oben |
+| 70 Memory/Profile.md | wer du bist |
+| 70 Memory/Rules.md | wie man mit dir arbeiten soll, eine Regel pro Zeile mit Datum |
+| 70 Memory/Thoughts.md | deine Gedanken und Ideen |
+| 70 Memory/Cards/<Thema>.md | Themenkarte: ein Fakt pro Zeile, Schlüsselwörter und versteckte Tags im Kopfbereich |
+| 70 Memory/Fact archive/ | Fakten, die durch neuere ersetzt wurden. Das ist die Historie, die Modelle nicht erhalten |
+| 70 Memory/Index.md | Inhaltsverzeichnis: Projekte, Karten und Personen mit Schlüsselwörtern. Wird automatisch erstellt |
+| 80 Meetings/ | Meeting-Aufzeichnungen, Transkripte und Zusammenfassungen |
+| 90 System/Journal/<Tag>.md | Journal: was von wem gespeichert wurde, in verständlicher Sprache |
+| 90 System/Recipes/ | Rezepte für wiederkehrende Aufgaben |
+| 95 Saves/ | Kopie einer Datei vor der ersten Änderung am Tag, die letzten zwei werden aufbewahrt |
+| 99 Archive/ | abgeschlossene Projekte samt Dokumenten |
+| .mnema/ | intern: KI-Zugriffe, Änderungsprotokoll, Snapshots zum Zurücksetzen, Tokens, Lerneinstellungen, Gespräche |
+
+Du kannst die Dateien im Gedächtnis auch von Hand bearbeiten. Mnema liest nur diese Struktur.
+
+## Zusätzliche Gedächtnisordner
+
+Einstellungen → Programm → „Zusätzliche Gedächtnisordner": weitere Ordner, die die KIs zusammen mit dem Hauptgedächtnis sehen. Geeignet ist jeder Ordner: Notizen, ein Obsidian-Vault, Dokumente, ein gemeinsamer Teamordner oder ein weiteres Mnema-Gedächtnis. Die Schaltfläche „Obsidian verbinden" findet Obsidian-Vaults auf deinem Computer von selbst (anhand der Einstellungen von Obsidian selbst) und zeigt sie mit der Anzahl der Notizen an: Die markierten werden zum zusätzlichen Gedächtnis, den Ordner kannst du auch manuell angeben. Jeden anderen Ordner fügst du mit der Schaltfläche „Hinzufügen" (oder „Auswählen…") hinzu, entfernen kannst du ihn mit „Entfernen" daneben. Der Vault wird einmal vollständig im Hintergrund eingelesen, danach nur noch geänderte Notizen, deshalb bremsen auch Tausende von Notizen die Antworten nicht aus. Markdown- und Textdateien werden auf deinem Computer gelesen, an die Frage werden nur passende Stellen angehängt, und zwar im gleichen Umfang wie beim Gedächtnis (Regler „Genauer ↔ Sparsamer"). Themen, die für diese KI ausgeblendet sind (#money, #health, #private und die russischen Formen), werden auch aus diesen Dateien herausgeschnitten. Mnema schreibt nichts in diese Ordner und lernt auch nicht aus ihnen.
+
+## Wie ein Fakt gespeichert wird
+
+Ein Fakt ist eine Zeile mit Datum: "- 21.09.2026 · Wir haben beschlossen, den Pilot im November zu starten". Ein Status wird mit dem Zusatz "(Status TT.MM.JJJJ)" geschrieben. Ein neuer Status zum selben Thema ersetzt den alten an Ort und Stelle, der alte wandert ins Faktenarchiv, und die Änderung erscheint im Ereignis-Feed. Was Mnema selbst gelernt hat, ist mit dem Wort "gelernt" markiert, damit man sieht, was aus dem Lernen stammt.
+
+Das Datum bei einem gelernten Fakt ist der Tag, an dem du es gesagt oder geschrieben hast, nicht der Tag, an dem Mnema es gelesen hat. Wenn Mnema heute einen Chatverlauf von vor einem Monat liest, bekommt der Fakt das Datum dieses Gesprächs, und der Beschluss landet in den Ereignissen dieses Monats. So wird Altes nicht als Neuigkeit ausgegeben.
+
+Status, die älter als 30 Tage sind, listet Mnema nicht gesondert auf. Das Modell kennt das Datum jedes Status: Geht es im Gespräch um einen Status, der älter als einen Monat ist, nennt es das Datum und fragt nach, ob er noch gilt.
+
+## Tab „Gedächtnis"
+
+Gedächtnis → Porträt: Oben siehst du dein Porträt mit Zählern für die Fakten, darunter die „Gedächtniskarte" – die Themen als Blasen rund um dich: Die Größe richtet sich nach der Anzahl der Fakten, ein Schloss markiert Themen, die nicht alle KIs sehen können, und was sich in den letzten drei Tagen geändert hat, pulsiert. Die Beschriftung einer kleinen Blase erscheint, wenn du mit der Maus darüberfährst. Unter der Karte findest du Themenkacheln: „Regeln für die KI", „Projekte", „Menschen um dich herum", die Abschnitte des Porträts, Themenkarten (die größten zuerst) und „Ereignisse und Entscheidungen". Auf jeder Kachel stehen die Anzahl der Fakten und zwei aktuelle Zeilen (bei Projekten und Personen sind es die ersten Namen). Ein Klick auf eine Kachel oder Blase öffnet das Thema in einem Fenster darüber: Alle Fakten stehen jeweils in einer Zeile pro Fakt, die neuesten oben und das Datum rechts. Dazu gibt es eine Suche, ein Klick klappt einen Fakt vollständig auf, bei gelernten Fakten findest du dort auch „Woher?", und der Stift öffnet die Datei. Gleiche Abschnitte des Porträts (zum Beispiel das offene und das verborgene „Wer ich bin") werden als ein Thema angezeigt.
+
+## Porträt
+
+Das Porträt besteht aus 2–3 Sätzen am Anfang von 70 Memory/Profile.md: Wer du bist, was du machst und was gerade für dich am wichtigsten ist. Jede KI bekommt es als Erstes. Mnema erstellt das Porträt selbst, sobald sich mindestens drei Fakten über dich angesammelt haben: aus den offenen Abschnitten des Profils, den aktiven Projekten und den Karten ohne versteckte Tags (Geld, Gesundheit und Privates fließen nicht ins Porträt ein). Geschrieben wird es von dem Modell, das du für das Lernen ausgewählt hast; ohne Modell besteht es aus den Fakten selbst, in kurzen Sätzen. Das Porträt wird nach dem Lernen neu erstellt: sofort, wenn sich das Profil geändert hat, und höchstens einmal in 6 Stunden, wenn sich nur Karten und Projekte geändert haben. Wenn du das Porträt selbst umgeschrieben hast, fasst Mnema es nicht mehr an. Die Erstellung erscheint im Protokoll als „Porträt erstellt“ und lässt sich im Verlauf rückgängig machen.
+
+## Zusammenfassung von 10 Now und das Inhaltsverzeichnis
+
+Mnema baut 10 Now.md und 70 Memory/Index.md nach jedem Eintrag selbst neu auf. In 10 Now stehen: wer du bist, aktive Projekte, die letzten Ereignisse, frische Fakten der letzten 14 Tage (höchstens 12) und veraltete Status. Im Inhaltsverzeichnis findest du jedes Projekt, jede Karte und jede Person samt den Stichwörtern, über die du sie suchen kannst. Diese Dateien von Hand zu bearbeiten bringt nichts: Beim nächsten Aufbau gehen deine Änderungen verloren.
+
+## Wie Mnema lernt
+
+Mnema lernt von selbst, im Laufe deines Alltags. Fragebögen und Formulare musst du nicht ausfüllen. Das Programm erkennt Fakten in den Quellen, die du freigegeben hast, und entscheidet, ob es sie sofort speichert oder dich vorher fragt. Das Lernen läuft im Hintergrund per Timer (die Häufigkeit hängt vom Engine-Modus ab: von 10 Minuten bis 2 Stunden) und sofort bei jeder deiner Nachrichten im Mnema-Chat. Beim ersten Start sieht Mnema sich den Verlauf der letzten 90 Tage an.
+
+Beim ersten Start fragt Mnema: „Darf Mnema andere Programme ansehen?“. „Nein, nur Mnema“ – dann lernt sie nur aus Gesprächen mit ihr und aus deinen Korrekturen darin und arbeitet ausschließlich mit ihrem eigenen Gedächtnisordner: Sie liest weder Claude-Code-Chats noch Notizen, Dokumente, Telegram, den Browser oder die Erweiterung. „Ja, ich wähle aus“ – es öffnet sich eine Liste dessen, was auf dem Computer gefunden wurde (Claude-Code-Chats, Notizordner, Dokumente, Telegram-Export, Browserverlauf, Erweiterung) samt Pfaden. Kein Eintrag ist vorausgewählt, und Mnema liest nur, was du markiert hast. E-Mail und Kalender schaltet sie nie von selbst ein: Dafür braucht es eine Adresse und ein Passwort oder einen geheimen Link.
+
+All das lässt sich unter „Einstellungen → Lernen“ ändern. „Was Mnema ansehen darf“ ist der Hauptschalter „Andere Programme und Browser“: Ist er ausgeschaltet, sind die Kacheln der externen Quellen mit einem Schloss gesperrt und lassen sich nicht aktivieren. Weiter unten, unter „Wo gelernt wird“, wird jede Quelle einzeln aktiviert; bei einigen kannst du einen Pfad und Ausnahmen festlegen.
+
+Den eigenen Gedächtnisordner und die eigenen internen Modellaufrufe liest Mnema nie.
+
+## Lernquellen
+
+| Quelle | Was gelesen wird |
+|---|---|
+| Gespräche in Mnema | deine Nachrichten im Mnema-Chat, sofort, während du schreibst |
+| Gespräche in Claude Code | deine Nachrichten aus dem Claude-Code-Verlauf (Ordner ~/.claude/projects), nur neue Zeilen. Systemanfragen von Skripten mit einer Kennzeichnung wie "[SERVICE-NAME]" am Anfang werden übersprungen |
+| ChatGPT-Export | die Datei conversations.json aus dem ChatGPT-Datenexport |
+| Deine Korrekturen | "nein, so nicht", "das hatte ich doch gesagt", "niemals …" in Gesprächen mit der KI werden zu Regeln für alle KIs |
+| Notizordner | neue Zeilen in Notizen, zum Beispiel in einem Obsidian-Vault. Systemordner (.obsidian, .trash, .git) sind ausgeschlossen |
+| E-Mail | deine gesendeten E-Mails per IMAP, Zitate werden abgeschnitten |
+| Telegram (Chats über die API) | der gesamte Chatverlauf – deine Nachrichten und die deiner Gesprächspartner – nur in den Chats, die du ausgewählt hast. Nur Lesezugriff, Details im Abschnitt "Telegram" |
+| Telegram (Export) | deine eigenen Nachrichten aus dem Telegram-Desktop-Export |
+| Kalender | eine .ics-Datei oder ein geheimer iCal-Link |
+| Dokumente | neue und geänderte Word-Dokumente, Texte und Notizen im ausgewählten Ordner (.docx, .txt, .md) |
+| Browserverlauf | Titel der gelesenen Seiten nach Tagen (Chrome, Edge, Yandex Browser). Standardmäßig wird nur beobachtet |
+
+## Lernmodi
+
+Der Modus wird für jede Quelle einzeln festgelegt:
+
+| Modus | Was passiert |
+|---|---|
+| Nur ansehen | zeigt, was Mnema lernen würde, schreibt aber nichts |
+| Alles nachfragen | schreibt von sich aus nichts: Im Gespräch in Mnema fragt sie nach, bei anderen Quellen zeigt sie nur an |
+| Gemischt (Standard) | Sichere Informationen schreibt Mnema selbst. Persönliches und Dinge, die dem Gedächtnis widersprechen, klärt sie bei Gesprächen in Mnema direkt im Gespräch per Rückfrage, bei anderen Quellen entscheidet sie selbst. Schwache Vermutungen warten auf eine Wiederholung |
+| Alles selbst | schreibt alles; als Absicherung dienen das Protokoll und die Rückgängig-Funktion |
+
+Kommt ein Fakt in mehreren Quellen vor, gilt der vorsichtigste dieser Modi.
+
+## Wie Mnema Texte versteht
+
+Normale Sprache kann Mnema auf unterschiedliche Weise auswerten („Einstellungen" → „Lernen" → „Womit Texte verstanden werden"):
+
+| Variante | So funktioniert es |
+|---|---|
+| Mnema selbst (Standard) | das Modell, mit dem du standardmäßig sprichst – ein beliebiges verbundenes, ob in der Cloud oder auf dem Computer; ist keines vorhanden, werden nur explizite Signale erkannt |
+| Ohne Modell | nur Explizites: „merk dir …", Korrekturen, Entscheidungen („entschieden …"), Statusdaten |
+| Claude per Abo | über das installierte Claude Code, ohne Tools, Hooks und MCP, die Sitzung wird nicht gespeichert |
+| Eigener Schlüssel | Anthropic oder OpenAI-kompatibel; der Schlüssel liegt im geschützten Speicher des Systems (Windows – DPAPI, macOS – Schlüsselbund, Linux – Passwortspeicher, falls vorhanden), nicht im Gedächtnisordner |
+| Modell auf dem Computer | integriert oder Ollama, nichts verlässt den Computer |
+
+Bevor ein Text an ein Cloud-Modell gesendet wird, werden Geheimnisse durch Platzhalter ersetzt (siehe „Was den Computer verlässt").
+
+## Wie Mnema entscheidet: speichern oder nachfragen
+
+- Der Standard-Schwellenwert für die Sicherheit liegt bei 80 %. Liegt die Sicherheit bei 80 % oder höher und ist der Fakt nicht persönlich, speichert Mnema ihn selbstständig. Bei 60 % bis 80 % fragt sie nach. Unter 60 % wartet sie, bis der Fakt noch einmal auftaucht.
+- Wiederholung erhöht die Sicherheit: Zweimal 60 % ergeben 84 %, und der Fakt wird gespeichert.
+- Geld, Gesundheit und Persönliches landen in einer Karte mit dem Tag #money, #health oder #private: Du kannst sie in der Tabelle „Welche KI was sieht" vor jeder KI verbergen. Kommt so etwas in einem Gespräch in Mnema zur Sprache, fragt Mnema zuerst direkt dort: „Das ist persönlich – soll ich es mir merken?"
+- Widerspruch im Gedächtnis („wohnt in Kasan" gegen „kommt aus Jekaterinburg"): In einem Gespräch in Mnema erscheint die Frage direkt dort („Jetzt ist es so", „Es war richtig", „Beides stimmt"). Aus anderen Quellen ersetzt der neue Fakt den alten. Hat die alte Zeile mehr ausgesagt, schreibt Mnema sie um und behält den Rest bei. Das Frühere wandert ins Faktenarchiv.
+- „Nie so etwas lernen" fügt eine Stoppphrase hinzu. Das Zurücksetzen eines gelernten Eintrags im Verlauf bedeutet „Nein": Das kommt nicht wieder.
+- Eine Warteschlange „wartet auf dich" gibt es nicht: Mnema sammelt keine Fragen an. Unter einem Gespräch steht immer höchstens eine Frage zum Gedächtnis; die nächste erscheint erst nach deiner Antwort.
+
+## Lernfeed und Rückfrage im Gespräch
+
+Der Feed „Ich lerne von dir" (Zahnrad → „Feed") zeigt, was Mnema gelesen hat, was sie verstanden hat und warum sie sich so entschieden hat, zum Beispiel „Sicherheit 90 % bei einem Schwellenwert von 80 %, nicht persönlich – selbst gespeichert" oder „Das betrifft Geld – im verborgenen Bereich gespeichert". Wenn für das Gedächtnis dein Wort gebraucht wird, erscheint unter dem Gespräch die Karte „Ich frage kurz nach" mit Schaltflächen; deine Antwort wird sofort gespeichert. Bei jeder gelernten Zeile gibt es „Woher ich das weiß": die Quelle, deine Worte, wie oft es vorkam und warum es gespeichert wurde.
+
+## Chat und Modelle
+
+Mnema ist ein Chat mit jedem Modell, alle Modelle sind gleichberechtigt. Das Modell wählst du oben links im Chat, das Menü hat zwei Gruppen:
+
+- Cloud – arbeiten über das Internet: per Schlüssel (Anthropic, OpenAI, Gemini, OpenRouter, DeepSeek, YandexGPT; die Modellliste holt sich Mnema vom Anbieter, bei YandexGPT aus dem Katalog von Yandex Cloud AI Studio) oder per Abo (Claude Code);
+- Auf dem Computer – kostenlos, ohne Internet, nichts verlässt deinen Rechner: das integrierte Modell (llama.cpp), Ollama und Strata.
+
+DeepSeek verbindest du mit einem Schlüssel von platform.deepseek.com. YandexGPT verbindest du mit dem API-Schlüssel eines Servicekontos von Yandex Cloud AI Studio (Rolle ai.languageModels.user) und der ID des Katalogs, in dem es angelegt wurde: Im Verbindungsfenster gibt es dafür zwei Felder. Modelle von YandexGPT: Alice AI LLM, YandexGPT Pro 5.1, YandexGPT Pro 5, Alice AI LLM Flash sowie DeepSeek V4.1 Flash und Qwen3.6 35B aus demselben Katalog. Strata ist ein eigenständiges, kostenloses Programm für große Modelle (Qwen, DeepSeek) auf der eigenen Grafikkarte (github.com/Niko1221/Strata): Installiere es und starte ein Modell mit dem Befehl strata launch – Mnema findet eine laufende Strata beim Start automatisch unter 127.0.0.1:8080; eine andere Adresse trägst du im Verbindungsfenster von Strata ein.
+
+Dieselben zwei Gruppen findest du unter „Einstellungen → KI und Modelle". Das Limit für die Antwortlänge („Einstellungen → Engine") gilt für alle Modelle einheitlich, auch für Claude per Abo.
+
+Gedächtnis und deine Regeln werden auf jede Nachricht angewendet, und jedes Modell bekommt nur das, was es sehen darf. Jedes Gespräch hat einen Titel aus 1–3 Wörtern. Du kannst ihn über den Stift neben dem Titel, per Doppelklick auf den Titel oder im Gesprächsmenü in der Liste ändern (Enter – speichern, Escape – abbrechen). In einem neuen Gespräch kannst du den Titel schon vor der ersten Nachricht festlegen; er wird zusammen mit ihr gespeichert. Was du von Hand umbenannt hast, ändert Mnema nicht mehr, ebenso wenig den Zeitpunkt der letzten Änderung und die verbrauchten Token. Die Liste lässt sich nach Datum oder nach Token sortieren, der Filter „KI" zeigt Gespräche mit einem bestimmten Modell.
+
+Die Schaltfläche „Mnema soll anfangen" in einem leeren Gespräch: Das Modell begrüßt dich und schlägt anhand des Gedächtnisses vor, womit du beginnen könntest. Ereignisse nennt es nur dann kürzlich, wenn ihr Datum das hergibt, und Entscheidungen, die älter als einen Monat sind, schlägt es zur Überprüfung vor.
+
+## Sitzungen
+
+Die Schaltfläche „Neue Sitzung" befindet sich im Kopf der Liste, unter „Neues Gespräch". Eine Sitzung umfasst alle Gespräche, die seit dem letzten Klick begonnen wurden: „Neues Gespräch" öffnet ein Gespräch in der aktuellen Sitzung, „Neue Sitzung" beginnt eine neue Gruppe. In der Liste sind die Gespräche einer Sitzung durch eine Linie links verbunden, die Gruppe hat eine Beschriftung und rechts die Anzahl der Gespräche: die oberste heißt „Aktuelle Sitzung", frühere heißen „Sitzung · 24. Okt." (Tag des letzten Gesprächs). Ein Klick auf die Beschriftung klappt die Gruppe ein, der eingeklappte Zustand wird gespeichert. Direkt nach „Neue Sitzung" gibt es keine leere Zeile: Die oberste Gruppe bleibt die „Aktuelle Sitzung", bis in der neuen das erste Gespräch erscheint. Neben der Beschriftung gibt es das Menü ⋮: „Umbenennen" (eigener Name für die Gruppe) und „Löschen" (die Sitzung samt ihren Gesprächen; angeheftete bleiben erhalten, Gelerntes bleibt im Gedächtnis). Gespräche, die vor der Einführung von Sitzungen begonnen wurden, bilden eine eigene Sitzung am Ende der Liste, angeheftete stehen oben außerhalb der Gruppen. Bei der Suche, bei der Sortierung nach Tokens und bei der Gruppierung nach Tagen ist die Liste normal, ohne Sitzungen.
+
+Neben den Schaltflächen steht „?": Eine Animation zeigt, warum es teuer ist, lange in einem Gespräch zu bleiben, und worin sich ein neues Gespräch und eine neue Sitzung unterscheiden.
+
+Jedes Gespräch schickt dem Modell nur seinen eigenen Verlauf. Deshalb beginnt ein Gespräch in einer neuen Sitzung mit einem sauberen Kontext: Das Modell erhält das Gedächtnis und die Regeln, aber nicht den Chatverlauf früherer Gespräche. Ein langes Gespräch schickt mit jeder Antwort immer mehr Verlauf mit, deshalb ist es günstiger, ein neues Thema in einem neuen Gespräch oder einer neuen Sitzung zu beginnen – das Wichtige aus der Vergangenheit hat Mnema bereits im Gedächtnis gespeichert.
+
+Wenn eine Antwort dreimal so viel gekostet hat wie die erste Antwort desselben Modells in diesem Gespräch (Eingabe-Tokens samt Cache und Antwort), erscheint darunter die Karte „Das Gespräch ist teuer geworden" (bei einem kostenlosen Modell auf dem Computer erscheint sie nicht): zwei Balken – die erste und die letzte Antwort – und der Faktor, um den die letzte teurer ist. Die Schaltfläche „Gedächtnis aktualisieren und neue Sitzung starten" lässt Mnema zuerst das gesamte Gespräch in einem Durchgang lernen und beginnt dann eine neue Sitzung mit sauberem Kontext. Eine Nachricht, die bereits früher gelernt wurde, gilt dabei nicht als Wiederholung. In einem Gespräch ohne Lernfunktion startet die Schaltfläche einfach eine neue Sitzung. „Nicht mehr anzeigen" schaltet den Hinweis ganz ab; wieder einschalten lässt er sich im Zahnrad („Hinweis zu teuren Gesprächen"). Das Kreuz auf der Karte blendet sie nur in diesem Gespräch aus.
+
+## Wie sie antwortet
+
+Einstellungen → „Antwortstil": Name, Anrede (du oder Sie), Antwortlänge (kurz, auf den Punkt, ausführlich), Geschlecht – für die Endungen (z. B. „bereit" bzw. grammatisch angepasste Formen) – und Charakter. Alle Auswahlmöglichkeiten sind Kacheln, rechts steht das „Antwortbeispiel": Dieselbe Frage zum Pilotprojekt, und die Antwort ändert sich sofort mit den Einstellungen, der Name sogar direkt bei der Eingabe. Die Charaktere – Sanft, Sachlich, Streng mit Prüfungen – sind Medaillen mit einer Prüfskala von eins bis drei. Darunter folgen Sets und ausführliche Regeln nach Gruppen.
+
+## Was das Modell in jeder Nachricht weiß
+
+Bevor das Modell antwortet, bekommt es:
+- wie es mit dir arbeiten soll – die Regeln aus dem Abschnitt „Wie geantwortet wird" (Charakter, Anrede, deine Wörter);
+- das Gedächtnis, das dieses Modell sehen darf (den Kopf des Gedächtnisses und die Zeilen, die zur Frage passen);
+- Angaben dazu, wie Mnema gerade aufgebaut ist: wo sie lernt, in welchem Modus sie läuft, womit sie Texte versteht und wie viele Einträge im Gedächtnis liegen;
+- das heutige Datum;
+- bei Fragen zu Mnema selbst – die passenden Abschnitte dieser Wissensbasis.
+
+Das Modell antwortet als Mnema und spricht über ihre Fähigkeiten nur das, was Mnema kann. Die Fähigkeiten der Engine, auf der sie läuft (zum Beispiel die Tools von Claude Code), gehören nicht zu Mnema.
+
+## Dateien und Dokumente, auch PDF
+
+Eine Datei hängst du mit der Büroklammer unter dem Eingabefeld an oder ziehst sie per Drag-and-drop ins Fenster. Eine Datei darf bis zu 25 MB groß sein. Mnema speichert sie neben dem Gespräch und extrahiert den Text selbst, auf deinem Computer und kostenlos.
+
+| Format | Was Mnema damit macht |
+|---|---|
+| PDF mit Textebene | extrahiert den Text seitenweise (mit Seitenzahlen) |
+| PDF-Scan ohne Text | erkennt den Text auf deinem Computer (RapidOCR), bis zu 40 Seiten, und gibt ihn als Text an jedes beliebige Modell weiter. Das Alphabet richtet sich nach der Sprache der Oberfläche: Kyrillisch (und Englisch) für Russisch, Lateinisch mit Diakritika für europäische Sprachen, Chinesisch und Englisch für Chinesisch und Japanisch. Wenn sich nichts erkennen ließ, geht die Datei als Ganzes an das Modell: Eine solche Datei liest nur Anthropic mit eigenem API-Schlüssel |
+| Passwortgeschütztes PDF | Mnema sagt dir, dass die Datei passwortgeschützt ist, und schlägt vor, das Passwort zu entfernen ("Drucken → Als PDF speichern") |
+| Excel (xlsx, xls), CSV, TSV | Tabelle nach Blättern, bis zu 2000 Zeilen pro Blatt |
+| Word (docx), PowerPoint (pptx), OpenDocument, RTF, HTML | Text; Word-Tabellen zeilenweise, Zellen getrennt durch « \| » |
+| Textdateien und Code (txt, md, json, xml, py und andere) | Text unverändert |
+| Bilder (png, jpg, gif, webp) | wird als Bild an das Modell weitergegeben (sehen können es Anthropic, Modelle OpenAI-kompatibler Anbieter und Ollama mit Bildunterstützung) und zusätzlich erkennt Mnema den Text im Bild auf deinem Computer – ihn erhält jedes Modell |
+| Andere Formate | das Modell erhält nur den Dateinamen |
+
+Der vollständige Text des Dokuments wird neben dem Gespräch gespeichert. Außer auf der genauesten Stufe von "Genauer ↔ Sparsamer" erhält das Modell den Anfang des Dokuments und die Abschnitte, die zur aktuellen Frage passen, nicht die ganze Datei. Auf der genauesten Stufe wird der Text vollständig eingefügt, aber nicht mehr als 60 000 Zeichen. So kannst du mit einem PDF: es zusammenfassen, eine Antwort im Text finden, Bankdaten und Zahlen herausziehen, zwei angehängte Dokumente vergleichen und Tabellen auswerten.
+
+Dateien erstellen und bearbeiten, PDF, Word und Excel anlegen, fertige Word- und Excel-Dateien ändern, PDFs zusammenfügen, zuschneiden, drehen und aufteilen sowie Dateien über den Pfad lesen – das sind Dateiaktionen (siehe den Abschnitt unten). Was Mnema mit Dateien nicht tut: Sie füllt keine PDF-Formulare aus und führt keine Programme oder Skripte aus.
+
+## Internet
+
+Der Schalter „Internet" unter dem Eingabefeld erlaubt die Suche, schaltet sie aber nicht für jede Nachricht ein. Mnema sucht nur, wenn sich ohne aktuelle externe Daten sicher nicht antworten lässt: Preise, Kurse, Nachrichten, neueste Versionen, Fahrpläne, „jetzt" und „heute" – sowie wenn du ausdrücklich „such" oder „recherchiere" sagst. Bei Fragen zu Mnema selbst, zu dir, bei Allgemeinwissen („Was ist …") und bei Aufgaben zu einem vorgegebenen Text geht das Programm nicht ins Netz. Ein Link in der Nachricht wird immer gelesen, auch bei ausgeschaltetem Schalter. Seiten hinter Links und VPN-Abos werden nur über Adressen im Internet geöffnet: Dieser Computer, das Heim- oder Büronetz und interne Adressen von Mnema sind gesperrt.
+
+Die Suche ist kostenlos und braucht keine Schlüssel: Bing und Yahoo über die Bibliothek ddgs, danach DuckDuckGo, Bing, Yandex und Wikipedia direkt. Ergebnisse, die nicht zur Mehrheit der Schlüsselwörter der Frage passen, werden verworfen. Die Seiten werden auf deinem Computer gelesen und bereinigt, das Modell erhält nummerierte Auszüge und verweist auf sie mit [1], [2]; die Quellen siehst du unter der Antwort. Ist das Internet ausgeschaltet, die Frage verlangt aber eindeutig aktuelle Daten, antwortet Mnema mit dem, was sie weiß, und schlägt vor, die Suche einzuschalten.
+
+## Genauer oder sparsamer
+
+Einstellungen → Engine → Feinabstimmung → "Genauer ↔ Sparsamer" – ein Schieberegler mit fünf Stufen, standardmäßig in der Mitte. Genauer: Mehr Gedächtnis und mehr Dokumentabschnitte werden mit der Frage abgeglichen, das Modell fragt öfter nach, die Antwort wird teurer. Sparsamer: weniger davon, das Modell fragt nur nach, wenn es nicht anders geht.
+
+| Stufe | Gedächtnis in der Anfrage | Dokumentabgleich | Gespräch | Rückfragen |
+|---|---|---|---|---|
+| Am sparsamsten | 2.000 Zeichen | bis zu 3.500 | bis zu 8.000 | nur wenn es nicht anders geht |
+| Sparsamer | 3.000 | bis zu 5.000 | bis zu 11.000 | nur wenn es nicht anders geht |
+| Ausgewogen (Standard) | 4.200 | bis zu 7.000 | bis zu 14.000 | bei Bedarf |
+| Genauer | 8.000 | bis zu 12.000 | bis zu 20.000 | öfter |
+| Maximal genau | 16.000 | vollständig | vollständig | bei jeder Unklarheit |
+
+Außer auf der genauesten Stufe werden vom Gedächtnis der Anfang und die Zeilen übernommen, die zur Frage passen. Die letzten 6 Nachrichten des Gesprächs bleiben vollständig erhalten, ältere werden auf 400 Zeichen gekürzt. Dokumente und Webseiten werden in passenden Abschnitten übernommen. Unter der Antwort siehst du, wie viele Tokens eingespart wurden (Schätzung: etwa 3,5 Zeichen pro Token). Messung an einem Vertrag mit 153.000 Zeichen: 29.643 Eingabe-Tokens ohne Einsparung gegenüber 6.159 mit Einsparung – und die richtige Antwort lieferte nur die Variante mit Einsparung.
+
+## Fragen per Schaltfläche, zweiter Durchgang, Zitat
+
+Braucht das Modell eine Klarstellung, stellt es genau eine Frage als Karte: die Frage selbst, in einer Zeile der Grund, warum es fragt, und 2–4 Antwortoptionen untereinander, der Reihe nach, jeweils mit einer kurzen Erklärung, was bei der Auswahl passiert. Du wählst eine Option per Klick oder mit der Zifferntaste auf der Tastatur; unten auf der Karte kannst du auch mit eigenen Worten antworten. Nach der Antwort ist die gewählte Option mit einem Häkchen markiert. Das Zahnrad auf der Karte steuert, ob Fragen als Optionen gestellt werden, ob die Optionen erklärt werden und ob nur bei echtem Bedarf gefragt wird. Der „Zweite Durchgang“ (in den Einstellungen) bewirkt, dass das Modell den Entwurf anhand deiner Regeln und deines Gedächtnisses prüft, bevor du ihn siehst. Einen markierten Teil der Antwort kannst du in der nächsten Nachricht zitieren. Die Schaltfläche „Hilfreich“ unter einer Antwort zeigt, welche Antwortform für dich passt: Markierte Antworten nimmt sich das Modell als Vorbild für die Form.
+
+## Wiederkehrende Aufgaben
+
+Bei der zweiten ähnlichen Aufgabe (oder bei jeder, oder nie – das stellst du in den Einstellungen ein) schlägt Mnema vor, ein Rezept zu speichern, damit du es beim nächsten Mal nicht erneut erklären musst und keine Tokens für Rückfragen verbrauchst. Ein Rezept – Ziel, Eingabedaten, Schritte, Format des Ergebnisses, Prüfungen und was nicht getan werden soll – liegt in 90 System/Recipes. Die nächste ähnliche Anfrage wird automatisch danach ausgeführt, unter der Antwort steht dann „nach Rezept „…"". Die Ähnlichkeit ermittelt Mnema lokal auf deinem Computer, anhand übereinstimmender Wortstämme.
+
+## Begriffs-Hinweise
+
+Wenn du die „Hinweise" aktivierst (im Menü „+" unter dem Eingabefeld), ergänzt das Modell seine Antwort um ein kurzes Glossar: unklare Begriffe und alle Namen in der Antwort – Personen, Unternehmen, Produkte, Dienste, Communities (zum Beispiel Show HN), außer dir selbst und Personen, von denen du selbst erzählt hast. Mnema schneidet das Glossar ab, unterstreicht diese Wörter in der Antwort und zeigt die Erklärung an, sobald du mit der Maus darüberfährst.
+
+## Konsortium
+
+„Mit verschiedenen KIs diskutieren" unter jeder Antwort: Zuerst öffnet sich das Fenster „Mit wem diskutieren?" – alle verbundenen Modelle außer dem Autor, die besten sind vorausgewählt, bis zu drei Gegner, das Fazit zieht das erste markierte Modell. Der Autor der Antwort verteidigt sie, die Gegner suchen, wo sie falsch oder unvollständig ist oder es eine bessere Variante gibt, am Ende steht das Fazit: ob die Antwort standhält oder nicht und was zu tun ist. Ist nur eine KI verbunden, diskutieren ihre Modelle untereinander (zum Beispiel Sonnet mit Opus). Das ist ein ganz normales Konsortium im Debattenformat, du kannst es fortsetzen, anhalten oder beenden.
+
+Der Button „Konsortium" unter dem Eingabefeld startet eine Diskussion von 2–4 KIs (beliebige verbundene Modelle, auch das integrierte) über 1 bis 20 Runden. Sie sprechen abwechselnd, sehen einander und sprechen sich mit Namen an, die letzte KI zieht das Fazit: worin sie sich einig sind, worin nicht und was sie empfehlen. Über den Nachrichten sitzt ein runder Tisch: Wer spricht, wer als Nächstes dran ist, dazu die Buttons „Pause", „Fortsetzen", „Beenden", „Nochmal diskutieren". „Stoppen" (der Senden-Button, solange eine Antwort läuft) bricht den aktuellen Sprecher sofort ab: Das Gesagte bleibt mit dem Vermerk „unterbrochen" stehen, die anderen warten auf „Fortsetzen". Besetzung und Rundenzahl kannst du mitten im Verlauf ändern. Jeder Teilnehmer bekommt das ganze Gespräch: die letzten 16 Nachrichten vollständig, frühere gekürzt, angehängte Dokumente in den Abschnitten, die zur Frage passen, dazu den Text aus Bildern, die Bilder selbst und PDF. Formate: Rat, Debatte, Brainstorming, Red Team und Roast (die Idee, der Lebenslauf oder der Text wird hart auseinandergenommen, das Fazit beginnt mit einer Bewertung „N/10"). Unter dem Fazit gibt es „Teilen": eine Bildkarte mit dem Ergebnis. Wenn du während der Diskussion schreibst, stoppt der aktuelle Sprecher und das Gespräch geht mit deiner Nachricht weiter; ein Sprecher, der noch nichts gesagt hat (der Dienst hängt), wird sofort abgesetzt. Ein Teilnehmer, dessen Schlüssel nicht passt oder dessen Guthaben aufgebraucht ist, sagt das einmal und nimmt danach nicht mehr an der Diskussion teil; das Fazit zieht dann ein anderer. Jeder Teilnehmer erhält Erinnerungen gemäß seinen Zugriffsrechten. Das Konsortium lässt sich in ein bereits laufendes Gespräch einschalten.
+
+
+Das Konsortium-Fenster ist zunächst schlicht: Wen du in den Rat holst (2–4 KIs, die Nummer auf der Karte ist die Reihenfolge), das Diskussionsformat und ein lebendiger Tisch mit den gewählten Teilnehmern in der Sprechreihenfolge. Der Button „Erweiterte Einstellungen" öffnet alles Weitere – Runden, Rollen, wer das Fazit zieht, Länge der Beiträge, Faktencheck und Rundenplan; jeder Bereich hat sein eigenes „?" mit einer Erklärung. „Einfacher" bringt dich zur schlichten Ansicht zurück.
+
+Faktencheck (standardmäßig aktiviert): Stützt sich ein Teilnehmer auf einen Fakt, eine Zahl, ein Datum oder aktuelle Informationen, sucht er selbst im Internet – bis zu zwei Anfragen pro Zug – und antwortet mit Links [1], [2]. Die Quellen siehst du unter seinem Beitrag. Bei Meinungen und Ratschlägen sucht er nicht. Ein Zug mit Suche dauert länger: Das Modell antwortet zweimal, vor der Suche und danach. Du kannst das in den erweiterten Einstellungen ausschalten: „Im Internet suchen".
+
+Das Zahnrad am Button „Konsortium" öffnet dieselben Einstellungen:
+
+| Einstellung | Optionen |
+|---|---|
+| Format | Rat: eigene Antwort → Prüfung → Verbesserung → Streitpunkte → gemeinsame Antwort. Debatte: Die Teilnehmer sind abwechselnd dafür und dagegen, Positionen → Einwände → Urteil. Brainstorming: Ideen ohne Kritik → fremde Ideen weiterentwickeln → die drei besten (warum, erster Schritt, Risiko). Red Team: Angriff auf deinen Plan → wie die Lücken geschlossen werden → Liste der Risiken und was zu tun ist |
+| Rollen | für jeden Teilnehmer: keine Rolle, Skeptiker, Praktiker, Finanzexperte, Jurist, Kreativer, Analyst, Kunde |
+| Fazit zieht | die letzte KI in der Reihenfolge oder ein ausgewählter Teilnehmer: In der letzten Runde spricht er als Letzter |
+| Beiträge | kurz (bis 80 Wörter, Fazit bis 120), normal (150 und 180), ausführlich (300 und 350) |
+
+Unten im Fenster steht ein Schema: der Tisch mit den Teilnehmern in der Sprechreihenfolge, die Seite in der Debatte, ein Pokal bei dem, der das Fazit zieht, und der Rundenplan für das gewählte Format. Format, Länge und Rollen werden für den nächsten Rat gespeichert.
+
+## Dateiaktionen
+
+Das Modell im Chat kann mit Dateien arbeiten: eine Datei lesen (auch PDF, Word, Excel, PowerPoint; Scans und Bilder werden auf deinem Computer erkannt), einen Ordner ansehen, Dateien anhand von Wörtern finden, eine Textdatei (.md, .txt, .csv, .json, .html) erstellen oder neu schreiben, einen Teil einer Datei ändern, aus Text mit Überschriften, Listen und Tabellen ein PDF-, Word- oder Excel-Dokument erzeugen und eine Zeile in den Speicher schreiben. Das funktioniert mit jedem Modell, ob in der Cloud oder auf deinem Computer.
+
+Fertige Dokumente:
+
+| Was | Wie |
+|---|---|
+| Word (.docx) | Text wird ersetzt, ohne die Formatierung zu verlieren: Die Wortgruppe wird auch dann gefunden, wenn sie ein fettes Wort enthält oder in der Datei in mehrere Teile zerlegt ist; der neue Text übernimmt die Formatierung der Stelle, an der die alte Wortgruppe begann. Kopf- und Fußzeilen sowie Fußnoten ebenfalls |
+| Excel (.xlsx, .xlsm) | Werte und Formeln in Zellen („Tabelle1!B3 = 1500“, „C7 = =SUM(C1:C6)“), Text in Zellen ersetzen; die übrigen Blätter, Formate und Formeln bleiben erhalten. Eine Arbeitsmappe mit Diagrammen, Bildern oder Pivot-Tabellen bearbeitet Mnema nicht, weil diese beim Speichern verloren gehen würden |
+| PDF | mehrere Dateien zusammenfügen, die gewünschten Seiten in der gewünschten Reihenfolge behalten (ebenso ausschneiden, löschen, umsortieren), Seiten um 90, 180 oder 270 Grad drehen, in Teile aufteilen. Die Originaldatei bleibt unverändert, die neue überschreibt keine vorhandene |
+
+Standardmäßig führt Mnema die Aktion sofort aus. Wenn du unter Einstellungen → Programm → „Dateiaktionen“ die Option „Bei jeder Aktion um Erlaubnis fragen“ aktivierst, erscheint unter der Antwort die Karte „Mnema möchte“ – was genau und mit welcher Datei – mit den Schaltflächen „Ja“, „Ja, für dieses Gespräch“ (gleiche Aktionen werden in diesem Gespräch nicht mehr abgefragt) und „Nein“. Nach der Aktion bleibt im Gespräch die Zeile „Datei erstellt …“ mit der Schaltfläche „Im Ordner anzeigen“, und das Modell setzt seine Antwort fort. Es werden keine Programme gestartet, und nichts geht ins Internet.
+
+Erlaubt ist das im Speicherordner und in den Arbeitsordnern, die du unter Einstellungen → Programm → „Dateiaktionen“ hinzugefügt hast; dort lassen sich die Aktionen auch komplett ausschalten. Der Systemordner .mnema ist gesperrt. Eine Notiz aus dem Speicher liest das Modell mit seinen eigenen Rechten: Versteckte Themen bleiben versteckt. Ein Dokument überschreibt nie ein vorhandenes – das neue erhält den Namen „Bericht (2).pdf“. Jeden Schreibvorgang kannst du rückgängig machen: „Speicher“ → „Verlauf“ – sowohl im Speicher als auch in den Arbeitsordnern. Das PDF wird über den Browser Edge, Chrome oder Chromium ohne sichtbares Fenster erstellt: Edge ist in jedem Windows 10 und 11 vorhanden, unter macOS und Linux wird einer der Browser benötigt.
+
+## Gespräch ohne Lernen
+
+Mit dem Schalter „Ohne Lernen" unter dem Eingabefeld lernt die Memory aus diesem Gespräch nichts, und zwar ab der ersten Nachricht. Das Modell sieht die Memory weiterhin, aber aus dem Gespräch wird nichts Neues gespeichert, und auch die Markierung „Hilfreich" lehrt darin nichts.
+
+## Stimme und Meetings
+
+Das Mikrofon unter dem Eingabefeld: Damit kannst du einen Befehl einsprechen oder ein Meeting aufnehmen. Ein Befehl wird über das Mikrofon aufgenommen, auf deinem Computer erkannt und als Nachricht gesendet, die Audiodatei wird gelöscht. Bei einer Meeting-Aufnahme werden das Mikrofon und der Computerton auf zwei Kanälen aufgezeichnet, daher ist im Transkript zu sehen, wer spricht. Du kannst auch einfach eine Audio- oder Videodatei in den Chat ziehen (auch .mov vom iPhone, .mp4, .avi, .3gp, .m4v). Falls das Erkennungsmodell noch fehlt, muss es einmalig heruntergeladen werden (etwa 0,5 GB, Internetverbindung nötig) – Mnema sagt dir Bescheid. Die Spracherkennung läuft über faster-whisper auf deinem Computer (Modell small oder medium, falls heruntergeladen). Alternativ geht auch das Cloud-Whisper mit einem OpenAI-Schlüssel: Das kostet $0.006 pro Minute, etwa $0.36 pro Stunde. Der Modus „Entscheidet selbst" (Standard) misst die Geschwindigkeit deines Computers in der ersten Minute und fragt wegen der Cloud nach, falls die Verarbeitung nicht in der Länge des Meetings oder in 10 Minuten fertig wäre. Audio und Расшифровка.md bleiben in 80 Meetings; im Chat landen das Transkript und eine kurze Zusammenfassung, und deine Worte fließen ins Lernen ein. Im Aufnahmefenster des Meetings gibt es oben rechts „Einstellungen" – das führt zu Einstellungen → Meeting-Aufnahmen. Dort ist der Weg eines Meetings in vier Schritten dargestellt: Aufnahme (ob das Audio gespeichert wird), Transkription (wo und mit welcher Genauigkeit), Zusammenfassung (welches Modell die Zusammenfassung erstellt), Gedächtnis (lernt aus deinen Worten). Klick auf einen Schritt, und darunter siehst du seine Beschreibung und die Einstellungen. Ganz oben findest du fertige Voreinstellungen: „Privat" (alles auf dem Computer, Audio wird gelöscht), „Ausgewogen" (entscheidet selbst), „Schnell" (Cloud-Whisper). Das Modell für die Zusammenfassung kannst du auch direkt im Aufnahmefenster auswählen.
+
+## Integriertes Modell auf dem Computer
+
+In Mnema ist ein llama.cpp-Server integriert. Zur Auswahl stehen 13 GGUF-Modelle von Hugging Face in fünf Gruppen: leichte (Gemma 3 1B, Qwen2.5 1.5B, Llama 3.2 3B), ausgewogene (Gemma 3 4B – empfohlen, Qwen3 4B, Phi-4 mini), intelligente (Qwen2.5 7B, Llama 3.1 8B, YandexGPT 5 Lite 8B), besondere (Qwen3 4B Thinking, Qwen2.5 Coder 7B) und große (Gemma 3 12B, Mistral Small 3.2 24B). Bei jedem Modell siehst du, wofür es gedacht ist, wie groß es ist, wie viel Speicher es braucht und wie lange der Download bei deiner Verbindung dauert. Der Download lässt sich pausieren und später fortsetzen. Die Modelle liegen in ~/.mnema/models. Das Ganze funktioniert offline und kostenlos, ist aber schwächer als die Cloud-Modelle.
+
+Solange ein Modell auf dem Computer ausgewählt ist, zeigt die Kopfzeile des Chats ein Thermometer an: die Prozessorauslastung, den Anteil des Modells, den Speicher und die Temperatur, sofern das System sie liefert (unter Windows nicht immer, unter Linux meist, unter macOS nicht). Wenn das Modell den Computer eine Minute lang aufheizt, senkt Mnema selbstständig dessen Priorität und teilt dir das mit. Es gibt die Schaltflächen „Auslastung senken" und „Modell stoppen".
+
+## Engine: Token und Last
+
+„Einstellungen → Engine“, drei Modi:
+
+| Modus | Genauer ↔ Sparsamer | Antwortlänge | Kerne | Kontext | Lernen |
+|---|---|---|---|---|---|
+| Sparsam | sparsamer (3.000 Zeichen Speicher) | bis zu 1.000 Token | ein Viertel | 4.096 | alle 2 Stunden |
+| Ausgewogen (Standard) | ausgewogen (4.200) | 3.000 | die Hälfte | 8.192 | alle 30 Minuten |
+| Maximum | maximal genau (16.000, ohne Kürzungen) | 8.000 | alle bis auf einen | 16.384 | alle 10 Minuten |
+
+Die Feineinstellung ist eine einzige Spalte: „Genauer ↔ Sparsamer“, längste Antwort, Monatslimit, Prozessorkerne, wie viel sich Mnema gleichzeitig merkt. Sobald du einen Regler manuell verschiebst, wechselt der Modus auf „Benutzerdefiniert“. Das Monatslimit zählt Cloud-Token; ist es aufgebraucht, werden Cloud-Anfragen mit einer verständlichen Meldung gestoppt, während das Modell auf deinem Computer weiterarbeitet. Die Antwortlänge von Claude über ein Abo lässt sich nicht begrenzen.
+
+Darunter folgt ein eigener Bereich „Im Hintergrund“: „Arbeit nicht stören“ senkt die Priorität des Modells auf deinem Computer, „Lernen im Hintergrund“ legt fest, wie oft Mnema die Lernquellen prüft.
+
+## Wer welche KI sieht
+
+Einstellungen → Sicherheit → „Wer welche KI sieht" – eine Tabelle: die KIs stehen in den Spalten, die Teile des Gedächtnisses in den Zeilen, dazu ein Bereich mit gesperrten Themen (Geld, Gesundheit, Persönliches – sie werden selbst aus erlaubten Teilen herausgeschnitten). Ein Klick wird sofort gespeichert, der Schalter unter einer Spalte deaktiviert diese KI komplett. Standardmäßig ist nichts verborgen, und jede KI darf Neues in den Eingang legen:
+
+| KI | Sieht | Darf ergänzen |
+|---|---|---|
+| Modell auf dem Computer (integriert, Ollama, Strata) | alles | Eingang |
+| Claude, Claude Code | alles | Eingang, Entscheidungen, Projekte, Karten, Personen, Regeln |
+| ChatGPT | Profil, Regeln, Projekte, Karten, Entscheidungen | Eingang |
+| OpenRouter, DeepSeek, YandexGPT | Profil, Regeln, Projekte, Karten, Entscheidungen | Eingang |
+| Gemini | Profil, Regeln, Karten | Eingang |
+| Cursor | Regeln, Projekte | Eingang |
+
+Das Modell auf dem Computer sieht alles, weil von deinem Computer nichts nach außen geht. Geld, Gesundheit und Persönliches sind standardmäßig für alle KIs sichtbar, denen die Karten offenstehen: Um ein Thema vor einer KI zu verbergen, klick in ihrer Spalte auf „sichtbar" – dann steht dort „verborgen".
+
+Ein verborgener Tag an einer Überschrift (zum Beispiel „## Geld #money") verbirgt sie samt allem, was darunter steht. Ein Tag am Titel „# Geld #money" oder in den Eigenschaften der Datei (tags) verbirgt die ganze Datei. Auch russische Tags funktionieren – #деньги, #здоровье, #личное – in beliebiger Groß- und Kleinschreibung, ebenso Eigenschaften in der Form, wie Obsidian sie schreibt (tags als Liste). Eine Statusänderung in einer verborgenen Karte landet mit demselben Tag im Ereignisprotokoll und ist deshalb ebenfalls verborgen.
+
+## Was den Computer verlässt
+
+Bevor eine Anfrage an eine Cloud-KI geht (Chat, Konsortium, zweiter Durchgang, Gesprächstitel, Lern-Gehirn, Porträt) und bevor eine Anfrage an Suchmaschinen geht, werden Kartennummern (mit Luhn-Prüfung), Passwörter, PINs und CVV, API-Schlüssel, Tokens und VPN-Schlüssel, Telefonnummern, Reisepass, SNILS, INN und Kontonummern durch Platzhalter wie [TELEFON-1] ersetzt. Die Antwort kommt mit den echten Werten zurück, und zwar erst auf deinem Computer. Du schaltest das unter „Einstellungen → Sicherheit" ein. Das Lern-Gehirn bekommt bei einer fremden Cloud die Erinnerungen nach denselben Regeln wie die KI im Chat: Versteckte Themen werden ihm nicht geschickt. Jede Anfrage nach außen ist ein Eintrag im Protokoll: wann, an wen, wofür (Antwort im Chat, Lernen, Porträt, Gesprächstitel, Websuche), wie viele Zeichen, wie viel von dem verfügbaren Gedächtnis weitergegeben wurde und was ausgeblendet wurde (nur die Anzahl, nicht die Werte). Eine Anfrage, die nicht rausgegangen ist (kein Programm, kein Schlüssel, keine Verbindung), wird nicht ins Protokoll geschrieben. „Nach außen diese Woche" in der Karte „Gedächtnis" unten links zeigt den Bericht für die letzten 7 Tage.
+
+## Speicher mit Passwort verschlüsseln
+
+"Einstellungen → Sicherheit → Speicher mit Passwort verschlüsseln", unter Windows, macOS und Linux. Dasselbe wird dir beim ersten Start im Schritt "Speicher mit Passwort schützen?" angeboten: Standardmäßig ist kein Passwort gesetzt, du kannst ein eigenes eingeben oder auf "Sicheres Passwort generieren" klicken. Bei einem verschlüsselten Speicher sendet die Synchronisierung mit Google Drive, Dropbox, einem eigenen Ordner oder einer Station nur verschlüsselte Dateien; eine Kopie mit einem anderen Passwort wird nicht akzeptiert und überschreibt deine nicht. Mnema verschlüsselt Notizen und Systemdateien mit dem, was du gesagt und getan hast, selbst: Gespräche, Text von Anhängen, das Protokoll und seine Snapshots für den Rollback, Lernspuren, den Bericht darüber, was nach außen gegangen ist, das Profil. Ohne Passwort lassen sie sich nicht lesen, selbst wenn man den Ordner kopiert.
+
+| | |
+|---|---|
+| Funktionsweise | Ein zufälliger Speicherschlüssel (AES-256-GCM) verschlüsselt die Dateien, das Passwort verschlüsselt diesen Schlüssel per scrypt; beide liegen in .mnema/crypto.json |
+| Passwort | mindestens 8 Zeichen, nicht wiederherstellbar: Wenn du es vergisst, ist der Speicher verloren. Du kannst es jederzeit ändern, die Dateien werden dabei nicht neu geschrieben |
+| Auf diesem Computer merken | Der Schlüssel liegt im geschützten Speicher des Systems (Windows – DPAPI, macOS – Schlüsselbund, Linux – Passwortspeicher, falls vorhanden, sonst eine Datei im Home-Ordner, die nur du lesen kannst): Mnema öffnet sich ohne Nachfrage. Ist die Option aus, wird bei jedem Start nach dem Passwort gefragt; bis dahin zeigt Mnema nichts an und lernt nichts |
+| Was nicht verschlüsselt wird | Binärdateien (PDF, Word, Bilder, Meeting-Aufnahmen) – sie werden von anderen Programmen geöffnet; Einstellungen, die vor der Passworteingabe gebraucht werden (Sprache, Modelle, Zugriffsrechte der KI); Ordner anderer Programme (.obsidian und ähnliche) |
+| Preis | Obsidian und andere Editoren können verschlüsselte Notizen nicht öffnen. Eine Notiz, die ein anderes Programm in den Ordner geschrieben hat, verschlüsselt Mnema beim nächsten Öffnen |
+| Abbruch mittendrin | Die Dateien werden einzeln verschlüsselt: Jede wird daneben geschrieben, es wird geprüft, dass sie sich genauso zurücklesen lässt, und erst dann ersetzt sie die alte. Wenn der Computer mittendrin ausgeschaltet wird, bleibt ein Teil der Dateien unverschlüsselt, alle sind lesbar, und beim nächsten Öffnen verschlüsselt Mnema den Rest nach |
+| Claude Code, Cursor (MCP) | erhalten den Speicher wie bisher, wenn Mnema läuft oder das Passwort auf diesem Computer gespeichert ist |
+
+"Verschlüsselung aufheben" (derselbe Schalter, Passwort erforderlich) stellt normale Dateien wieder her.
+
+Unter Windows gibt es außerdem die Verschlüsselung per Systemfunktion (EFS): Sie arbeitet transparent für dich, für Mnema und für andere Programme, der Schlüssel ist dein Windows-Benutzerkonto; sie ist unter Windows Home nicht verfügbar.
+
+## Verlauf und Rückgängig-Machen
+
+Jeder Eintrag in den Speicher landet in einem Protokoll: wer ihn geschrieben hat, was und wann. Im Bereich „Speicher" → „Verlauf" lässt sich jede Änderung mit einem Klick rückgängig machen. Wurde die Datei danach noch geändert, entfernt das Zurücksetzen nur die Zeilen dieses Eintrags und lässt spätere Änderungen bestehen; es verweigert sich nur, wenn genau diese Zeile bereits von Hand angepasst wurde. Vor der ersten Änderung einer Datei am Tag legt Mnema eine Kopie in 95 Saves ab, die zwei letzten bleiben erhalten. Einträge aus dem Chat, aus dem Lernen und von anderen KIs werden nacheinander abgearbeitet, daher gehen gleichzeitige Einträge nicht gegenseitig verloren. Hat sich eine Datei im Mnema-Editor geändert, während du sie bearbeitest, überschreibt Mnema sie nicht, sondern bittet dich, sie neu zu öffnen.
+
+Wird eine Regel mit anderen Worten ausgedrückt („Fass Gespräche kurz zusammen" und „Mach die Zusammenfassungen kurz"), fügt Mnema keine zweite Zeile hinzu, sondern formuliert die bisherige Zeile mit den neuen Worten um.
+
+## Andere KIs verbinden
+
+- Claude Code, Claude Desktop, Cursor: Einstellungen → „KI & Modelle" → „Gedächtnis in anderen KIs" → auf der Kachel „Verbinden". Die Verbindung läuft über MCP: memory_context, memory_search, memory_remember, memory_stale, memory_journal, memory_undo. Der Kontext wird in Teile von bis zu 9 000 Zeichen aufgeteilt. Cursor erhält nur Regeln und Projekte und schreibt nichts. Auf der Kachel siehst du, ob die Verbindung schon besteht.
+- ChatGPT und Gemini: im Mnema-Chat mit deinem eigenen Schlüssel (Einstellungen → „KI & Modelle" → Kachel OpenAI oder Gemini → „Schlüssel eingeben"). Eine Browser-Erweiterung gibt es nicht: Alles, was die KIs selbst nicht können, erledigt Mnema bei sich auf deinem Computer.
+- Über MCP sieht jede KI im Journal nur die Einträge zu dem, was sie lesen darf, und macht nur ihre eigenen Einträge rückgängig. Nach dem Update von der portablen Version wechselt die Verbindung in Claude und Cursor automatisch zum neuen Programm.
+- Modelle: Einstellungen → „KI & Modelle". Oben steht „Antwortet gerade": die Medaille des Standardmodells und seine Auswahl. Darunter folgen „Modelle" in zwei Bereichen: „Kostenpflichtig" (Unterabschnitt „Per Abo" – Claude im Abo; Unterabschnitt „Per API-Schlüssel" – ChatGPT, Claude · API-Schlüssel, DeepSeek, Gemini, OpenRouter, YandexGPT, Abrechnung nach Verbrauch, getrennt vom Abo) und „Kostenlos" (integriertes Modell, Ollama und Strata, auf diesem Computer). Genauso aufgeteilt sind das Modellmenü oben links und der Schritt „Mit welcher KI möchtest du sprechen?" beim ersten Start. Die Kacheln sind gleichwertige Medaillen in den Farben des jeweiligen Anbieters: integriert, Claude im Abo, Claude · API-Schlüssel (Anthropic), ChatGPT (API-Schlüssel von OpenAI), Gemini, OpenRouter, Ollama. ChatGPT und Gemini lassen sich nur per API-Schlüssel verbinden: Die Abos ChatGPT Plus und Gemini Advanced liefern keinen Schlüssel, die API wird bei OpenAI und Google separat nach Verbrauch bezahlt. Eine verbundene Kachel ist farbig und trägt den Status „verbunden", eine nicht verbundene ist grau. Auf der Kachel gibt es eine einzige Schaltfläche: „Schlüssel eingeben" → das Schlüsselfeld öffnet sich direkt in der Kachel → „Speichern und Modelle suchen" oder „Abbrechen"; bei Ollama ist es die Adresse, beim integrierten Modell „Auswählen und herunterladen". Claude im Abo erscheint von selbst, wenn auf dem Computer Claude Code vorhanden ist: Mnema sucht es nicht nur in den Suchpfaden für Programme, sondern auch dort, wohin die Installer es legen (offizieller Installer, npm, WinGet, Volta, bun, Homebrew), und innerhalb der Claude-Desktop-App. Wenn Claude Code gefunden wurde, aber die Anmeldung beim Konto fehlt, zeigt die Kachel die Schaltfläche „Anmelden": Es öffnet sich ein Claude-Code-Fenster, dort meldest du dich mit dem Abo an und klickst dann auf „Erneut prüfen". Wird es nicht gefunden, gibt es „So installierst du es". Jede verbundene KI hat die Schaltfläche „Ausschalten": Sie verschwindet aus allen Modelllisten (Chat, Konsortium, „Mit und ohne Gedächtnis"), Schlüssel und Einstellungen bleiben erhalten, mit „Einschalten" kommt sie zurück. Wenn eine KI verbunden ist, aber wegen des Kontos nicht antwortet – das Limit oder das Claude-Abo ist ausgelaufen, das Guthaben ist aufgebraucht, die Anmeldung in Claude Code ist veraltet, der Schlüssel wurde nicht akzeptiert –, schreibt die Kachel „funktioniert nicht" samt Ursache, die KI verschwindet aus den Listen, und die nächste funktionierende antwortet. Die Schaltfläche „Erneut prüfen" sendet eine kleine echte Anfrage. Das Modellmenü oben links ist für alle KIs gleich aufgebaut: Bei jeder verbundenen KI stehen die drei besten Modelle (die neuesten Vollmodelle, dann die leichten mini und flash) und der Link „Alle Modelle" mit Zähler. Unter „Alle Modelle" stehen zuerst die funktionierenden Modelle, darunter, hinter einem Trennstrich, „Ältere und technische": frühere Generationen (gpt-3.5, gpt-4, Claude 3), Kopien mit Datum, Modelle für Bilder, Sprache und Suche. Das ausgewählte Modell ist im Menü auch dann sichtbar, wenn es nicht zu den drei besten gehört. Schlüssel und Prüfung sind dort unterhalb der Liste eingeklappt. Ein erreichtes Limit probiert Mnema nach einer halben Stunde selbst erneut. Der Schlüssel wird sofort beim Speichern geprüft: Ein falscher Schlüssel gilt nicht als verbunden. Bei einer verbundenen Kachel in „Gedächtnis in anderen KIs" läuft ein Punkt entlang der Linie Mnema → Programm.
+- Integriertes Modell: Einstellungen → „KI & Modelle" → „Lokales Modell".
+
+## Proxy und VPN
+
+Alles, was ins Internet geht (Modelle, Suche, Herunterladen von Modellen), läuft über einen einzigen Proxy: zuerst den, der in Mnema festgelegt ist (beim ersten Start, im Tray-Menü unter „Proxy …", unter „Einstellungen" → „Programm" → „VPN und Proxy"), sonst den Systemproxy (Windows; macOS — Systemeinstellungen → Netzwerk; Linux — die Variablen https_proxy und die GNOME-Einstellung), sonst direkt. HTTP und SOCKS5 werden mit Benutzername und Passwort unterstützt, das Passwort liegt im geschützten Speicher des Systems. VPN per Schlüssel: Füge einen Link vless://, vmess://, trojan://, ss:// oder ein Abo https:// ein, und Mnema startet Xray nur für sich selbst („Schlüssel importieren" aus der Zwischenablage oder „Schlüssel manuell eingeben"). Es geht auch über einen bereits laufenden VPN-Client. „Prüfen" erreicht Anthropic über den Proxy und sagt dir, was nicht stimmt. Das integrierte Modell läuft nicht über den Proxy.
+
+## Fenster, Infobereich, Installation
+
+Beim ersten Start gibt es eine kurze Einführung: sechs Fälle mit je einem Gedanken pro Bildschirm (nichts muss neu erklärt werden, ein Gedächtnis für alle KIs, weniger Tokens in jeder KI, Meeting → Aufgaben, merkt sich Entscheidungen und Fristen, Geheimnisse bleiben bei dir) und die Auswahl der KI. Der Fall zum Thema Tokens zeigt die Messung aus dem Abschnitt „Tokens sparen": eine Frage zu einem Vertrag mit 153 000 Zeichen, 29 643 Eingabe-Tokens mit dem gesamten Text gegenüber 6 159 mit Mnema. „Überspringen" beendet die Einführung sofort.
+
+Wenn du das Fenster schließt, wird es in den Infobereich verschoben, und das Lernen läuft weiter. Beim ersten Mal fragt Mnema „In den Infobereich oder beenden?" und merkt sich deine Antwort. „Beenden" im Menü des Infobereichs stoppt alles. Im Menü des Infobereichs findest du: „Mnema öffnen", „Jetzt lernen", „Lernen pausieren", „Proxy…" und den Autostart („Mit Windows starten", unter macOS „Beim Anmelden in macOS öffnen", unter Linux „Beim Anmelden am System starten"). Ein erneuter Start öffnet keine zweite Kopie, sondern zeigt das Fenster der ersten. Unter Windows entfernt Mnema beim Start die Symbole beendeter Mnema-Prozesse selbst aus dem Infobereich. Zeigt die Linux-Desktopumgebung keinen Infobereich an, beendet das Schließen des Fensters das Programm.
+
+Das Installationsprogramm installiert Mnema ohne Administratorrechte nach %LOCALAPPDATA%\Programs\Mnema, erkennt ältere Versionen und löscht nur deren Programmdateien: Alles andere in diesem Ordner (zum Beispiel ein neben dem Programm angelegtes Gedächtnis) bleibt erhalten. Auch beim Deinstallieren wird dein Gedächtnis nicht gelöscht. Es gibt außerdem eine portable Version als Archiv. Das Installationsprogramm hat noch keine digitale Signatur: Windows zeigt „Der Computer wurde durch Windows geschützt" an – klicke auf „Weitere Informationen" → „Trotzdem ausführen". Auf einem frischen Windows 10 installiert Mnema die Fensterkomponente Microsoft WebView2 selbst (einmalig ist eine Internetverbindung nötig). macOS: ein .dmg-Image, ziehe Mnema in den Ordner „Programme". Das Programm hat keine Apple-Signatur, öffne es deshalb beim ersten Mal per Rechtsklick → „Öffnen" (oder Systemeinstellungen → Datenschutz & Sicherheit → „Trotzdem öffnen"). Linux: eine einzelne .AppImage-Datei (mach sie ausführbar und starte sie) oder ein .tar.gz-Archiv mit einem Ordner. Das Fenster wird unter Linux mit Qt gezeichnet; öffnet es sich nicht, brauchst du die Pakete libxcb-cursor0 und libfuse2 (für AppImage).
+
+Wenn der Gedächtnisordner beim Start nicht an seinem Platz ist (er wurde verschoben, umbenannt oder eine externe Festplatte ist nicht angeschlossen), sagt Mnema das offen und bietet an, den neuen Speicherort anzugeben, erneut zu prüfen oder ein neues Gedächtnis anzulegen. Die ersten Bildschirme erscheinen in der Systemsprache. Fehler von Diensten erklärt Mnema in einfachen Worten: was passiert ist und was du tun kannst; der Fehler bleibt im Gespräch sichtbar, eine abgebrochene Antwort wird markiert, und „Stopp" gibt das Gespräch sofort wieder frei.
+
+## Zahnrad, Design, Sprache, Erfolge
+
+Das Zahnrad oben rechts öffnet: Lernen (oben steht der Status; ist der Speicher eingeschaltet, findest du dort auch den Schalter zum Pausieren des Lernens, ist er ausgeschaltet, steht dort nur der Hinweis "Speicher ausgeschaltet"; außerdem Modus und Verlauf), Design, Sprache, Erfolge (lassen sich ausschalten), "So funktioniert Mnema" (Tour), "So funktioniert der Speicher" (Guide) und das "Mnema-Handbuch". Ausgeschaltete Tipps kannst du hier ebenfalls wieder aktivieren: "Tutorial in neuen Gesprächen" und "Hinweis auf teure Gespräche". Das Schließen-Kreuz jedes Fensters ist ein durchsichtiger Kreis mit einem dünnen Kreuz, so groß wie das "?"-Symbol; auch mit Escape lässt sich das Fenster schließen. In einem Gespräch ohne Lernen ist der Punkt am Zahnrad orange, außerhalb eines solchen Gesprächs richtet er sich wieder nach dem Lernstatus. Der Punkt am Zahnrad zeigt den Status an: grün – Mnema lernt, gelb – Speicher ausgeschaltet oder Lernen pausiert, grau – Mnema lernt nur ausdrücklich Gesagtes oder das Lernen ist ausgeschaltet. Den Lernstatus siehst du in der Eingabezeile: "Mnema lernt · Speicher vor N Min. aktualisiert". Gibt es kein Modell zur Auswertung von Sprache, steht dort "Mnema merkt sich nur direkt Gesagtes": Gespeichert wird nur Ausdrückliches ("merk dir …", Korrekturen, Entscheidungen).
+
+Es gibt neun Sprachen für die Oberfläche: Russisch, Englisch, Chinesisch, Spanisch, Hindi, Portugiesisch, Französisch, Deutsch, Japanisch. Das Modell antwortet in der gewählten Sprache. Gespräche und Speicher werden nicht übersetzt.
+
+Erfolge: 99 Auszeichnungen in fünf Gruppen (Einstieg, Speicherwachstum, Ersparnis und Gewohnheit, Datenschutz, Seltene); die meisten seltenen sind verborgen, bis du sie erhältst. Erfahrungspunkte für Auszeichnungen (10, 25, 50, 100) bringen dich durch Level von "Neuling" bis "Ewiges Gedächtnis".
+
+Im Zahnrad-Menü findest du das "Mnema-Handbuch" – das ist das Handbuch direkt im Programm: links die Abschnitte, oben die Suche, Treffer werden hervorgehoben. Die Einstellungen öffnen sich immer beim ersten Abschnitt "KI und Modelle". Beim Start zeigt Mnema kurz einen Startbildschirm: Logo, Name und den Schriftzug "Free Memory AI Interface". Das Zahnrad der Eingabezeile ist klein, sitzt oben rechts neben dem "?" und öffnet die Einstellungen der Eingabezeile.
+
+## Mehrere Gedächtnisse
+
+In den Einstellungen findest du links unter den Bereichen den Block „Gedächtnis": alle Gedächtnisse dieses Computers, das geöffnete ist mit einem Häkchen markiert. Ein Klick auf ein anderes öffnet es. „Neues Gedächtnis" führt zum ersten Bildschirm, das aktuelle bleibt in der Liste. Im Menü ⋮ eines Gedächtnisses gibt es „Umbenennen" – das ändert den Namen in der Liste (der Ordner auf der Festplatte behält seinen Namen) – und „Löschen". Das Löschen fragt zweimal nach: Im zweiten Fenster „Wirklich löschen …?" steht, was verschwindet (Porträt, Fakten, Gespräche, Verlauf), und die Schaltfläche „Löschen" wird erst nach 10 Sekunden aktiv – unter ihr schrumpft ein roter Balken und ein Countdown läuft. Der Ordner landet im Papierkorb, von dort kannst du ihn wiederherstellen. Ein geöffnetes Gedächtnis schließt Mnema zuerst und wechselt zum nächsten in der Liste, und wenn es keine weiteren gibt, zum ersten Bildschirm.
+
+## Telegram
+
+"Einstellungen → Lernen → „Telegram"". Mnema liest Telegram über die API und liest ausschließlich: Der Telegram-Client in Mnema beherrscht nur Anmeldung und Lesen, jeder andere Befehl (senden, löschen, als gelesen markieren, beitreten, Reaktion) wird im Programm selbst abgelehnt, bevor er abgeschickt wird. Die Anmeldung läuft wie in Telegram Desktop: api_id und api_hash von my.telegram.org (API development tools), Telefonnummer, Code aus Telegram und das Cloud-Passwort, falls du eines hast. Darunter findest du „Chats zum Lesen": „Chats hinzufügen" öffnet eine durchsuchbare Liste deiner persönlichen Chats und Gruppen, in der du die gewünschten markierst. Solange kein Chat ausgewählt ist, liest Mnema nichts. Kanäle und Bots lassen sich nicht auswählen. In den ausgewählten Chats wird der gesamte Verlauf gelesen: Deine Nachrichten sind mit „Ich" gekennzeichnet, die anderen mit dem Namen des Gesprächspartners, sodass Mnema sowohl dich als auch die Menschen um dich herum kennenlernt. Die Anmeldung wird verschlüsselt im geschützten Speicher des Systems abgelegt, die Chatliste und das Gelernte liegen im Speicherordner; Mnema hat keine eigenen Server. „Trennen" löscht die Anmeldung; in Telegram bleibt die Sitzung unter „Geräte" bestehen, bis du sie dort beendest.
+
+## Karte „Gedächtnis" unten links
+
+Zwei Zeilen, und jede öffnet einen Beweis: „Lokales Gedächtnis auf dem PC" öffnet den Gedächtnisordner, „Zugriffseinstellungen" öffnet die Tabelle „Welche KI was sieht". Das Zahnrad der Karte führt zu den Schutzeinstellungen, das grüne „?" daneben öffnet den Guide „Wie das Gedächtnis funktioniert" mit 12 Kapiteln: links das Inhaltsverzeichnis, rechts eine Szene, die Erklärung, ein Beispiel (was du sagst und was im Gedächtnis passiert) und die Schaltfläche „Ausprobieren", die dich zu der echten Stelle im Programm bringt. Die Kapitel: der Ordner auf dem Computer, wie der Gedächtnisordner aufgebaut ist, das Datum eines Fakts – wann du es gesagt hast, Lernen aus Gesprächen, sofort speichern oder nachfragen (Schwellen 60 % und 80 %), Korrekturen werden zu Regeln, die Auswahl des Passenden vor der Antwort, Rechte der KI, Geheimnisse, Altes wird neu hinterfragt, Verlauf mit Rücksetzen, das Modell auf dem Computer. Am Ende steht „Selbst prüfen": der Ordner, wer was sieht, was nach außen gegangen ist.
+
+Ausprobieren (Menü „+" unter dem Eingabefeld und Seite „Gedächtnis"):
+- „Kennenlernen" – sieben kurze Fragen: wer du bist, wo du wohnst, was gerade am wichtigsten ist, Projekte, Menschen um dich herum, wie man mit dir sprechen soll und was die KI nicht tun darf. Die Antworten landen als ganz normale Fakten im Gedächtnis und überschreiben nichts.
+- „Wie gut kennt Mnema dich?" – ein Quiz aus zehn Fakten aus dem Gedächtnis: „Stimmt" (der Status bekommt das heutige Datum), „Stimmt nicht mehr" (du schreibst, wie es jetzt ist, das Alte wandert ins Faktenarchiv), „Falsch" (der Fakt wandert ins Archiv). Am Ende gibt es eine Punktzahl.
+- „Mit und ohne Gedächtnis" – eine Frage an die verbundenen KIs (bis zu drei); jede antwortet zweimal: wie ein normaler Chat ohne Gedächtnis und über Mnema. Die Antworten stehen nebeneinander.
+- „Roast" – ein Konsortium im Roast-Format.
+
+Jedes Ergebnis lässt sich in eine Bildkarte verwandeln („Teilen"): kopieren, unter „Bilder/Mnema" speichern oder den fertigen Posttext mit Link kopieren. Auf dem Bild steht nur das, was vor dem Senden im Fenster zu sehen ist.
+
+## Was Mnema nicht kann
+
+- Sie startet keine Programme oder Skripte. Mit Dateien arbeitet sie nur über Aktionen: im Gedächtnisordner und in Arbeitsordnern, jede davon steht im Protokoll und lässt sich rückgängig machen.
+- Verschlüsselung über das System (EFS) gibt es nur unter Windows; die Verschlüsselung mit einem Mnema-Passwort funktioniert überall.
+- Bei einem langen Scan werden nur die ersten 40 Seiten erkannt.
+- Ohne Internet funktionieren Cloud-Modelle und die Suche nicht. Wenn das Netz mitten im Gespräch ausfällt, antwortet das Modell auf deinem Computer (sofern es heruntergeladen ist) und weist in einer Zeile über der Antwort darauf hin.
+- Sie liest weder E-Mails noch Kalender, solange du ihr keine Adresse und kein Passwort oder keinen Link gibst.

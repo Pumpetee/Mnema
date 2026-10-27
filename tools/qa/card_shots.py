@@ -21,7 +21,14 @@ LANG = _lang
 
 OUT = HERE / "design" / "cards"
 OUT.mkdir(parents=True, exist_ok=True)
-SEC = {"c-you": "style", "c-learn": "learn", "c-sources": "learn", "c-access": "security", "scrcard": "meetings"}
+SEC = {
+    "c-prov": "ai",
+    "c-you": "style",
+    "c-learn": "learn",
+    "c-sources": "learn",
+    "c-access": "security",
+    "scrcard": "meetings",
+}
 
 with sync_playwright() as p:
     b = p.chromium.launch()

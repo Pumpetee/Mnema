@@ -8,7 +8,6 @@ const LANGS = [
   ["zh", "中文"],
   ["es", "Español"],
   ["hi", "हिन्दी"],
-  ["ar", "العربية"],
   ["pt", "Português"],
   ["fr", "Français"],
   ["de", "Deutsch"],
@@ -19,9 +18,15 @@ const NO_I18N =
   ".md,.msg.user .b,.uq,textarea,code,pre,.facts li,.path,#ctitle,.citem .tr b,.hit,.ttip,.editor,[data-noi18n],.who,.spk,.conline,.pi b," +
   ".mtprev,.mth b,.mbub b,.mbub span,.mtlist,.rlq,.mtmh b";
 async function loadLang() {
+  if (!LANGS.some(([k]) => k === I18N.lang)) {
+    // a language Mnema no longer has (Arabic was removed): English instead
+    I18N.lang = "en";
+    LS.set("lang", "en");
+    post("/api/agent", { lang: "en" }).catch(() => {}); // the answers follow the interface again
+  }
   const l = I18N.lang;
   document.documentElement.lang = l;
-  document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
+  document.documentElement.dir = "ltr";
   if (l === "ru") {
     I18N.dict = {};
     I18N.pats = [];
@@ -170,7 +175,7 @@ function langMenu(anchor) {
   document.body.appendChild(m);
   const r = anchor.getBoundingClientRect();
   m.style.width = "250px";
-  m.style.left = (I18N.lang === "ar" ? r.left : r.right - 250) + "px";
+  m.style.left = r.right - 250 + "px";
   m.style.top = r.bottom + 6 + "px";
   $$("[data-l]", m).forEach(
     (b) =>

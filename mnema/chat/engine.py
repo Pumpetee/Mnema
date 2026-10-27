@@ -309,14 +309,13 @@ def split_model(ref: str) -> tuple[str, str]:
 # ---------------------------------------------------------------- prompt
 
 
-LANGS = ["ru", "en", "zh", "es", "hi", "ar", "pt", "fr", "de", "ja"]
+LANGS = ["ru", "en", "zh", "es", "hi", "pt", "fr", "de", "ja"]
 LANG_NAMES = {
     "ru": "русский",
     "en": "английский (English)",
     "zh": "китайский (简体中文)",
     "es": "испанский (Español)",
     "hi": "хинди (हिन्दी)",
-    "ar": "арабский (العربية)",
     "pt": "португальский (Português)",
     "fr": "французский (Français)",
     "de": "немецкий (Deutsch)",
@@ -981,7 +980,13 @@ def _generate(
                     from .. import errors as E, localllm
 
                     local = localllm.installed_models() if localllm.engine_ok() else []
-                    if g["text"].strip() or steps or pid in ("local", "ollama") or not local or not E.no_network(e):
+                    if (
+                        g["text"].strip()
+                        or steps
+                        or pid in ("local", "ollama", "strata")
+                        or not local
+                        or not E.no_network(e)
+                    ):
                         raise
                     pid, mname = "local", local[0]["id"]
                     g["phase"] = "нет сети — отвечаю моделью на компьютере"

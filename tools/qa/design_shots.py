@@ -4,7 +4,7 @@ menu and window — in the asked themes, widths and languages.
 
     python tools/qa/design_shots.py ru light,dark 1366,900     →  tools/qa/design/<lang>-<theme>-<width>/*.png
     python tools/qa/design_shots.py en dark 1366
-    python tools/qa/design_shots.py ar dark 1366               (the demo memory is the English one, the interface Arabic)
+    python tools/qa/design_shots.py de dark 1366               (the demo memory is the English one, the interface German)
 
 Nothing touches the owner's memory: a throw-away home and memory folder, scripted answers, no network.
 """

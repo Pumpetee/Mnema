@@ -1,15 +1,24 @@
-"""The README in two languages, built from one layout: a centered header with the animated logo and a typing line,
-badges, languages, downloads, animations of the real interface, the AIs it works with, the details folded.
+"""The README in nine languages, built from one layout: a centered header with the animated logo and a typing line,
+badges, a button to the guide, the languages with their README and guide, downloads, animations of the real
+interface, the AIs it works with, the details folded.
 
-    python tools/readme_build.py        →  README.md, README.ru.md
+    python tools/readme_build.py               →  README.md (English), README.<lang>.md
+    python tools/readme_build.py --translate   →  first translates what is missing for the other eight languages
 
-The languages table and the long reference parts (install, build, how it is built, security, license) live in
-docs/readme/<lang>/*.md and are only folded here; edit them there.
+English and Russian are written here (L). The other languages are translated from English by the owner's
+Claude Code into docs/readme/<lang>/strings.json and docs/readme/<lang>/<part>.md, once; delete a file to have it
+translated again. The long parts (install, build, how it is built, security, license) live in docs/readme/<lang>/.
+Animations are recorded in every language by tools/qa/readme_anim.py.
 """
 
 from __future__ import annotations
 
+import concurrent.futures as cf
+import json
 import re
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 from urllib.parse import quote
 
@@ -42,7 +51,7 @@ def badge(label: str, msg: str, color: str, logo: str = "", style: str = "flat-s
 
 
 def tile(name: str, label: str, src: str) -> str:
-    return f'<td align="center" width="96"><img src="{src}" width="44" alt="{label}"><br><sub><b>{label}</b></sub></td>'
+    return f'<td align="center" width="92"><img src="{src}" width="40" alt="{label}"><br><sub><b>{label}</b></sub></td>'
 
 
 SI = "https://cdn.simpleicons.org"
@@ -50,10 +59,12 @@ SI = "https://cdn.simpleicons.org"
 L = {
     "en": {
         "file": "README.md",
-        "other": ("Русский", "README.ru.md"),
+        "langs_intro": "Mnema speaks nine languages. The interface, the help and the AI's answers follow the one you pick, even when you write in another. This README and the Mnema guide exist in each of them.",
+        "guide_btn": "Mnema guide",
+        "guide_msg": "every screen and setting",
+        "badges": ["read only", "read only", "encryption", "your files"],
         "typing": [
             "One memory for every AI",
-            "Claude · ChatGPT · Gemini · local models",
             "Free, on your computer, no account",
         ],
         "lead": "Mnema remembers who you are, what you are working on, what you decided and how you like answers — and every AI you talk to gets that context. The memory is a folder of plain Markdown files on your computer. No cloud, no account.",
@@ -103,6 +114,37 @@ L = {
                     "**Presets:** Private, Balanced, Fast set the whole way at once.",
                 ],
             ),
+            (
+                "🌱 It learns by itself",
+                "learning",
+                "You mention something in passing, and the feed shows what Mnema read, understood and wrote down, and why",
+                [
+                    "**Sure means saved:** a fact it is sure of (80% or more) is written at once, a doubtful one waits to be heard again.",
+                    "**Personal goes apart:** money, health and private matters land in tagged cards you can hide from any AI.",
+                    "**Nothing is hidden from you:** the «What I understood and why» feed shows every decision with its reason.",
+                ],
+            ),
+            (
+                "✈️ Reads Telegram, never writes there",
+                "telegram",
+                "Telegram connected read only: you pick the chats, Mnema learns from them",
+                [
+                    "**You pick the chats:** Mnema learns about you and the people around you only from those.",
+                    "**Read only, by design:** the Telegram client inside Mnema can only read; any other command is refused before it is sent.",
+                    "**Stays on your computer:** the login is encrypted in the system's store, and Mnema has no servers of its own.",
+                ],
+            ),
+            (
+                "📉 Saves tokens",
+                "tokens",
+                "A question about a 153,000-character contract: 29,643 input tokens for the whole text, 6,159 with Mnema",
+                [
+                    "**Only what matters goes out:** memory, documents and web pages are read on your computer, and the model gets the relevant parts.",
+                    "**Measured:** on a question about a 153,000-character contract the whole text took 29,643 input tokens; Mnema sent 6,159, and only the Mnema answer was right.",
+                    "**Visible every time:** under each answer you see how many tokens were saved.",
+                ],
+                560,
+            ),
         ],
         "priv": "🔐 Private by design",
         "priv_l": ("lock", "First start: a password on the memory, like KeePass"),
@@ -122,11 +164,8 @@ L = {
         "local": "Built-in",
         "more": "And more",
         "more_text": [
-            "**Learns by itself.** A fact it is sure of (80% or more) is written at once, a doubtful one waits to be heard again. The «What I understood and why» feed shows every decision.",
-            "**Reads Telegram, never writes there.** The client inside Mnema can only read; any other command is refused before it is sent.",
             "**Works with your files.** Reads scans, writes notes, makes PDF, Word and Excel, merges and splits PDF. Every write can be undone in Memory → History.",
-            "**Saves tokens.** On a question about a 153,000-character contract the whole text took 29,643 input tokens; Mnema sent 6,159, and only the Mnema answer was right.",
-            "**Ten languages.** The interface and the AI's answers follow the one you pick; Arabic reads right to left.",
+            "**Nine languages.** The interface and the AI's answers follow the one you pick, even when you write in another.",
         ],
         "fold": ["Install", "Build from source", "How it is built", "Security"],
         "lic": "License",
@@ -134,10 +173,12 @@ L = {
     },
     "ru": {
         "file": "README.ru.md",
-        "other": ("English", "README.md"),
+        "langs_intro": "Mnema говорит на девяти языках. Интерфейс, подсказки и ответы ИИ идут на выбранном, даже если пишешь на другом. Этот README и справочник Mnema есть на каждом из них.",
+        "guide_btn": "Справочник Mnema",
+        "guide_msg": "каждый экран и настройка",
+        "badges": ["только чтение", "только чтение", "шифрование", "твои файлы"],
         "typing": [
             "Одна память для всех ИИ",
-            "Claude · ChatGPT · Gemini · локальные модели",
             "Бесплатно, на твоём компьютере, без аккаунта",
         ],
         "lead": "Mnema помнит, кто ты, над чем работаешь, что решил и как тебе отвечать, — и подставляет это в любой ИИ. Память — папка обычных Markdown-файлов на твоём компьютере. Без облака и без аккаунта.",
@@ -187,6 +228,37 @@ L = {
                     "**Готовые настройки:** Приватно, Баланс, Быстро задают весь путь сразу.",
                 ],
             ),
+            (
+                "🌱 Учится сама",
+                "learning",
+                "Ты говоришь что-то между делом, а в ленте видно, что Mnema прочитала, поняла и записала, и почему",
+                [
+                    "**Уверена — записывает:** факт с уверенностью от 80% записывается сразу, сомнительный ждёт повтора.",
+                    "**Личное — отдельно:** деньги, здоровье и личное попадают в помеченные карточки, их можно скрыть от любого ИИ.",
+                    "**Ничего не прячет:** в ленте «Что я поняла и почему» видно каждое решение с причиной.",
+                ],
+            ),
+            (
+                "✈️ Читает Telegram, но ничего туда не пишет",
+                "telegram",
+                "Telegram подключён только на чтение: ты выбираешь чаты, Mnema по ним учится",
+                [
+                    "**Чаты выбираешь ты:** Mnema узнаёт тебя и людей вокруг только по ним.",
+                    "**Только чтение, в самой программе:** клиент Telegram внутри Mnema умеет только читать, любая другая команда отклоняется до отправки.",
+                    "**Всё на твоём компьютере:** вход зашифрован в хранилище системы, своих серверов у Mnema нет.",
+                ],
+            ),
+            (
+                "📉 Экономит токены",
+                "tokens",
+                "Вопрос по договору в 153 000 знаков: 29 643 входных токена на весь текст, 6 159 с Mnema",
+                [
+                    "**Уходит только нужное:** память, документы и страницы читаются на компьютере, модели достаются нужные куски.",
+                    "**Замер:** вопрос по договору в 153 000 знаков — весь текст занял 29 643 входных токена, Mnema отправила 6 159, и правильный ответ дал только вариант с Mnema.",
+                    "**Видно каждый раз:** под каждым ответом написано, сколько токенов сэкономлено.",
+                ],
+                560,
+            ),
         ],
         "priv": "🔐 Приватно по устройству",
         "priv_l": ("lock", "Первый запуск: пароль на память, как в KeePass"),
@@ -206,11 +278,8 @@ L = {
         "local": "Встроенная",
         "more": "И ещё",
         "more_text": [
-            "**Учится сама.** Факт, в котором уверена на 80% и больше, записывает сразу, сомнительный ждёт повтора. В ленте «Что я поняла и почему» видно каждое решение.",
-            "**Читает Telegram и ничего туда не пишет.** Клиент внутри Mnema умеет только читать, любая другая команда отклоняется до отправки.",
             "**Работает с файлами.** Читает сканы, пишет заметки, делает PDF, Word и Excel, склеивает и режет PDF. Любую запись можно откатить: Память → История.",
-            "**Экономит токены.** Вопрос по договору в 153 000 знаков: весь текст — 29 643 входных токена, Mnema отправила 6 159, и правильный ответ дал только вариант с Mnema.",
-            "**Десять языков.** Интерфейс и ответы ИИ идут на выбранном, арабский читается справа налево.",
+            "**Девять языков.** Интерфейс и ответы ИИ идут на выбранном, даже если пишешь на другом.",
         ],
         "fold": ["Установка", "Сборка из исходников", "Как устроено", "Безопасность"],
         "lic": "Лицензия",
@@ -219,21 +288,61 @@ L = {
 }
 
 
+PARTS = ["install", "build", "how", "security"]  # folded, in this order; then the license
+# code, native name, flag, file, the word for «guide» in the table
+LANGS = [
+    ("en", "English", "gb", "README.md", "Guide"),
+    ("ru", "Русский", "ru", "README.ru.md", "Справочник"),
+    ("zh", "中文", "cn", "README.zh.md", "指南"),
+    ("es", "Español", "es", "README.es.md", "Guía"),
+    ("hi", "हिन्दी", "in", "README.hi.md", "गाइड"),
+    ("pt", "Português", "pt", "README.pt.md", "Guia"),
+    ("fr", "Français", "fr", "README.fr.md", "Guide"),
+    ("de", "Deutsch", "de", "README.de.md", "Handbuch"),
+    ("ja", "日本語", "jp", "README.ja.md", "ガイド"),
+]
+NAMES = {
+    "zh": "Simplified Chinese",
+    "es": "Spanish",
+    "hi": "Hindi",
+    "pt": "Portuguese (Brazil)",
+    "fr": "French",
+    "de": "German",
+    "ja": "Japanese",
+}
+
+
+def strings(lang: str) -> dict:
+    if lang in L:
+        return L[lang]
+    f = ROOT / "docs" / "readme" / lang / "strings.json"
+    if not f.exists():
+        raise SystemExit(f"{lang}: нет перевода — запусти с --translate")
+    return {**json.loads(f.read_text(encoding="utf-8")), "file": dict((x[0], x[3]) for x in LANGS)[lang]}
+
+
+def lang_table(lang: str) -> str:
+    """Ten flags, two rows: each language with its README and its guide."""
+    cells = []
+    for code, native, flag, file, guide in LANGS:
+        name = f"<b>{native}</b>" if code != lang else f"<b>✓ {native}</b>"
+        cells.append(
+            f'<td align="center" width="10%"><img src="https://flagcdn.com/w80/{flag}.png" width="36" alt="{native}"><br>{name}'
+            f'<br><sub><a href="{file}">README</a> · <a href="docs/guide/{code}.md">{guide}</a></sub></td>'
+        )
+    return "<table>\n<tr>" + "".join(cells[:5]) + "</tr>\n<tr>" + "".join(cells[5:]) + "</tr>\n</table>\n"
+
+
 def build(lang: str) -> str:
-    c = L[lang]
+    c = strings(lang)
     img = f"docs/img/{lang}"
     src = ROOT / "docs" / "readme" / lang
 
-    def part(title: str) -> str:
-        f = src / f"{title}.md"
-        if not f.exists():  # the first build takes it from the README as it was
-            f.parent.mkdir(parents=True, exist_ok=True)
-            f.write_text(section((ROOT / c["file"]).read_text(encoding="utf-8"), title) + "\n", encoding="utf-8")
-        return f.read_text(encoding="utf-8").strip()
+    def part(slug: str) -> str:
+        return (src / f"{slug}.md").read_text(encoding="utf-8").strip()
 
-    langs = part(c["langs"])
-    folds = {t: part(t) for t in c["fold"]}
-    lic = part(c["lic"])
+    folds = {s: part(s) for s in PARTS}
+    lic = part("license")
 
     out = []
     out.append('<div align="center">\n')
@@ -252,23 +361,26 @@ def build(lang: str) -> str:
         )
         + "\n"
     )
+    ro, ro2, enc, files = c["badges"]
     out.append(
         " ".join(
             f'<img src="{badge(a, b, col, logo)}" alt="{a}: {b}">'
             for a, b, col, logo in [
                 ("MCP", "Claude · Cursor", "7c3aed", "modelcontextprotocol"),
-                ("Obsidian", "read only" if lang == "en" else "только чтение", "7c3aed", "obsidian"),
-                ("Telegram", "read only" if lang == "en" else "только чтение", "229ED9", "telegram"),
-                ("AES-256", "encryption" if lang == "en" else "шифрование", "15803d", ""),
-                ("Markdown", "your files" if lang == "en" else "твои файлы", "555555", "markdown"),
+                ("Obsidian", ro, "7c3aed", "obsidian"),
+                ("Telegram", ro2, "229ED9", "telegram"),
+                ("AES-256", enc, "15803d", ""),
+                ("Markdown", files, "555555", "markdown"),
                 ("Python", "3.13", "3776ab", "python"),
             ]
         )
         + "\n"
     )
-    out.append(f'<sub><a href="{c["other"][1]}">{c["other"][0]}</a></sub>\n')
+    out.append(
+        f'<a href="docs/guide/{lang}.md"><img src="{badge(c["guide_btn"], c["guide_msg"], "8b5cf6", "gitbook", "for-the-badge")}" alt="{c["guide_btn"]}"></a>\n'
+    )
     out.append("</div>\n")
-    out.append(f"## {c['langs']}\n\n{langs}\n")
+    out.append(f"## {c['langs']}\n\n{c['langs_intro']}\n\n{lang_table(lang)}")
     out.append('<div align="center">\n')
     out.append(f"{c['lead']}\n")
     dl, alltxt = c["dl"]
@@ -286,7 +398,6 @@ def build(lang: str) -> str:
     out.append(f"<sub>{c['hero_cap']}</sub>\n")
     out.append("</div>\n")
 
-    # what it does: a grid of six
     rows = [c["grid"][i : i + 3] for i in range(0, 6, 3)]
     grid = (
         "<table>\n"
@@ -298,9 +409,11 @@ def build(lang: str) -> str:
     )
     out.append(f"## ✨ {c['what']}\n\n{grid}")
 
-    for title, gif, alt, bullets in c["sec"]:
+    for title, gif, alt, bullets, *rest in c["sec"]:
         out.append(f"## {title}\n")
-        out.append(f'<p align="center"><img src="{img}/{gif}.gif" width="860" alt="{alt}"></p>\n')
+        out.append(
+            f'<p align="center"><img src="{img}/{gif}.gif" width="{rest[0] if rest else 860}" alt="{alt}"></p>\n'
+        )
         out.append("\n".join(f"- {b}" for b in bullets) + "\n")
 
     out.append(f"## {c['priv']}\n")
@@ -314,9 +427,20 @@ def build(lang: str) -> str:
     g = c["groups"]
     cloud = "".join(
         tile(n, n2, f"docs/img/brand/{n}.svg")
-        for n, n2 in [("claude", "Claude"), ("chatgpt", "ChatGPT"), ("gemini", "Gemini"), ("openrouter", "OpenRouter")]
+        for n, n2 in [
+            ("claude", "Claude"),
+            ("chatgpt", "ChatGPT"),
+            ("gemini", "Gemini"),
+            ("deepseek", "DeepSeek"),
+            ("yandex", "YandexGPT"),
+            ("openrouter", "OpenRouter"),
+        ]
     )
-    local = tile("local", c["local"], "docs/img/brand/local.svg") + tile("ollama", "Ollama", f"{SI}/ollama/ffffff")
+    local = (
+        tile("local", c["local"], "docs/img/brand/local.svg")
+        + tile("ollama", "Ollama", f"{SI}/ollama/ffffff")
+        + tile("strata", "Strata", "docs/img/brand/strata.svg")
+    )
     tools = tile("claude", "Claude Code", f"{SI}/claude/D97757") + tile("cursor", "Cursor", "docs/img/brand/cursor.svg")
     systems = (
         tile("windows", "Windows", "docs/img/brand/windows.svg")
@@ -324,38 +448,133 @@ def build(lang: str) -> str:
         + tile("linux", "Linux", f"{SI}/linux/FCC624")
     )
 
-    def box(i, cells):
-        return (
-            f'<td align="center" valign="top"><code>{g[i][0]}</code><br><sub>{g[i][1]}</sub>'
-            f"<table><tr>{cells}</tr></table></td>"
-        )
+    # one grid, a row per group: the group on the left, its AIs across — never wider than the page
+    rows = [(0, cloud), (1, local), (2, tools), (3, systems)]
+    width = max(cells.count("<td") for _, cells in rows)
+
+    def row(i, cells):
+        pad = "<td></td>" * (width - cells.count("<td"))
+        return f'<tr><td valign="middle" width="150"><b>{g[i][0]}</b><br><sub>{g[i][1]}</sub></td>{cells}{pad}</tr>'
 
     out.append(f"## {c['works']}\n")
-    out.append(
-        '<div align="center">\n<table><tr>'
-        + box(0, cloud)
-        + box(1, local)
-        + "</tr><tr>"
-        + box(2, tools)
-        + box(3, systems)
-        + "</tr></table>\n</div>\n"
-    )
+    out.append('<div align="center">\n<table>' + "".join(row(i, cells) for i, cells in rows) + "</table>\n</div>\n")
 
     out.append(f"## ⚡ {c['more']}\n")
     out.append("\n".join(f"- {b}" for b in c["more_text"]) + "\n")
 
-    for t in c["fold"]:
-        out.append(f"<details>\n<summary><b>{t}</b></summary>\n\n{folds[t]}\n\n</details>\n")
+    for s, title in zip(PARTS, c["fold"]):
+        out.append(f"<details>\n<summary><b>{title}</b></summary>\n\n{folds[s]}\n\n</details>\n")
 
     out.append(f"## {c['lic']}\n\n{lic}\n")
     out.append(
         f'<div align="center">\n<img src="docs/img/brand/logo.svg" width="40" alt="Mnema">\n\n<sub>{c["foot"]}</sub>\n</div>\n'
     )
-    return "\n".join(out)
+    text = "\n".join(out)
+    return text
+
+
+# ---------------------------------------------------------------- translating the other eight, once
+
+PROMPT_STRINGS = """You translate the texts of the GitHub README of Mnema — a free desktop app that keeps a person's memory
+for every AI (Claude, ChatGPT, Gemini, local models) as Markdown files on their own computer — into {lang}.
+
+Below is a JSON object in English. Return ONLY a JSON object with exactly the same structure: the same keys, the same
+list lengths, the same order. Translate every human-readable text. Keep unchanged: emoji, numbers, Markdown (**bold**),
+«quotes» style adapted to {lang}, the animation ids (memory, consortium, meetings, learning, telegram, tokens, lock,
+privacy) and any number that is a width. Keep brand and product names (Mnema, Claude, Claude Code, ChatGPT, Gemini,
+OpenRouter, Ollama, Cursor, Obsidian, Markdown, Telegram, Whisper, KeePass, AES-256, MCP, API, PDF, Word, Excel,
+QuickBooks, Windows, macOS, Linux). The «typing» lines are short slogans: keep them short (under 40 characters).
+Address the reader informally where the language allows it, like a friendly modern app.
+
+JSON:
+{items}"""
+
+PROMPT_PART = """Translate this part of the GitHub README of Mnema (a desktop app that keeps memory for every AI) from
+English into {lang}. Return ONLY the translated Markdown. Keep the Markdown structure, tables, links, code blocks
+and commands exactly; do not translate code, commands, file names, paths, URLs, product names.
+
+{text}"""
+
+
+def ask(prompt: str) -> str:
+    sys.path.insert(0, str(ROOT))
+    from mnema import net
+    from mnema.chat.providers import claude_exe
+
+    p = subprocess.run(
+        [
+            claude_exe(),
+            "-p",
+            "--model",
+            "sonnet",
+            "--output-format",
+            "text",
+            "--tools",
+            "",
+            "--setting-sources",
+            "",
+            "--strict-mcp-config",
+            "--no-session-persistence",
+        ],
+        input=prompt.encode("utf-8"),
+        capture_output=True,
+        cwd=Path(tempfile.gettempdir()),
+        env=net.env(),
+        timeout=900,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+    )
+    return p.stdout.decode("utf-8", "replace").strip()
+
+
+def same_shape(a, b) -> bool:
+    if isinstance(a, dict):
+        return isinstance(b, dict) and a.keys() == b.keys() and all(same_shape(a[k], b[k]) for k in a)
+    if isinstance(a, (list, tuple)):
+        return isinstance(b, list) and len(a) == len(b) and all(same_shape(x, y) for x, y in zip(a, b))
+    if isinstance(a, int):
+        return a == b
+    return isinstance(b, str)
+
+
+def translate(lang: str) -> None:
+    d = ROOT / "docs" / "readme" / lang
+    d.mkdir(parents=True, exist_ok=True)
+    name = NAMES[lang]
+    f = d / "strings.json"
+    if not f.exists():
+        en = {k: v for k, v in L["en"].items() if k != "file"}
+        en = json.loads(json.dumps(en))  # tuples → lists
+        for _ in range(3):
+            m = re.search(
+                r"\{.*\}", ask(PROMPT_STRINGS.format(lang=name, items=json.dumps(en, ensure_ascii=False))), re.S
+            )
+            try:
+                got = json.loads(m.group(0)) if m else None
+            except ValueError:
+                got = None
+            if got and same_shape(en, got) and all(x[1] == y[1] for x, y in zip(en["sec"], got["sec"])):
+                f.write_text(json.dumps(got, ensure_ascii=False, indent=1), encoding="utf-8")
+                break
+        else:
+            print(f"{lang}: строки не перевелись", flush=True)
+    for slug in PARTS + ["license"]:
+        pf = d / f"{slug}.md"
+        if pf.exists():
+            continue
+        text = (ROOT / "docs" / "readme" / "en" / f"{slug}.md").read_text(encoding="utf-8")
+        out = re.sub(r"^```(?:markdown)?\s*\n(?=[^`])|\n```\s*$", "", ask(PROMPT_PART.format(lang=name, text=text)))
+        if len(out) > len(text) * 0.15:  # Chinese and Japanese are much shorter than English
+            pf.write_text(out.strip() + "\n", encoding="utf-8")
+        else:
+            print(f"{lang}/{slug}: не перевелось", flush=True)
+    print(f"{lang}: ready", flush=True)
 
 
 if __name__ == "__main__":
-    for lang in ("en", "ru"):
-        text = build(lang)
-        (ROOT / L[lang]["file"]).write_text(text, encoding="utf-8")
-        print(L[lang]["file"], len(text))
+    if "--translate" in sys.argv:
+        with cf.ThreadPoolExecutor(4) as ex:
+            list(ex.map(translate, NAMES))
+    for code, *_ in LANGS:
+        text = build(code)
+        (ROOT / dict((x[0], x[3]) for x in LANGS)[code]).write_text(text, encoding="utf-8")
+        print(dict((x[0], x[3]) for x in LANGS)[code], len(text))

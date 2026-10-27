@@ -1,0 +1,168 @@
+{
+ "langs_intro": "Mnema spricht neun Sprachen. Oberfläche, Hilfe und die Antworten der KI richten sich nach der Sprache, die du auswählst – auch wenn du in einer anderen schreibst. Diese README und die Mnema-Anleitung gibt es in jeder davon.",
+ "guide_btn": "Mnema-Anleitung",
+ "guide_msg": "jeder Bildschirm und jede Einstellung",
+ "badges": [
+  "nur lesen",
+  "nur lesen",
+  "Verschlüsselung",
+  "deine Dateien"
+ ],
+ "typing": [
+  "Ein Gedächtnis für jede KI",
+  "Kostenlos, auf deinem Rechner, ohne Konto"
+ ],
+ "lead": "Mnema merkt sich, wer du bist, woran du arbeitest, was du entschieden hast und wie du Antworten magst – und jede KI, mit der du sprichst, bekommt diesen Kontext. Das Gedächtnis ist ein Ordner mit einfachen Markdown-Dateien auf deinem Rechner. Keine Cloud, kein Konto.",
+ "dl": [
+  "Herunterladen für",
+  "alle Dateien"
+ ],
+ "hero_alt": "Eine Frage, und die Antwort kommt aus dem Gedächtnis: der Wochenplan als Tabelle, mit dem Preis und der Meeting-Regel, die Mnema schon kennt",
+ "hero_cap": "Du fragst «Was ist diese Woche wichtig?» – der Plan kommt als Tabelle, mit dem vereinbarten Preis und deiner Regel für Meetings. Du musstest sie nie erneut eintippen.",
+ "langs": "Sprachen",
+ "what": "Was Mnema kann",
+ "grid": [
+  [
+   "🧠",
+   "Kennt dich",
+   "Ein Porträt, das jede KI zuerst liest, eine lebendige Gedächtniskarte, einfache Dateien, die dir gehören."
+  ],
+  [
+   "🗣️",
+   "Konsortium",
+   "Claude, ChatGPT und Gemini diskutieren und einigen sich auf eine Antwort."
+  ],
+  [
+   "🎙️",
+   "Meetings",
+   "Aus einem Anruf werden ein Transkript, eine Zusammenfassung und Aufgaben mit Verantwortlichen."
+  ],
+  [
+   "🔐",
+   "Privat",
+   "Ein Passwort auf dem Gedächtnis wie bei KeePass. Geheimnisse erreichen nie die Cloud."
+  ],
+  [
+   "💻",
+   "Offline",
+   "13 kostenlose Modelle laufen auf deinem Rechner, ganz ohne Schlüssel."
+  ],
+  [
+   "📉",
+   "Weniger Tokens",
+   "Nur das Wichtige geht ans Modell: 4,8× weniger Tokens bei einem langen Vertrag."
+  ]
+ ],
+ "sec": [
+  [
+   "🧠 Es kennt dich",
+   "memory",
+   "Porträt und Gedächtniskarte: Themen als Blasen, die Größe zeigt, wie viel Mnema weiß",
+   [
+    "**Ein Porträt, das jede KI zuerst liest:** wer du bist, was du aufbaust, wie du gern arbeitest. Mnema schreibt es beim Lernen fort, du kannst es von Hand korrigieren.",
+    "**Eine Gedächtniskarte:** Jedes Thema ist eine Blase, ein Pulsieren heißt, dass es sich kürzlich geändert hat, ein Schloss bedeutet, dass manche KIs es nicht sehen.",
+    "**Alte Fakten gelten nicht als neu:** Jeder Fakt trägt sein Datum, und bei einem Status, der älter als einen Monat ist, fragt Mnema noch einmal nach.",
+    "**Mehr als ein Ordner:** Verbinde einen Obsidian-Vault oder einen Team-Ordner – nur lesend, das Programm selbst verhindert dort jedes Schreiben."
+   ]
+  ],
+  [
+   "🗣️ Konsortium: mehrere KIs, eine Antwort",
+   "consortium",
+   "Claude, ChatGPT und Gemini besprechen die Frage, eine davon fasst zusammen",
+   [
+    "**Rat, Debatte, Brainstorming, Red Team, Roast** – wähle das Format und die Anzahl der Runden.",
+    "**Greif jederzeit ein:** «Stopp» unterbricht die aktuelle KI und behält, was sie gesagt hat.",
+    "**Streite mit verschiedenen KIs** unter jeder Antwort: Ihr Autor verteidigt sie, die anderen suchen, wo sie falsch ist."
+   ]
+  ],
+  [
+   "🎙️ Meetings: vom Anruf zu Aufgaben",
+   "meetings",
+   "So läuft ein Meeting ab: Aufnahme, Transkript, Zusammenfassung, Gedächtnis – jeder Schritt mit eigenen Einstellungen",
+   [
+    "**Zwei Spuren:** dein Mikrofon und der Ton des Computers, damit das Transkript weiß, wer gesprochen hat.",
+    "**Whisper kostenlos auf deinem Rechner** oder das Cloud-Whisper (≈ 0,36 $ pro Stunde) – Stille, erfundene Sätze und Echo werden herausgeschnitten.",
+    "**Die Zusammenfassung:** was entschieden wurde, die Aufgaben und wer sie übernimmt, von jedem Modell deiner Wahl, auch einem lokalen.",
+    "**Voreinstellungen:** Privat, Ausgewogen und Schnell legen den ganzen Ablauf auf einmal fest."
+   ]
+  ],
+  [
+   "🌱 Es lernt von selbst",
+   "learning",
+   "Du erwähnst etwas nebenbei, und der Feed zeigt, was Mnema gelesen, verstanden und notiert hat – und warum",
+   [
+    "**Sicher heißt gespeichert:** Ein Fakt, dessen es sich sicher ist (80 % oder mehr), wird sofort geschrieben, ein zweifelhafter wartet, bis er noch einmal auftaucht.",
+    "**Persönliches kommt getrennt:** Geld, Gesundheit und Privates landen in markierten Karten, die du vor jeder KI verbergen kannst.",
+    "**Nichts bleibt vor dir verborgen:** Der Feed «Was ich verstanden habe und warum» zeigt jede Entscheidung mit ihrer Begründung."
+   ]
+  ],
+  [
+   "✈️ Liest Telegram, schreibt dort nie",
+   "telegram",
+   "Telegram nur lesend verbunden: Du wählst die Chats, Mnema lernt aus ihnen",
+   [
+    "**Du wählst die Chats:** Mnema lernt nur aus diesen etwas über dich und die Menschen um dich herum.",
+    "**Nur lesend, by Design:** Der Telegram-Client in Mnema kann ausschließlich lesen; jeder andere Befehl wird abgelehnt, bevor er gesendet wird.",
+    "**Bleibt auf deinem Rechner:** Die Anmeldung wird im Speicher des Systems verschlüsselt abgelegt, und Mnema hat keine eigenen Server."
+   ]
+  ],
+  [
+   "📉 Spart Tokens",
+   "tokens",
+   "Eine Frage zu einem Vertrag mit 153.000 Zeichen: 29.643 Eingabe-Tokens für den ganzen Text, 6.159 mit Mnema",
+   [
+    "**Nur das Wichtige geht raus:** Gedächtnis, Dokumente und Webseiten werden auf deinem Rechner gelesen, und das Modell bekommt die relevanten Teile.",
+    "**Gemessen:** Bei einer Frage zu einem Vertrag mit 153.000 Zeichen brauchte der ganze Text 29.643 Eingabe-Tokens; Mnema schickte 6.159, und nur die Antwort mit Mnema war richtig.",
+    "**Jedes Mal sichtbar:** Unter jeder Antwort siehst du, wie viele Tokens gespart wurden."
+   ],
+   560
+  ]
+ ],
+ "priv": "🔐 Privat von Grund auf",
+ "priv_l": [
+  "lock",
+  "Erster Start: ein Passwort auf dem Gedächtnis, wie bei KeePass"
+ ],
+ "priv_r": [
+  "privacy",
+  "Wer was sieht: ein Häkchen pro Gedächtnisteil, ein Schloss pro Thema"
+ ],
+ "priv_text": [
+  "**Ein Passwort auf dem Gedächtnis:** AES-256, der Schlüssel entsteht aus deinem Passwort, quelloffene Kryptografie. Ohne es sind die Notizen nicht lesbar, selbst wenn sie von der Festplatte kopiert werden. Auch eine synchronisierte Kopie bleibt verschlüsselt.",
+  "**Geheimnisse bleiben bei dir:** Kartennummern, Passwörter, Schlüssel und Telefonnummern werden zu Platzhaltern, bevor irgendetwas an ein Cloud-Modell geht.",
+  "**Jede KI hat ihren eigenen Zugriff:** Geld, Gesundheit und private Themen verbirgst du mit einem Klick vor jeder von ihnen."
+ ],
+ "works": "🤖 Funktioniert mit",
+ "groups": [
+  [
+   "Cloud-KI",
+   "per Schlüssel oder Abo"
+  ],
+  [
+   "Auf deinem Rechner",
+   "kostenlos, offline"
+  ],
+  [
+   "In deinen Tools",
+   "über MCP"
+  ],
+  [
+   "Systeme",
+   "eine App"
+  ]
+ ],
+ "local": "Integriert",
+ "more": "Und mehr",
+ "more_text": [
+  "**Arbeitet mit deinen Dateien.** Liest Scans, schreibt Notizen, erstellt PDF, Word und Excel, fügt PDFs zusammen und teilt sie. Jede Schreibaktion lässt sich unter Gedächtnis → Verlauf rückgängig machen.",
+  "**Neun Sprachen.** Oberfläche und KI-Antworten richten sich nach der Sprache, die du auswählst – auch wenn du in einer anderen schreibst."
+ ],
+ "fold": [
+  "Installation",
+  "Aus dem Quellcode bauen",
+  "Wie es aufgebaut ist",
+  "Sicherheit"
+ ],
+ "lic": "Lizenz",
+ "foot": "Wenn Mnema sich etwas Nützliches für dich merkt, hilft ein ⭐ anderen, es zu finden."
+}

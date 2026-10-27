@@ -1,10 +1,15 @@
 # ruff: noqa: F821  — the demo, the server and their helpers come from readme_shots via exec
 """Short animations for the README: the real interface on the demo memory, recorded frame by frame into GIFs.
 
-    python tools/qa/readme_anim.py ru|en [scene,scene]   →  docs/img/<lang>/<scene>.gif
+    python tools/qa/readme_anim.py <lang> [scene,scene]   →  docs/img/<lang>/<scene>.gif
+
+<lang> is any of the ten: ru and en use the demo as written in readme_shots; for the other eight the interface is in
+that language and the demo itself (the memory, the answers, the discussion) is translated from English by the
+owner's Claude Code once, into tools/qa/demo_i18n/<lang>.json — delete the file to translate again.
 
 Scenes: hero (a question, the answer from memory), memory (portrait → map), consortium (three AIs talk),
-meetings (the four steps), lock (a password on the memory), privacy (who sees what).
+meetings (the four steps), lock (a password on the memory), privacy (who sees what), telegram (chats to read),
+tokens (the measured contract), learning (the live feed).
 Nothing touches the owner's memory: the demo of readme_shots, scripted answers, no network.
 """
 
@@ -15,7 +20,93 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 _args = sys.argv[1:]
 src = (HERE / "readme_shots.py").read_text(encoding="utf-8")
-sys.argv = [sys.argv[0], _args[0] if _args else "ru"]
+_lang = _args[0] if _args else "ru"
+NAMES = {
+    "zh": "Simplified Chinese",
+    "es": "Spanish",
+    "hi": "Hindi",
+    "pt": "Portuguese (Brazil)",
+    "fr": "French",
+    "de": "German",
+    "ja": "Japanese",
+}
+
+
+def demo_strings(lang: str) -> dict:
+    """The English texts of the demo (every T(ru, en) here and in readme_shots) in another language, kept in a file."""
+    import ast
+    import json
+    import re
+    import subprocess
+    import tempfile
+
+    f = HERE / "demo_i18n" / f"{lang}.json"
+    if f.exists():
+        return json.loads(f.read_text(encoding="utf-8"))
+    en = set()
+    for name in ("readme_shots.py", "readme_anim.py"):
+        for node in ast.walk(ast.parse((HERE / name).read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Call) and getattr(node.func, "id", None) == "T" and len(node.args) == 2:
+                a = node.args[1]
+                if isinstance(a, ast.Constant) and isinstance(a.value, str):
+                    en.add(a.value)
+                elif isinstance(a, (ast.List, ast.Tuple)):  # T([...], [...]): every line of a list
+                    en.update(x.value for x in a.elts if isinstance(x, ast.Constant) and isinstance(x.value, str))
+    sys.path.insert(0, str(HERE.parents[1]))
+    from mnema import net
+    from mnema.chat.providers import claude_exe
+
+    prompt = (
+        f"Translate the values of this demo for the Mnema app (a fictional founder Alex, his car-service CRM «Garage», "
+        f"his team Oleg, Maria, Sergio) from English into {NAMES[lang]}. Return ONLY a JSON object: the same English "
+        "keys, the translations as values. Keep Markdown (tables, **bold**), line breaks, numbers, prices, emoji and "
+        "product names (Mnema, Claude, ChatGPT, Gemini, QuickBooks, PDF). Names of people and companies may be "
+        "adapted to the language's script; «quotes» in the language's own style. Short labels stay short.\n\n"
+        + json.dumps({k: k for k in sorted(en)}, ensure_ascii=False, indent=0)
+    )
+    for _ in range(3):
+        out = subprocess.run(
+            [
+                claude_exe(),
+                "-p",
+                "--model",
+                "sonnet",
+                "--output-format",
+                "text",
+                "--tools",
+                "",
+                "--setting-sources",
+                "",
+                "--strict-mcp-config",
+                "--no-session-persistence",
+            ],
+            input=prompt.encode("utf-8"),
+            capture_output=True,
+            cwd=tempfile.gettempdir(),
+            env=net.env(),
+            timeout=900,
+        ).stdout.decode("utf-8", "replace")
+        m = re.search(r"\{.*\}", out, re.S)
+        try:
+            got = json.loads(m.group(0)) if m else {}
+        except ValueError:
+            got = {}
+        got = {k: v for k, v in got.items() if k in en and isinstance(v, str) and v.strip()}
+        if len(got) >= len(en) * 0.95:
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(json.dumps(got, ensure_ascii=False, indent=1), encoding="utf-8")
+            return got
+    raise SystemExit(f"{lang}: the demo did not translate")
+
+
+if _lang not in ("ru", "en"):  # the demo in this language; the interface follows LANG
+    _TR = demo_strings(_lang)
+    _line = "T = (lambda ru, en: ru) if RU else (lambda ru, en: en)"
+    assert src.count(_line) == 1
+    src = src.replace(
+        _line, "T = lambda ru, en: [_TR.get(x, x) for x in en] if isinstance(en, list) else _TR.get(en, en)"
+    )
+sys.argv = [sys.argv[0], _lang]
 exec(compile(src[: src.index("with sync_playwright() as p:")], "readme_shots", "exec"))
 ONLY = set(_args[1].split(",")) if len(_args) > 1 else None
 
@@ -27,7 +118,31 @@ W, H, OUTW = 1280, 800, 960
 _fast = PR.stream
 
 
+NOTED = T(
+    "Записала: «Колесо» идёт в пилот при условии интеграции с 1С. Добавлю это в план пилота.",
+    "Noted: «Wheel» joins the pilot on condition of a QuickBooks integration. I'll add it to the pilot plan.",
+)
+
+
+WHEEL = T(
+    "Олег звонил: «Колесо» тоже хочет пилот, но только с интеграцией 1С",
+    "Oleg called: «Wheel» wants the pilot too, but only with a QuickBooks integration",
+)
+
+
 def slow(*a, **kw):
+    msgs = a[4] if len(a) > 4 else kw.get("messages") or []
+    said = (msgs[-1].get("text", "") if msgs else "") if isinstance(msgs, list) else ""
+    system = a[3] if len(a) > 3 else kw.get("system", "")
+    whole = " ".join(m.get("text", "") for m in msgs) if isinstance(msgs, list) else ""
+    if system.startswith("Ты придумываешь") and WHEEL[:24] in whole:
+        yield T("Пилот с «Колесом»", "Pilot with «Wheel»")
+        return
+    if WHEEL[:24] in said:
+        for k in range(0, len(NOTED), 12):
+            time.sleep(0.06)
+            yield NOTED[k : k + 12]
+        return
     for chunk in _fast(*a, **kw):
         time.sleep(0.06)
         yield chunk
@@ -284,6 +399,141 @@ with sync_playwright() as p:
                 r.run(0.7, 90)
         r.run(1.5, 100)
         r.save()
+
+    if want("telegram"):
+        # a connected Telegram, two chats read; «Add chats» picks two more — the program reads only, never writes
+        everyone = [
+            {"id": "1", "name": T("Олег", "Oleg"), "kind": "user"},
+            {"id": "2", "name": T("Команда «Гаража»", "«Garage» team"), "kind": "group"},
+            {"id": "3", "name": T("Марина", "Maria"), "kind": "user"},
+            {"id": "4", "name": T("Избранное", "Saved Messages"), "kind": "self"},
+            {"id": "5", "name": T("Сергей, СТО «Мотор»", "Sergio, «Motor» garage"), "kind": "user"},
+            {"id": "6", "name": T("Пилот: 5 сервисов", "Pilot: 5 garages"), "kind": "group"},
+        ]
+        tg = {
+            "set": True,
+            "who": T("Иван", "Alex"),
+            "api_id": "1234567",
+            "phone": "+7",
+            "step": None,
+            "chats": everyone[:2],
+        }
+
+        def tg_route(rt):
+            if rt.request.method == "POST":
+                import json as _j
+
+                body = _j.loads(rt.request.post_data or "{}")
+                if "chats" in body:
+                    tg["chats"] = body["chats"]
+            rt.fulfill(json=tg)
+
+        page.route("**/api/telegram", tg_route)
+        page.route("**/api/telegram/chats", lambda rt: rt.fulfill(json={"chats": everyone}))
+        page.set_viewport_size({"width": W, "height": H})
+        page.goto(base + "#settings/learn")
+        page.wait_for_timeout(2500)
+        quiet(page)
+        page.evaluate("document.querySelector('#c-tg').scrollIntoView({block: 'start'}); window.scrollBy(0, -16)")
+        page.evaluate(
+            "(() => { const c = document.querySelector('#c-tg'); let s = c.parentElement; while (s && s.scrollHeight <= s.clientHeight + 4) s = s.parentElement; if (s) s.scrollTop += c.getBoundingClientRect().top - 16; })()"
+        )
+        page.wait_for_timeout(500)
+        r = Rec(page, "telegram")
+        r.run(1.8, 100)
+        page.locator("#tgadd").click()
+        r.run(0.9, 100)
+        for cid in ("5", "6"):
+            page.locator(f".tgpick [data-id='{cid}']").click()
+            r.run(0.6, 100)
+        page.locator(".tgpick #tgok").click()
+        r.run(2.6, 100)
+        r.save()
+        page.unroute("**/api/telegram/chats")
+        page.unroute("**/api/telegram")
+
+    if want("tokens"):
+        # the measured case from the welcome: a 153 000-character contract, input tokens without and with Mnema
+        page.goto(base + "#chat")
+        page.wait_for_timeout(1500)
+        page.evaluate(
+            "window.__wlc = 0; document.querySelectorAll('.wlc').forEach(e => e.remove()); setTimeout(() => welcomeFlow(), 0)"
+        )
+        page.wait_for_timeout(1200)
+        for _ in range(4):
+            if page.locator(".wlc .wtok").count():
+                break
+            page.locator(".wlc [data-next]").click()
+            page.wait_for_timeout(250)
+        b3 = page.locator(".wlc .card").bounding_box()
+        page.locator(".wlc [data-back]").click()  # one step back, so the bars are seen growing
+        page.wait_for_timeout(500)
+        b2 = page.locator(".wlc .card").bounding_box()
+        top = min(b2["y"], b3["y"])
+        bottom = max(b2["y"] + b2["height"], b3["y"] + b3["height"])
+        pad = 24
+        clip = {
+            "x": b3["x"] - pad,
+            "y": max(0, top - pad),
+            "width": b3["width"] + 2 * pad,
+            "height": bottom - top + 2 * pad,
+        }
+        r = Rec(page, "tokens", clip)
+        r.snap(60)
+        page.locator(".wlc [data-next]").click()
+        r.run(4.2, 90)
+        r.hold(1500)
+        r.save()
+        page.evaluate(
+            "document.querySelectorAll('.wlc').forEach(e => e.remove()); document.body.classList.remove('wlc-on')"
+        )
+
+    if want("learning"):
+        # you say something in passing; the feed shows what Mnema read, understood, wrote down — and why
+        page.goto(base + "#chat")
+        page.wait_for_timeout(1800)
+        quiet(page)
+        page.locator("#newc").click()
+        page.wait_for_timeout(900)
+        page.evaluate("toggleDrawer(true)")
+        page.wait_for_timeout(1200)
+        r = Rec(page, "learning")
+        r.run(0.8, 100)
+        typing(page, r, "#inp", WHEEL, per=3)
+        page.focus("#inp")
+        page.keyboard.press("Enter")
+        r.run(1.2, 110)
+        for stage, text, why in [
+            (
+                "читаю",
+                T(
+                    "«Колесо» хочет пилот, условие — интеграция 1С",
+                    "«Wheel» wants the pilot, on condition of a QuickBooks integration",
+                ),
+                "",
+            ),
+            (
+                "записала",
+                T(
+                    "СТО «Колесо» — в пилот, нужна интеграция с 1С",
+                    "«Wheel» garage joins the pilot, needs a QuickBooks integration",
+                ),
+                T(
+                    "уверенность 92% при пороге 80%, не личное — записала сама",
+                    "confidence 92% at an 80% threshold, not personal — wrote it myself",
+                ),
+            ),
+            (
+                "подтвердилось",
+                T("Олег ведёт переговоры с сервисами", "Oleg runs the talks with the garages"),
+                T("встретилось ещё раз, всего 4", "seen again, 4 times in all"),
+            ),
+        ]:
+            LE.emit(v, stage, text, why=why, source="mnema_chat")
+            r.run(1.7, 110)
+        r.hold(2500)
+        r.save()
+        page.evaluate("toggleDrawer(false)")
     b.close()
 shutil.rmtree(DEMO, ignore_errors=True)
 print("done", OUT)

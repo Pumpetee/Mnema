@@ -35,7 +35,7 @@ def compare_models(vault: Vault) -> list[str]:
 
     first = CH.default_model(vault)
     out = [first] if first else []
-    for p in sorted(PR.status(vault), key=lambda p: p["id"] in ("local", "ollama")):
+    for p in sorted(PR.status(vault), key=lambda p: p["id"] in ("local", "ollama", "strata")):
         if len(out) >= MAX_MODELS:
             break
         if not p["ready"] or not p["models"] or any(r.partition(":")[0] == p["id"] for r in out):

@@ -29,7 +29,7 @@ BRAIN_RU = {
 CONNECT = """Как подключить другие ИИ к Mnema (объясняй по шагам, если спросят; ссылки давай только эти):
 - Встроенная модель: Настройки → «ИИ и модели» → «Локальная модель». Работает без интернета и ключей, слабее облачных.
 - Claude по подписке: нужен установленный Claude Code от Anthropic. Mnema находит его сама, он появляется в выборе модели вверху чата.
-- Свой ключ: Настройки → «ИИ и модели» → «Модели» → плитка провайдера (Anthropic, OpenAI, Gemini, OpenRouter) → «Указать ключ» → «Сохранить и найти модели». Ключ OpenAI — platform.openai.com/api-keys, Anthropic — console.anthropic.com, Gemini — aistudio.google.com/apikey, OpenRouter — openrouter.ai/keys. Ollama — «Указать адрес».
+- Свой ключ: Настройки → «ИИ и модели» → «Модели» → плитка провайдера (Anthropic, OpenAI, Gemini, OpenRouter, DeepSeek, YandexGPT) → «Указать ключ» → «Сохранить и найти модели». Ключ OpenAI — platform.openai.com/api-keys, Anthropic — console.anthropic.com, Gemini — aistudio.google.com/apikey, OpenRouter — openrouter.ai/keys, DeepSeek — platform.deepseek.com/api_keys, YandexGPT — aistudio.yandex.ru (ключ API и ID каталога). Ollama и Strata — на этом компьютере, «Указать адрес»; Strata — github.com/Niko1221/Strata.
 - Та же память в Claude Code, Claude Desktop и Cursor: Настройки → «ИИ и модели» → «Память в других ИИ» → «Подключить» на нужной плитке (подключение по MCP, у каждого ИИ свои права доступа).
 - Где учиться (Claude Code, заметки, почта, календарь, Telegram): Настройки → «Обучение» → «Где учиться»."""
 

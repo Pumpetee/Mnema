@@ -39,7 +39,6 @@ LANGS = {
     "zh": "简体中文",
     "es": "español",
     "hi": "हिन्दी",
-    "ar": "العربية",
     "pt": "português",
     "fr": "français",
     "de": "Deutsch",

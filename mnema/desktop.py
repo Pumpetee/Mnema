@@ -208,7 +208,6 @@ body{overflow:hidden}
 .seg{display:inline-flex;background:var(--soft);border-radius:10px;padding:3px;gap:3px}.seg button{background:none;color:var(--ink2);padding:7px 14px}.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .fl{margin:14px 0 6px;font-size:13px;color:var(--ink3);font-weight:600}.nav{display:flex;justify-content:space-between;align-items:center;margin-top:22px}
 button:disabled{opacity:.45;cursor:default}.thhint{margin:14px 0 0;font-size:13px;color:var(--ink3);min-height:18px;transition:color .3s}
-[dir=rtl] .langs button{text-align:right}
 
 :root{--bg:#f4f3ef;--card:#fff;--ink:#16181d;--ink2:#4b505a;--ink3:#8a909a;--line:#e5e3dc;--soft:#efeee9;--acc:#5b5bd6;--acc2:#ecebff;--acc2b:#eaf4ff;--acc3:#dcdafb;--okb:#f1faf4;--okl:#bfe3cd;--blob:.55}
 [data-theme=dark]{--bg:#0f1115;--card:#171a21;--ink:#e8e9ee;--ink2:#a9adb8;--ink3:#7d828d;--line:#2a2e38;--soft:#1e222b;--acc:#7b7cf5;--acc2:#262842;--acc2b:#1d2a3a;--acc3:#3a3c66;--okb:#15281e;--okl:#24543a;--blob:.22}
@@ -276,14 +275,13 @@ const AI_LANG={ru:['ИИ будет отвечать тебе на русско�
  zh:['AI 将用中文回答你','即使你用其他语言书写也是如此。可随时通过右上角的语言按钮更改。','继续'],
  es:['La IA te responderá en español','Aunque escribas en otro idioma. Puedes cambiarlo cuando quieras con el botón de idioma arriba a la derecha.','Continuar'],
  hi:['AI आपको हिन्दी में जवाब देगा','भले ही आप किसी और भाषा में लिखें। ऊपर दाईं ओर भाषा बटन से इसे कभी भी बदल सकते हैं।','आगे'],
- ar:['سيجيبك الذكاء الاصطناعي بالعربية','حتى لو كتبت بلغة أخرى. يمكنك تغييرها في أي وقت من زر اللغة في الأعلى.','متابعة'],
  pt:['A IA vai responder em português','Mesmo que você escreva em outro idioma. Dá para mudar a qualquer momento no botão de idioma no canto superior direito.','Continuar'],
  fr:['L’IA te répondra en français','Même si tu écris dans une autre langue. Tu peux la changer à tout moment avec le bouton de langue en haut à droite.','Continuer'],
  de:['Die KI antwortet dir auf Deutsch','Auch wenn du in einer anderen Sprache schreibst. Ändern kannst du das jederzeit über die Sprachtaste oben rechts.','Weiter'],
  ja:['AI は日本語で答えます','別の言語で書いても同じです。右上の言語ボタンでいつでも変更できます。','次へ']};
-const LANGS=[['ru','Русский'],['en','English'],['zh','中文'],['es','Español'],['hi','हिन्दी'],['ar','العربية'],['pt','Português'],['fr','Français'],['de','Deutsch'],['ja','日本語']];
+const LANGS=[['ru','Русский'],['en','English'],['zh','中文'],['es','Español'],['hi','हिन्दी'],['pt','Português'],['fr','Français'],['de','Deutsch'],['ja','日本語']];
 const DICT=__SETUP_I18N__;let LANG='en';const ORIG=new Map();
-function trAll(){const d=DICT[LANG]||{};document.documentElement.dir=LANG==='ar'?'rtl':'ltr';document.documentElement.lang=LANG;
+function trAll(){const d=DICT[LANG]||{};document.documentElement.dir='ltr';document.documentElement.lang=LANG;
   const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT,{acceptNode:n=>n.nodeType===1&&n.matches('[data-noi18n],script,style')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
   let n;while((n=w.nextNode())){if(n.nodeType===3){if(!ORIG.has(n))ORIG.set(n,n.nodeValue);const o=ORIG.get(n),k=o.trim();if(k)n.nodeValue=d[k]?o.replace(k,d[k]):o}
     else if(n.placeholder){if(!ORIG.has(n))ORIG.set(n,n.placeholder);n.placeholder=d[ORIG.get(n)]||ORIG.get(n)}}}

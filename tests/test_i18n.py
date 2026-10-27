@@ -44,7 +44,7 @@ class TestLanguage(unittest.TestCase):
         self.assertIn("Обращайся на вы.", rules)
 
     def test_ten_languages(self):
-        self.assertEqual(CH.LANGS, ["ru", "en", "zh", "es", "hi", "ar", "pt", "fr", "de", "ja"])
+        self.assertEqual(CH.LANGS, ["ru", "en", "zh", "es", "hi", "pt", "fr", "de", "ja"])
         self.assertEqual(set(CH.LANG_NAMES), set(CH.LANGS))
 
 

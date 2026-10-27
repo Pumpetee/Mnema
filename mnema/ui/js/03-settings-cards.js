@@ -142,6 +142,9 @@ function provName(pid) {
       openai: "ChatGPT",
       gemini: "Gemini",
       openrouter: "OpenRouter",
+      deepseek: "DeepSeek",
+      yandex: "YandexGPT",
+      strata: "Strata",
       api: "ИИ по ключу",
       web: "Поисковики",
     }[pid] || pid

@@ -71,6 +71,20 @@ PROVIDERS = {
         "key": True,
         "base": "https://openrouter.ai/api/v1",
     },
+    "deepseek": {
+        "name": "DeepSeek",
+        "note": "Ключ API от DeepSeek.",
+        "client": "deepseek",
+        "key": True,
+        "base": "https://api.deepseek.com",
+    },
+    "yandex": {
+        "name": "YandexGPT",
+        "note": "Ключ API и ID каталога Yandex Cloud AI Studio.",
+        "client": "yandex",
+        "key": True,
+        "base": "https://ai.api.cloud.yandex.net/v1",
+    },
     "ollama": {
         "name": "Ollama",
         "note": "Всё остаётся на компьютере.",
@@ -78,7 +92,24 @@ PROVIDERS = {
         "key": False,
         "base": "http://127.0.0.1:11434",
     },
+    "strata": {
+        "name": "Strata",
+        "note": "Большие модели на этом компьютере: Qwen, DeepSeek. Без ключа и интернета.",
+        "client": "local",
+        "key": False,
+        "base": "http://127.0.0.1:8080/v1",
+    },
 }
+# Yandex Cloud AI Studio has no list of models over its OpenAI-compatible API: the text models of its catalogue
+# (aistudio.yandex.ru/docs/en/ai-studio/concepts/generation/models), addressed as gpt://<folder>/<id>
+YANDEX_MODELS = [
+    "aliceai-llm",
+    "yandexgpt-5.1",
+    "yandexgpt-5-pro",
+    "aliceai-llm-flash",
+    "deepseek-v4.1-flash",
+    "qwen3.6-35b-a3b",
+]
 CLAUDE_CODE_MODELS = [("", "Claude"), ("sonnet", "Claude Sonnet"), ("opus", "Claude Opus"), ("haiku", "Claude Haiku")]
 
 
@@ -106,6 +137,7 @@ def save(
     key: str | None = None,
     disabled: bool | None = None,
     created: dict | None = None,
+    folder: str | None = None,
 ) -> dict:
     """disabled: the owner switched this AI off — it leaves every list of models, its key and models stay."""
     if pid not in PROVIDERS:
@@ -120,6 +152,8 @@ def save(
         data[pid]["created"] = created
     if endpoint is not None:
         data[pid]["endpoint"] = endpoint.strip()
+    if folder is not None:  # YandexGPT: the Yandex Cloud folder the key belongs to
+        data[pid]["folder"] = folder.strip()
     if key is not None and not key.startswith("••••"):
         secrets_store.put(_vid(vault), f"chat.{pid}", key.strip())
     vault.service.mkdir(parents=True, exist_ok=True)
@@ -129,6 +163,10 @@ def save(
 
 def key_of(vault: Vault, pid: str) -> str:
     return secrets_store.get(_vid(vault), f"chat.{pid}")
+
+
+def folder_of(vault: Vault, pid: str = "yandex") -> str:
+    return (load(vault).get(pid) or {}).get("folder", "")
 
 
 def base_of(vault: Vault, pid: str) -> str:
@@ -177,12 +215,24 @@ def status(vault: Vault) -> list[dict]:
             inst = localllm.installed_models()
             ready, models = bool(inst and localllm.engine_ok()), [{"id": m["id"], "name": m["name"]} for m in inst]
         else:
-            ready = claude_signed_in() if pid == "claude_code" else bool(key) if p["key"] else bool(data[pid]["models"])
+            ready = (
+                claude_signed_in()
+                if pid == "claude_code"
+                else bool(key and data[pid].get("folder"))
+                if pid == "yandex"
+                else bool(key)
+                if p["key"]
+                else bool(data[pid]["models"])
+            )
             models = (
                 [{"id": m, "name": n} for m, n in CLAUDE_CODE_MODELS]
                 if pid == "claude_code"
                 else [
-                    {"id": m, "name": m, **({"old": True} if model_rank.old(m) and pid != "ollama" else {})}
+                    {
+                        "id": m,
+                        "name": m,
+                        **({"old": True} if model_rank.old(m) and pid not in ("ollama", "strata", "yandex") else {}),
+                    }
                     for m in model_rank.rank(pid, data[pid]["models"], data[pid].get("created"))
                 ]
             )
@@ -200,6 +250,7 @@ def status(vault: Vault) -> list[dict]:
                 "problem": problem,
                 "key": ("••••" + key[-4:]) if key else "",
                 "endpoint": data[pid].get("endpoint", ""),
+                **({"folder": data[pid].get("folder", "")} if pid == "yandex" else {}),
                 "models": models,
             }
         )
@@ -233,6 +284,17 @@ def fetch_models(vault: Vault, pid: str) -> list[str]:
                 pass
     elif pid == "ollama":
         ids = [m["name"] for m in _get(base + "/api/tags", {}).get("models", [])]
+    elif pid == "yandex":
+        folder = folder_of(vault)
+        if not key or not folder:
+            raise NotSent("Нужны ключ API и ID каталога Yandex Cloud")
+        _yandex_ping(base, key, folder)  # no list to ask for: a one-token request checks the key and the folder
+        ids = list(YANDEX_MODELS)
+    elif pid == "strata":
+        ids = [
+            m.get("id", "")
+            for m in _get(base + "/models", {"Authorization": f"Bearer {key or 'strata'}"}).get("data", [])
+        ]
     else:
         if pid == "openrouter":  # its list of models is public: the key is checked on its own
             _get(base + "/key", {"Authorization": f"Bearer {key}"})
@@ -245,10 +307,124 @@ def fetch_models(vault: Vault, pid: str) -> list[str]:
         }
         if pid == "openai":
             ids = [i for i in ids if i.startswith(("gpt", "o1", "o3", "o4", "chatgpt"))] or ids
-    ids = model_rank.rank(pid, sorted({i for i in ids if i}), created)
+    ids = sorted({i for i in ids if i and not NOT_CHAT.search(i)}) if pid in PROBE else sorted({i for i in ids if i})
+    if pid in PROBE and pid != "yandex":
+        ids = usable(vault, pid, ids)  # what the provider lists is not what answers in a chat: each one is asked
+    ids = model_rank.rank(pid, ids, created)
     save(vault, pid, models=ids, created={i: created[i] for i in ids if i in created})
     clear_problem(vault, pid)  # the key works again
     return ids
+
+
+# The providers whose list of models is checked model by model. OpenAI's list holds about a hundred names, and in a
+# chat only a third of them answer: the rest are retired (o4-mini, gpt-4, o1…), made for sound, pictures or voice, or
+# open only through another API (pro, codex). OpenRouter lists hundreds of chat models and is not asked one by one.
+PROBE = {"openai", "gemini", "deepseek", "yandex"}
+NOT_CHAT = re.compile(
+    r"image|audio|realtime|tts|transcri|embed|moderation|dall-e|whisper|sora|davinci|babbage|imagen|veo|aqa|"
+    r"native-audio|live-|computer-use",
+    re.I,
+)
+GONE = re.compile(
+    r"deprecated|not a chat model|not supported in the v1/chat/completions|only supported in v1/responses|"
+    r"does not exist|model_not_found|not found for API version|is not found|modality contain audio|no longer available",
+    re.I,
+)
+
+
+def _probe(vault: Vault, pid: str, mid: str):
+    """One tiny request: True — it answers, False — the provider says it is not a chat model or is gone,
+    None — can't tell now (a limit, a busy server, no network): the model stays."""
+    from .. import errors as E
+
+    base, key = base_of(vault, pid), key_of(vault, pid)
+    folder = folder_of(vault) if pid == "yandex" else ""
+    body = {
+        "model": f"gpt://{folder}/{mid}" if pid == "yandex" else mid,
+        "messages": [{"role": "user", "content": "ok"}],
+    }
+    body["max_completion_tokens" if pid == "openai" else "max_tokens"] = 16
+    req = urllib.request.Request(
+        base + "/chat/completions",
+        method="POST",
+        data=json.dumps(body).encode(),
+        headers=_yandex_headers(key, folder)
+        if pid == "yandex"
+        else {"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+    )
+    try:
+        with net.urlopen(req, timeout=40) as r:
+            r.read()
+        return True
+    except urllib.error.HTTPError as e:
+        body_text = E._body(e)
+        if e.code in (400, 404) and GONE.search(body_text):
+            return False
+        if e.code == 404:
+            return False
+        return None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def usable(vault: Vault, pid: str, ids: list[str]) -> list[str]:
+    import concurrent.futures as cf
+
+    with cf.ThreadPoolExecutor(8) as ex:
+        res = dict(zip(ids, ex.map(lambda m: _probe(vault, pid, m), ids)))
+    return [m for m in ids if res.get(m) is not False]
+
+
+def forget_model(vault: Vault, pid: str, mid: str) -> None:
+    """A model the provider has retired or that is not a chat model leaves the saved list at its first refusal."""
+    data = load(vault)
+    ms = data.get(pid, {}).get("models", [])
+    if mid in ms:
+        save(vault, pid, models=[m for m in ms if m != mid])
+
+
+_strata_looked: set[str] = set()
+
+
+def find_strata(vault: Vault) -> None:
+    """Strata, once per start of Mnema: if it runs on its usual address and isn't connected yet, take its models.
+    A quiet, quick look on this computer only; nothing happens if it isn't there."""
+    import os
+
+    root = str(vault.root)
+    if root in _strata_looked or os.environ.get("MNEMA_NO_DETECT"):
+        return
+    _strata_looked.add(root)
+    if load(vault)["strata"].get("models"):
+        return
+    try:
+        d = _get(base_of(vault, "strata") + "/models", {"Authorization": "Bearer strata"}, timeout=1)
+    except Exception:  # noqa: BLE001 — not running, not installed: nothing to say
+        return
+    ids = [m.get("id", "") for m in d.get("data", []) if m.get("id")]
+    if ids:
+        save(vault, "strata", models=ids)
+
+
+def _yandex_ping(base: str, key: str, folder: str) -> None:
+    req = urllib.request.Request(
+        base + "/chat/completions",
+        method="POST",
+        data=json.dumps(
+            {
+                "model": f"gpt://{folder}/aliceai-llm-flash",
+                "max_tokens": 1,
+                "messages": [{"role": "user", "content": "ok"}],
+            }
+        ).encode(),
+        headers=_yandex_headers(key, folder),
+    )
+    with net.urlopen(req, timeout=30) as r:
+        r.read()
+
+
+def _yandex_headers(key: str, folder: str) -> dict:
+    return {"Authorization": f"Bearer {key}", "OpenAI-Project": folder, "Content-Type": "application/json"}
 
 
 def claude_login() -> dict:
@@ -484,9 +660,22 @@ def stream(
         if not _never_connected(e):
             sent()
         _remember_problem(vault, pid, e)
+        _drop_if_gone(vault, pid, model, e)
         raise
     if got and problem_of(load(vault), pid):
         clear_problem(vault, pid)
+
+
+def _drop_if_gone(vault: Vault, pid: str, model: str, e: BaseException) -> None:
+    """The provider says this model is retired or not a chat model: it leaves the list, the owner picks another."""
+    from .. import errors as E
+
+    try:
+        if isinstance(e, urllib.error.HTTPError) and e.code in (400, 404) and GONE.search(E._body(e)):
+            forget_model(vault, pid, model)
+            e.model_gone = True
+    except Exception:  # noqa: BLE001
+        pass
 
 
 def _remember_problem(vault: Vault, pid: str, e: BaseException) -> None:
@@ -639,6 +828,9 @@ def _stream_raw(
         base, key = base_of(vault, pid), key_of(vault, pid)
     if PROVIDERS[pid]["key"] and not key:
         raise NotSent(f"Нет ключа {PROVIDERS[pid]['name']}: добавь его в настройках")
+    folder = folder_of(vault) if pid == "yandex" else ""
+    if pid == "yandex" and not folder:
+        raise NotSent("Нет ID каталога Yandex Cloud: добавь его в настройках")
     if not model:
         raise NotSent("Выбери модель")
     msgs = [{"role": m["role"], "content": _content(pid, m)} for m in messages]
@@ -742,7 +934,7 @@ def _stream_raw(
         method="POST",
         data=json.dumps(
             {
-                "model": model,
+                "model": f"gpt://{folder}/{model}" if pid == "yandex" else model,
                 "stream": True,
                 "stream_options": {"include_usage": True},
                 **({"max_completion_tokens": cap} if pid == "openai" else {"max_tokens": cap}),
@@ -758,7 +950,9 @@ def _stream_raw(
                 "messages": [{"role": "system", "content": system}] + msgs,
             }
         ).encode(),
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+        headers=_yandex_headers(key, folder)
+        if pid == "yandex"
+        else {"Authorization": f"Bearer {key or 'local'}", "Content-Type": "application/json"},
     )
     finished = False
     for ev in _sse(req):

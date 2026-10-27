@@ -62,6 +62,16 @@ def http(code: int, body: str, who: str, model: str = "") -> str:
         )
     if code == 429:
         return f"{who} просит подождать: слишком много запросов подряд. Повтори через минуту."
+    if code in (400, 404) and re.search(
+        r"deprecated|not a chat model|not supported in the v1/chat/completions|only supported in v1/responses|"
+        r"modality contain audio|no longer available",
+        msg,
+    ):
+        what = f"Модель «{model}»" if model else "Эта модель"
+        return (
+            f"{what} у {who} больше не работает в чате (снята с поддержки или сделана не для разговора) — "
+            "я убрала её из списка. Выбери другую слева вверху."
+        )
     if code == 404:
         what = f"«{model}»" if model else "эта модель"
         return f"У {who} нет модели {what}: выбери другую слева вверху или обнови список — {KEYS}."
@@ -144,7 +154,10 @@ def provider_name(pid: str) -> str:
         "openai": "ChatGPT",
         "gemini": "Gemini",
         "openrouter": "OpenRouter",
+        "deepseek": "DeepSeek",
+        "yandex": "YandexGPT",
         "ollama": "Ollama",
+        "strata": "Strata",
         "local": "Модель на компьютере",
     }.get(pid, pid or "сервис")
 

@@ -1,0 +1,168 @@
+{
+ "langs_intro": "O Mnema fala nove idiomas. A interface, a ajuda e as respostas da IA seguem o idioma que você escolher, mesmo quando você escreve em outro. Este README e o guia do Mnema existem em cada um deles.",
+ "guide_btn": "Guia do Mnema",
+ "guide_msg": "todas as telas e configurações",
+ "badges": [
+  "somente leitura",
+  "somente leitura",
+  "criptografia",
+  "seus arquivos"
+ ],
+ "typing": [
+  "Uma memória para todas as IAs",
+  "Grátis, no seu computador, sem conta"
+ ],
+ "lead": "O Mnema lembra quem você é, no que está trabalhando, o que decidiu e como você gosta das respostas — e toda IA com quem você conversa recebe esse contexto. A memória é uma pasta de arquivos Markdown simples no seu computador. Sem nuvem, sem conta.",
+ "dl": [
+  "Baixar para",
+  "todos os arquivos"
+ ],
+ "hero_alt": "Uma pergunta, e a resposta vem da memória: o plano da semana em forma de tabela, com o preço e a regra de reuniões que ele já conhece",
+ "hero_cap": "Você pergunta “o que é importante esta semana?” — o plano vem em uma tabela, com o preço combinado e a sua regra sobre reuniões. Você não precisou digitar nada disso de novo.",
+ "langs": "Idiomas",
+ "what": "O que ele faz",
+ "grid": [
+  [
+   "🧠",
+   "Conhece você",
+   "Um retrato que toda IA lê primeiro, um mapa vivo da memória, arquivos simples que são seus."
+  ],
+  [
+   "🗣️",
+   "Consórcio",
+   "Claude, ChatGPT e Gemini debatem e chegam a uma única resposta."
+  ],
+  [
+   "🎙️",
+   "Reuniões",
+   "Uma chamada vira transcrição, resumo e tarefas com responsáveis."
+  ],
+  [
+   "🔐",
+   "Privado",
+   "Uma senha na memória, como no KeePass. Segredos nunca chegam à nuvem."
+  ],
+  [
+   "💻",
+   "Offline",
+   "13 modelos gratuitos rodam no seu computador, sem chaves."
+  ],
+  [
+   "📉",
+   "Menos tokens",
+   "Só o que importa vai para o modelo: 4,8× menos tokens em um contrato longo."
+  ]
+ ],
+ "sec": [
+  [
+   "🧠 Ele conhece você",
+   "memory",
+   "Retrato e mapa da memória: os tópicos são bolhas, e o tamanho mostra o quanto o Mnema sabe",
+   [
+    "**Um retrato que toda IA lê primeiro:** quem você é, o que está construindo, como gosta de trabalhar. O Mnema escreve o retrato conforme aprende, e você pode corrigi-lo à mão.",
+    "**Um mapa da memória:** cada tópico é uma bolha, uma pulsação indica que mudou recentemente, um cadeado indica que algumas IAs não o enxergam.",
+    "**Fatos antigos não se passam por novos:** cada fato leva a sua data, e o Mnema pergunta de novo sobre qualquer status com mais de um mês.",
+    "**Mais de uma pasta:** conecte um cofre do Obsidian ou uma pasta de equipe — somente leitura, o próprio programa bloqueia a escrita ali."
+   ]
+  ],
+  [
+   "🗣️ Consórcio: várias IAs, uma resposta",
+   "consortium",
+   "Claude, ChatGPT e Gemini discutem a pergunta, e uma delas faz o resumo",
+   [
+    "**Conselho, debate, brainstorm, red team, roast** — escolha o formato e o número de rodadas.",
+    "**Intervenha quando quiser:** “Parar” interrompe a IA atual e mantém o que ela disse.",
+    "**Discuta com IAs diferentes** sob qualquer resposta: o autor a defende, e as demais procuram onde ela erra."
+   ]
+  ],
+  [
+   "🎙️ Reuniões: de uma chamada a tarefas",
+   "meetings",
+   "O caminho de uma reunião: gravação, transcrição, resumo, memória — cada etapa com suas próprias configurações",
+   [
+    "**Duas faixas:** seu microfone e o som do computador, para a transcrição saber quem falou.",
+    "**Whisper no seu computador de graça**, ou o Whisper na nuvem (≈ US$ 0,36 por hora) — silêncio, frases inventadas e eco são removidos.",
+    "**O resumo:** o que foi decidido, as tarefas e quem é o responsável, feito por qualquer modelo que você escolher, inclusive um local.",
+    "**Predefinições:** Privado, Equilibrado e Rápido ajustam todo o processo de uma vez."
+   ]
+  ],
+  [
+   "🌱 Ele aprende sozinho",
+   "learning",
+   "Você menciona algo de passagem, e o feed mostra o que o Mnema leu, entendeu e anotou, e por quê",
+   [
+    "**Certeza significa salvar:** um fato de que ele tem certeza (80% ou mais) é gravado na hora, e um duvidoso espera ser ouvido de novo.",
+    "**O pessoal fica à parte:** dinheiro, saúde e assuntos privados vão para cartões com etiqueta que você pode esconder de qualquer IA.",
+    "**Nada fica escondido de você:** o feed “O que entendi e por quê” mostra cada decisão com o seu motivo."
+   ]
+  ],
+  [
+   "✈️ Lê o Telegram, nunca escreve nele",
+   "telegram",
+   "Telegram conectado somente para leitura: você escolhe os chats, e o Mnema aprende com eles",
+   [
+    "**Você escolhe os chats:** o Mnema aprende sobre você e as pessoas ao seu redor apenas com eles.",
+    "**Somente leitura, por design:** o cliente do Telegram dentro do Mnema só consegue ler; qualquer outro comando é recusado antes de ser enviado.",
+    "**Fica no seu computador:** o login é criptografado no armazenamento do sistema, e o Mnema não tem servidores próprios."
+   ]
+  ],
+  [
+   "📉 Economiza tokens",
+   "tokens",
+   "Uma pergunta sobre um contrato de 153.000 caracteres: 29.643 tokens de entrada com o texto inteiro, 6.159 com o Mnema",
+   [
+    "**Só o que importa sai daqui:** memória, documentos e páginas da web são lidos no seu computador, e o modelo recebe apenas as partes relevantes.",
+    "**Medido:** em uma pergunta sobre um contrato de 153.000 caracteres, o texto inteiro custou 29.643 tokens de entrada; o Mnema enviou 6.159, e só a resposta do Mnema estava certa.",
+    "**Visível sempre:** embaixo de cada resposta você vê quantos tokens foram economizados."
+   ],
+   560
+  ]
+ ],
+ "priv": "🔐 Privado por design",
+ "priv_l": [
+  "lock",
+  "Primeiro início: uma senha na memória, como no KeePass"
+ ],
+ "priv_r": [
+  "privacy",
+  "Quem vê o quê: um visto por parte da memória, um cadeado por tópico"
+ ],
+ "priv_text": [
+  "**Uma senha na memória:** AES-256, a chave vem da sua senha, criptografia de código aberto. Sem ela, as notas não podem ser lidas, mesmo copiadas do disco. Uma cópia sincronizada também continua criptografada.",
+  "**Segredos ficam com você:** números de cartão, senhas, chaves e telefones viram marcadores antes que qualquer coisa vá para um modelo na nuvem.",
+  "**Cada IA tem o seu próprio acesso:** dinheiro, saúde e tópicos privados ficam ocultos de qualquer uma delas com um clique."
+ ],
+ "works": "🤖 Funciona com",
+ "groups": [
+  [
+   "IA na nuvem",
+   "por chave ou assinatura"
+  ],
+  [
+   "No seu computador",
+   "grátis, offline"
+  ],
+  [
+   "Nas suas ferramentas",
+   "via MCP"
+  ],
+  [
+   "Sistemas",
+   "um só app"
+  ]
+ ],
+ "local": "Integrado",
+ "more": "E mais",
+ "more_text": [
+  "**Trabalha com os seus arquivos.** Lê digitalizações, escreve notas, cria PDF, Word e Excel, junta e divide PDF. Toda escrita pode ser desfeita em Memória → Histórico.",
+  "**Nove idiomas.** A interface e as respostas da IA seguem o idioma que você escolher, mesmo quando você escreve em outro."
+ ],
+ "fold": [
+  "Instalar",
+  "Compilar a partir do código-fonte",
+  "Como é construído",
+  "Segurança"
+ ],
+ "lic": "Licença",
+ "foot": "Se o Mnema lembra de algo útil para você, uma ⭐ ajuda outras pessoas a encontrá-lo."
+}

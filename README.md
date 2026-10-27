@@ -4,23 +4,24 @@
 
 # Mnema
 
-<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2600&pause=900&color=A78BFA&center=true&vCenter=true&width=720&height=46&lines=One%20memory%20for%20every%20AI;Claude%20%C2%B7%20ChatGPT%20%C2%B7%20Gemini%20%C2%B7%20local%20models;Free%2C%20on%20your%20computer%2C%20no%20account" alt="One memory for every AI">
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2600&pause=900&color=A78BFA&center=true&vCenter=true&width=720&height=46&lines=One%20memory%20for%20every%20AI;Free%2C%20on%20your%20computer%2C%20no%20account" alt="One memory for every AI">
 
 <a href="https://github.com/Pumpetee/Mnema/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnema?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnema/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnema/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnema?style=flat-square&color=ec4899" alt="last commit"></a>
 
 <img src="https://img.shields.io/badge/MCP-Claude%20%C2%B7%20Cursor-7c3aed?style=flat-square&logo=modelcontextprotocol&logoColor=white" alt="MCP: Claude · Cursor"> <img src="https://img.shields.io/badge/Obsidian-read%20only-7c3aed?style=flat-square&logo=obsidian&logoColor=white" alt="Obsidian: read only"> <img src="https://img.shields.io/badge/Telegram-read%20only-229ED9?style=flat-square&logo=telegram&logoColor=white" alt="Telegram: read only"> <img src="https://img.shields.io/badge/AES--256-encryption-15803d?style=flat-square" alt="AES-256: encryption"> <img src="https://img.shields.io/badge/Markdown-your%20files-555555?style=flat-square&logo=markdown&logoColor=white" alt="Markdown: your files"> <img src="https://img.shields.io/badge/Python-3.13-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python: 3.13">
 
-<sub><a href="README.ru.md">Русский</a></sub>
+<a href="docs/guide/en.md"><img src="https://img.shields.io/badge/Mnema%20guide-every%20screen%20and%20setting-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnema guide"></a>
 
 </div>
 
 ## Languages
 
-Mnema speaks ten languages. The interface, the help and the AI's answers follow the one you pick, even when you write in another. Arabic reads right to left. This README is in English and [Russian](README.ru.md).
+Mnema speaks nine languages. The interface, the help and the AI's answers follow the one you pick, even when you write in another. This README and the Mnema guide exist in each of them.
 
-| <img src="https://flagcdn.com/w80/gb.png" width="40" alt="English"><br><b>English</b><br><sub>English</sub> | <img src="https://flagcdn.com/w80/ru.png" width="40" alt="Russian"><br><b>Русский</b><br><sub>Russian</sub> | <img src="https://flagcdn.com/w80/cn.png" width="40" alt="Chinese"><br><b>中文</b><br><sub>Chinese</sub> | <img src="https://flagcdn.com/w80/es.png" width="40" alt="Spanish"><br><b>Español</b><br><sub>Spanish</sub> | <img src="https://flagcdn.com/w80/in.png" width="40" alt="Hindi"><br><b>हिन्दी</b><br><sub>Hindi</sub> |
-|:---:|:---:|:---:|:---:|:---:|
-| <img src="https://flagcdn.com/w80/sa.png" width="40" alt="Arabic"><br><b>العربية</b><br><sub>Arabic</sub> | <img src="https://flagcdn.com/w80/pt.png" width="40" alt="Portuguese"><br><b>Português</b><br><sub>Portuguese</sub> | <img src="https://flagcdn.com/w80/fr.png" width="40" alt="French"><br><b>Français</b><br><sub>French</sub> | <img src="https://flagcdn.com/w80/de.png" width="40" alt="German"><br><b>Deutsch</b><br><sub>German</sub> | <img src="https://flagcdn.com/w80/jp.png" width="40" alt="Japanese"><br><b>日本語</b><br><sub>Japanese</sub> |
+<table>
+<tr><td align="center" width="10%"><img src="https://flagcdn.com/w80/gb.png" width="36" alt="English"><br><b>✓ English</b><br><sub><a href="README.md">README</a> · <a href="docs/guide/en.md">Guide</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/ru.png" width="36" alt="Русский"><br><b>Русский</b><br><sub><a href="README.ru.md">README</a> · <a href="docs/guide/ru.md">Справочник</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/cn.png" width="36" alt="中文"><br><b>中文</b><br><sub><a href="README.zh.md">README</a> · <a href="docs/guide/zh.md">指南</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/es.png" width="36" alt="Español"><br><b>Español</b><br><sub><a href="README.es.md">README</a> · <a href="docs/guide/es.md">Guía</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/in.png" width="36" alt="हिन्दी"><br><b>हिन्दी</b><br><sub><a href="README.hi.md">README</a> · <a href="docs/guide/hi.md">गाइड</a></sub></td></tr>
+<tr><td align="center" width="10%"><img src="https://flagcdn.com/w80/pt.png" width="36" alt="Português"><br><b>Português</b><br><sub><a href="README.pt.md">README</a> · <a href="docs/guide/pt.md">Guia</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/fr.png" width="36" alt="Français"><br><b>Français</b><br><sub><a href="README.fr.md">README</a> · <a href="docs/guide/fr.md">Guide</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/de.png" width="36" alt="Deutsch"><br><b>Deutsch</b><br><sub><a href="README.de.md">README</a> · <a href="docs/guide/de.md">Handbuch</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/jp.png" width="36" alt="日本語"><br><b>日本語</b><br><sub><a href="README.ja.md">README</a> · <a href="docs/guide/ja.md">ガイド</a></sub></td></tr>
+</table>
 
 <div align="center">
 
@@ -77,6 +78,30 @@ Mnema remembers who you are, what you are working on, what you decided and how y
 - **The summary:** what was decided, the tasks and who owns them, by any model you pick, a local one included.
 - **Presets:** Private, Balanced, Fast set the whole way at once.
 
+## 🌱 It learns by itself
+
+<p align="center"><img src="docs/img/en/learning.gif" width="860" alt="You mention something in passing, and the feed shows what Mnema read, understood and wrote down, and why"></p>
+
+- **Sure means saved:** a fact it is sure of (80% or more) is written at once, a doubtful one waits to be heard again.
+- **Personal goes apart:** money, health and private matters land in tagged cards you can hide from any AI.
+- **Nothing is hidden from you:** the «What I understood and why» feed shows every decision with its reason.
+
+## ✈️ Reads Telegram, never writes there
+
+<p align="center"><img src="docs/img/en/telegram.gif" width="860" alt="Telegram connected read only: you pick the chats, Mnema learns from them"></p>
+
+- **You pick the chats:** Mnema learns about you and the people around you only from those.
+- **Read only, by design:** the Telegram client inside Mnema can only read; any other command is refused before it is sent.
+- **Stays on your computer:** the login is encrypted in the system's store, and Mnema has no servers of its own.
+
+## 📉 Saves tokens
+
+<p align="center"><img src="docs/img/en/tokens.gif" width="560" alt="A question about a 153,000-character contract: 29,643 input tokens for the whole text, 6,159 with Mnema"></p>
+
+- **Only what matters goes out:** memory, documents and web pages are read on your computer, and the model gets the relevant parts.
+- **Measured:** on a question about a 153,000-character contract the whole text took 29,643 input tokens; Mnema sent 6,159, and only the Mnema answer was right.
+- **Visible every time:** under each answer you see how many tokens were saved.
+
 ## 🔐 Private by design
 
 <table><tr><td width="50%" valign="top" align="center"><img src="docs/img/en/lock.gif" alt="First start: a password on the memory, like KeePass"><br><sub>First start: a password on the memory, like KeePass</sub></td><td width="50%" valign="top" align="center"><img src="docs/img/en/privacy.gif" alt="Who sees what: a tick per part of memory, a lock per topic"><br><sub>Who sees what: a tick per part of memory, a lock per topic</sub></td></tr></table>
@@ -88,16 +113,13 @@ Mnema remembers who you are, what you are working on, what you decided and how y
 ## 🤖 Works with
 
 <div align="center">
-<table><tr><td align="center" valign="top"><code>Cloud AI</code><br><sub>by key or subscription</sub><table><tr><td align="center" width="96"><img src="docs/img/brand/claude.svg" width="44" alt="Claude"><br><sub><b>Claude</b></sub></td><td align="center" width="96"><img src="docs/img/brand/chatgpt.svg" width="44" alt="ChatGPT"><br><sub><b>ChatGPT</b></sub></td><td align="center" width="96"><img src="docs/img/brand/gemini.svg" width="44" alt="Gemini"><br><sub><b>Gemini</b></sub></td><td align="center" width="96"><img src="docs/img/brand/openrouter.svg" width="44" alt="OpenRouter"><br><sub><b>OpenRouter</b></sub></td></tr></table></td><td align="center" valign="top"><code>On your computer</code><br><sub>free, offline</sub><table><tr><td align="center" width="96"><img src="docs/img/brand/local.svg" width="44" alt="Built-in"><br><sub><b>Built-in</b></sub></td><td align="center" width="96"><img src="https://cdn.simpleicons.org/ollama/ffffff" width="44" alt="Ollama"><br><sub><b>Ollama</b></sub></td></tr></table></td></tr><tr><td align="center" valign="top"><code>In your tools</code><br><sub>over MCP</sub><table><tr><td align="center" width="96"><img src="https://cdn.simpleicons.org/claude/D97757" width="44" alt="Claude Code"><br><sub><b>Claude Code</b></sub></td><td align="center" width="96"><img src="docs/img/brand/cursor.svg" width="44" alt="Cursor"><br><sub><b>Cursor</b></sub></td></tr></table></td><td align="center" valign="top"><code>Systems</code><br><sub>one app</sub><table><tr><td align="center" width="96"><img src="docs/img/brand/windows.svg" width="44" alt="Windows"><br><sub><b>Windows</b></sub></td><td align="center" width="96"><img src="https://cdn.simpleicons.org/apple/ffffff" width="44" alt="macOS"><br><sub><b>macOS</b></sub></td><td align="center" width="96"><img src="https://cdn.simpleicons.org/linux/FCC624" width="44" alt="Linux"><br><sub><b>Linux</b></sub></td></tr></table></td></tr></table>
+<table><tr><td valign="middle" width="150"><b>Cloud AI</b><br><sub>by key or subscription</sub></td><td align="center" width="92"><img src="docs/img/brand/claude.svg" width="40" alt="Claude"><br><sub><b>Claude</b></sub></td><td align="center" width="92"><img src="docs/img/brand/chatgpt.svg" width="40" alt="ChatGPT"><br><sub><b>ChatGPT</b></sub></td><td align="center" width="92"><img src="docs/img/brand/gemini.svg" width="40" alt="Gemini"><br><sub><b>Gemini</b></sub></td><td align="center" width="92"><img src="docs/img/brand/deepseek.svg" width="40" alt="DeepSeek"><br><sub><b>DeepSeek</b></sub></td><td align="center" width="92"><img src="docs/img/brand/yandex.svg" width="40" alt="YandexGPT"><br><sub><b>YandexGPT</b></sub></td><td align="center" width="92"><img src="docs/img/brand/openrouter.svg" width="40" alt="OpenRouter"><br><sub><b>OpenRouter</b></sub></td></tr><tr><td valign="middle" width="150"><b>On your computer</b><br><sub>free, offline</sub></td><td align="center" width="92"><img src="docs/img/brand/local.svg" width="40" alt="Built-in"><br><sub><b>Built-in</b></sub></td><td align="center" width="92"><img src="https://cdn.simpleicons.org/ollama/ffffff" width="40" alt="Ollama"><br><sub><b>Ollama</b></sub></td><td align="center" width="92"><img src="docs/img/brand/strata.svg" width="40" alt="Strata"><br><sub><b>Strata</b></sub></td><td></td><td></td><td></td></tr><tr><td valign="middle" width="150"><b>In your tools</b><br><sub>over MCP</sub></td><td align="center" width="92"><img src="https://cdn.simpleicons.org/claude/D97757" width="40" alt="Claude Code"><br><sub><b>Claude Code</b></sub></td><td align="center" width="92"><img src="docs/img/brand/cursor.svg" width="40" alt="Cursor"><br><sub><b>Cursor</b></sub></td><td></td><td></td><td></td><td></td></tr><tr><td valign="middle" width="150"><b>Systems</b><br><sub>one app</sub></td><td align="center" width="92"><img src="docs/img/brand/windows.svg" width="40" alt="Windows"><br><sub><b>Windows</b></sub></td><td align="center" width="92"><img src="https://cdn.simpleicons.org/apple/ffffff" width="40" alt="macOS"><br><sub><b>macOS</b></sub></td><td align="center" width="92"><img src="https://cdn.simpleicons.org/linux/FCC624" width="40" alt="Linux"><br><sub><b>Linux</b></sub></td><td></td><td></td><td></td></tr></table>
 </div>
 
 ## ⚡ And more
 
-- **Learns by itself.** A fact it is sure of (80% or more) is written at once, a doubtful one waits to be heard again. The «What I understood and why» feed shows every decision.
-- **Reads Telegram, never writes there.** The client inside Mnema can only read; any other command is refused before it is sent.
 - **Works with your files.** Reads scans, writes notes, makes PDF, Word and Excel, merges and splits PDF. Every write can be undone in Memory → History.
-- **Saves tokens.** On a question about a 153,000-character contract the whole text took 29,643 input tokens; Mnema sent 6,159, and only the Mnema answer was right.
-- **Ten languages.** The interface and the AI's answers follow the one you pick; Arabic reads right to left.
+- **Nine languages.** The interface and the AI's answers follow the one you pick, even when you write in another.
 
 <details>
 <summary><b>Install</b></summary>

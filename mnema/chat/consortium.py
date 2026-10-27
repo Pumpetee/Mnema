@@ -58,7 +58,15 @@ def speaker_name(ref: str, vault=None) -> str:
         return m["name"] if m else (mid or "Локальная модель")
     if pid == "anthropic":
         return _pretty(mid) if mid else "Claude"
-    base = {"openai": "ChatGPT", "gemini": "Gemini", "openrouter": "", "ollama": ""}.get(pid, "")
+    base = {
+        "openai": "ChatGPT",
+        "gemini": "Gemini",
+        "openrouter": "",
+        "ollama": "",
+        "deepseek": "",
+        "yandex": "",
+        "strata": "",
+    }.get(pid, "")
     return f"{base} · {mid}" if base and mid else (mid or PR.PROVIDERS.get(pid, {}).get("name", pid))
 
 

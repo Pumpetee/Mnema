@@ -558,13 +558,13 @@ async function viewSettings(arg) {
       .join(
         "",
       )}</div><div class="aisub">${tr("По ключу API")}<span class="hint">${tr("оплата по расходу, отдельно от подписки")}</span></div><div class="aigrid">${ms.providers
-      .filter((x) => !["local", "ollama", "claude_code"].includes(x.id))
+      .filter((x) => !["local", "ollama", "strata", "claude_code"].includes(x.id))
       .sort((a, b) => tr(a.name).localeCompare(tr(b.name)))
       .map((x, n) => provTile(x, n + 1))
       .join(
         "",
       )}</div><div class="aigrp">${tr("Бесплатные")}<span class="hint">${tr("на этом компьютере, без интернета, ничего не уходит наружу")}</span></div><div class="aigrid">${ms.providers
-      .filter((x) => ["local", "ollama"].includes(x.id))
+      .filter((x) => ["local", "ollama", "strata"].includes(x.id))
       .map((x, n) => provTile(x, n))
       .join("")}</div></div>
     ${engineCard(eng)}
@@ -1091,7 +1091,10 @@ const AI_LOOK = {
   openai: ["◎", "#10a37f", "#4fd1a5"],
   gemini: ["✦", "#4285f4", "#9b8cf5"],
   openrouter: ["R", "#475569", "#94a3b8"],
+  deepseek: ["🐋", "#4d6bfe", "#7c93ff"],
+  yandex: ["Я", "#fc3f1d", "#ff9a3c"],
   ollama: ["🦙", "#374151", "#9ca3af"],
+  strata: ["S", "#0ea5e9", "#6366f1"],
   "claude-code": [">_", "#d97757", "#f4a582"],
   "claude-desktop": ["C", "#c2410c", "#fb923c"],
   cursor: ["⌘", "#1f2937", "#6b7280"],
@@ -1452,6 +1455,42 @@ function consScheme(sel, fmt, summ) {
     .join("");
   return `<div class="cschem f-${fmt}"><svg viewBox="0 0 172 172">${arcs}</svg><div class="cschem-table"><span>${CONS_FORMATS[fmt].art}</span></div>${seats}</div>`;
 }
+// «Подключить ещё ИИ» from the consortium: the AIs not connected yet as tiles; one opens its connect window, and
+// when that closes the consortium comes back with whoever got connected
+async function connectPick(back) {
+  await refreshProviders();
+  const P = (CHAT.providers || []).filter((p) => !p.ready && p.id !== "claude_code");
+  const pop = document.createElement("div");
+  pop.className = "modal cpick";
+  pop.innerHTML = `<div class="card"><h2>${tr("Подключить ещё ИИ")}</h2><p class="hint">${tr("Выбери, кого добавить в обсуждение. После подключения вернёшься к консорциуму.")}</p>
+    <div class="cpgrid">${
+      P.map((p, n) => {
+        const [g, c1, c2] = aiLook(p.id, p.name);
+        return `<button class="cpt" data-pid="${esc(p.id)}" style="--c1:${c1};--c2:${c2};--d:${n * 0.05}s"><span class="medal2"><span>${esc(g)}</span></span><b data-noi18n>${esc(p.name)}</b><small>${tr(p.needs_key ? "по ключу API" : "на компьютере")}</small></button>`;
+      }).join("") || `<p class="hint">${tr("Все ИИ уже подключены.")}</p>`
+    }</div>
+    <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn g" data-x>${tr("Назад")}</button></div></div>`;
+  document.body.appendChild(pop);
+  const close = () => {
+    pop.remove();
+    back && back();
+  };
+  pop.onclick = (e) => e.target === pop && close();
+  $("[data-x]", pop).onclick = close;
+  $$("[data-pid]", pop).forEach(
+    (b) =>
+      (b.onclick = async () => {
+        pop.remove();
+        await connectModal(b.dataset.pid);
+        const watch = setInterval(async () => {
+          if ($(".modal.pm")) return;
+          clearInterval(watch);
+          await refreshProviders();
+          back && back();
+        }, 300);
+      }),
+  );
+}
 async function consortModal(full = false, preset = "") {
   await refreshProviders();
   const cur = CHAT.cons,
@@ -1666,9 +1705,12 @@ async function consortModal(full = false, preset = "") {
     );
     $("#cmx", pop).onclick = () => pop.remove();
     $("#cmconnect", pop).onclick = (e) => {
+      // a window of its own over the consortium, and back to the consortium when done (the model menu used to open
+      // here and close at once on the same click, so the window just vanished)
       e.preventDefault();
+      e.stopPropagation();
       pop.remove();
-      modelMenu($("#model"));
+      connectPick(() => consortModal(full, preset));
     };
     if ($("#cmoff", pop))
       $("#cmoff", pop).onclick = () => {
@@ -1739,7 +1781,10 @@ function provOf(v) {
       openai: "ChatGPT · ключ API",
       gemini: "Google Gemini",
       openrouter: "OpenRouter",
+      deepseek: "DeepSeek · ключ API",
+      yandex: "YandexGPT · Yandex Cloud",
       ollama: "Ollama · на компьютере",
+      strata: "Strata · на компьютере",
       local: "на этом компьютере",
     }[pid] || (pid ? pid : ""),
   );
@@ -1789,7 +1834,10 @@ function modelMenu(anchor) {
     openai: "#10a37f",
     gemini: "#4f7cf7",
     openrouter: "#7c5cf0",
+    deepseek: "#4d6bfe",
+    yandex: "#fc3f1d",
     ollama: "#334155",
+    strata: "#0ea5e9",
   };
   const NM = {
     local: "Встроенная модель",
@@ -1797,11 +1845,14 @@ function modelMenu(anchor) {
     openai: "ChatGPT",
     gemini: "Gemini",
     openrouter: "OpenRouter",
+    deepseek: "DeepSeek",
+    yandex: "YandexGPT",
     ollama: "Ollama",
+    strata: "Strata",
     anthropic: "Claude · ключ API",
   };
   const ready = P.filter((p) => p.ready),
-    LOCAL = ["local", "ollama"],
+    LOCAL = ["local", "ollama", "strata"],
     label = (p) => tr(NM[p.id] || p.name),
     // cloud first, then this computer; inside each — by name: no model goes first because of who made it
     byName = (a, b) => LOCAL.includes(a.id) - LOCAL.includes(b.id) || label(a).localeCompare(label(b));
@@ -1838,10 +1889,11 @@ function modelMenu(anchor) {
     .sort(byName)
     .map(
       (p) =>
-        `<button class="m2add" data-p="${p.id}" style="--pc:${COL[p.id] || "#64748b"}"><span>+</span>${tr(p.id === "local" ? "Скачать бесплатную модель" : p.id === "anthropic" ? "Ключ API Anthropic" : p.id === "claude_code" ? "Подписка Claude" : NM[p.id] || p.name)}</button>`,
+        // a row like the connected AIs above: the name, how it connects, and «Подключить» on the right
+        `<button class="m3grp m3prov m2conn" data-p="${p.id}" style="--pc:${COL[p.id] || "#64748b"}"><span>${tr(p.id === "local" ? "Встроенная модель" : p.id === "anthropic" ? "Claude · ключ API" : p.id === "claude_code" ? "Подписка Claude" : NM[p.id] || p.name)}<small>${tr(p.id === "local" ? "бесплатно на компьютере" : ["ollama", "strata"].includes(p.id) ? "на компьютере" : p.id === "claude_code" ? "по подписке" : "по ключу API")}</small></span><em>${tr(p.id === "local" ? "Скачать" : "Подключить")}</em></button>`,
     )
     .join("");
-  m.innerHTML = `<div class="m3list">${cards || `<div class="hint" style="padding:10px">${tr("Пока ни одного ИИ не подключено")}</div>`}</div>${add ? `<div class="m2foot"><span>${tr("Подключить ещё")}</span><div>${add}</div></div>` : ""}`;
+  m.innerHTML = `<div class="m3list">${cards || `<div class="hint" style="padding:10px">${tr("Пока ни одного ИИ не подключено")}</div>`}</div>${add ? `<div class="m2foot"><span>${tr("Подключить ещё")}</span><div class="m2conns">${add}</div></div>` : ""}`;
   document.body.appendChild(m);
   const r = anchor.getBoundingClientRect();
   m.style.left = Math.max(8, Math.min(window.innerWidth - m.offsetWidth - 8, r.left)) + "px";
@@ -1879,6 +1931,18 @@ const PROV_HOW = {
     u: "https://aistudio.google.com",
   },
   openrouter: { t: "Один ключ на сотни моделей разных компаний: openrouter.ai/keys.", u: "https://openrouter.ai/keys" },
+  deepseek: {
+    t: "Ключ берётся на platform.deepseek.com, раздел API keys. Оплата по расходу, отдельно от чата DeepSeek.",
+    u: "https://platform.deepseek.com/api_keys",
+  },
+  yandex: {
+    t: "В Yandex Cloud AI Studio создай API-ключ сервисного аккаунта с ролью ai.languageModels.user и скопируй ID каталога, в котором он создан. Оплата по расходу в Yandex Cloud.",
+    u: "https://aistudio.yandex.ru",
+  },
+  strata: {
+    t: "Strata запускает большие модели (Qwen, DeepSeek) на этом компьютере, бесплатно и без интернета. Поставь Strata, запусти модель (strata launch) и нажми «Проверить». Адрес по умолчанию — 127.0.0.1:8080.",
+    u: "https://github.com/Niko1221/Strata",
+  },
   ollama: {
     t: "Нужна установленная и запущенная Ollama (ollama.com). Адрес по умолчанию — http://127.0.0.1:11434.",
     u: "https://ollama.com",
@@ -1906,7 +1970,8 @@ async function connectModal(pid) {
       ? `<div class="fld" style="margin-top:12px"><span>${tr("Выбери модель")} (${list.length})</span><input id="pq" placeholder="${tr("поиск")}"></div><div class="mlist" id="pml">${good.map(btn).join("")}${aged.length ? `<div class="mlold">${tr("Старые и служебные")}</div>${aged.map(btn).join("")}` : ""}</div>`
       : "";
     const setup = `<div class="how">${esc(how.t)}${how.u ? ` <a href="#" id="openu" style="color:var(--acc)">Открыть сайт</a>` : ""}</div>
-    ${pid === "claude_code" ? "" : p.needs_key ? `<div class="fld"><span>Ключ API хранится в защищённом хранилище системы, не в папке памяти</span><input id="pkey" type="password" placeholder="${p.key ? "сохранён " + esc(p.key) : "вставь ключ"}"></div>` : `<div class="fld"><span>Адрес</span><input id="pend" value="${esc(p.endpoint)}" placeholder="http://127.0.0.1:11434"></div>`}
+    ${pid === "claude_code" ? "" : p.needs_key ? `<div class="fld"><span>Ключ API хранится в защищённом хранилище системы, не в папке памяти</span><input id="pkey" type="password" placeholder="${p.key ? "сохранён " + esc(p.key) : "вставь ключ"}"></div>` : `<div class="fld"><span>Адрес</span><input id="pend" value="${esc(p.endpoint)}" placeholder="${pid === "strata" ? "http://127.0.0.1:8080/v1" : "http://127.0.0.1:11434"}"></div>`}
+    ${pid === "yandex" ? `<div class="fld"><span>${tr("ID каталога Yandex Cloud")}</span><input id="pfolder" value="${esc(p.folder || "")}" placeholder="b1g…"></div>` : ""}
     <div class="row" style="margin-top:10px"><button class="btn" id="pgo">${pid === "claude_code" ? "Проверить снова" : "Проверить и найти модели"}</button><span class="hint" id="pmsg">${esc(msg || "")}</span></div>`;
     const on = p.connected && !p.disabled && list.length;
     pop.innerHTML = `<div class="card"><h2>${esc(p.name)} <span class="hint">${provState(p)}</span></h2>
@@ -1945,7 +2010,8 @@ async function connectModal(pid) {
     );
     $("#pgo", pop).onclick = async () => {
       const k = $("#pkey", pop),
-        e = $("#pend", pop);
+        e = $("#pend", pop),
+        fo = $("#pfolder", pop);
       $("#pmsg", pop).textContent = "проверяю…";
       try {
         if (pid !== "claude_code")
@@ -1953,6 +2019,7 @@ async function connectModal(pid) {
             id: pid,
             key: k && k.value ? k.value : undefined,
             endpoint: e ? e.value : undefined,
+            folder: fo ? fo.value : undefined,
           });
         if (pid === "claude_code") {
           const r = await post("/api/providers/check", { id: pid });

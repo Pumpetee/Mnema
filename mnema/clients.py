@@ -54,6 +54,8 @@ DEFAULT_CLIENTS = [
     Client("chatgpt", "ChatGPT", scopes=["profile", "rules", "projects", "cards", "decisions"], via="api"),
     Client("gemini", "Gemini", scopes=["profile", "rules", "cards"], via="api"),
     Client("openrouter", "OpenRouter", scopes=["profile", "rules", "projects", "cards", "decisions"], via="api"),
+    Client("deepseek", "DeepSeek", scopes=["profile", "rules", "projects", "cards", "decisions"], via="api"),
+    Client("yandex", "YandexGPT", scopes=["profile", "rules", "projects", "cards", "decisions"], via="api"),
     Client("cursor", "Cursor", scopes=["rules", "projects"], via="mcp"),
 ]
 

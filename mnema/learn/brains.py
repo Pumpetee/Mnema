@@ -556,7 +556,7 @@ class ModelBrain(_LLMBrain):
 
     @property
     def cloud(self) -> bool:
-        return self._ref().partition(":")[0] not in ("local", "ollama")
+        return self._ref().partition(":")[0] not in ("local", "ollama", "strata")
 
     def _ref(self) -> str:
         from ..chat import engine as CH

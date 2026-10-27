@@ -9678,19 +9678,21 @@ code.tok {
   line-height: 1;
 }
 .uq {
-  max-width: 82%;
+  /* what the message answers: a quiet card above the bubble, in the theme's own colours */
+  max-width: min(82%, 560px);
   margin-bottom: 6px;
-  padding: calc(6px * var(--den)) calc(10px * var(--den));
-  border-left: 3px solid var(--acc3);
-  background: rgba(238, 240, 255, 0.6);
-  border-radius: calc(8px * var(--rad));
+  padding: calc(7px * var(--den)) calc(12px * var(--den));
+  border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--acc);
+  background: color-mix(in srgb, var(--acc) 6%, var(--paper));
+  border-radius: calc(12px * var(--rad));
   font-size: calc(12.5px * var(--fs));
-  color: var(--ink2);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  line-height: 1.45;
+  color: var(--ink3);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
   overflow: hidden;
-  white-space: pre-wrap;
 }
 .selq {
   position: fixed;
@@ -19356,4 +19358,123 @@ button.xft:hover {
   width: 13px;
   height: 13px;
   flex: none;
+}
+
+.uq svg.i {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  margin-top: 2px;
+  color: var(--acc);
+}
+.uq > span {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* «Подключить ещё ИИ» from the consortium: the AIs not connected yet, as medal tiles */
+.cpick .card {
+  width: 560px;
+  max-width: calc(100vw - 40px);
+}
+.cpgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.cpt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: calc(14px * var(--rad));
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+  animation: srcin 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+  animation-delay: var(--d);
+}
+.cpt:hover {
+  transform: translateY(-2px);
+  border-color: var(--acc);
+  box-shadow: 0 10px 22px rgba(16, 18, 23, 0.1);
+}
+.cpt .medal2 {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+  color: #fff;
+  filter: none;
+  opacity: 1;
+  background: radial-gradient(circle at 35% 30%, #fff9, transparent 60%), linear-gradient(135deg, var(--c1), var(--c2));
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--c1) 38%, transparent);
+}
+.cpt b {
+  font-size: calc(13.5px * var(--fs));
+}
+.cpt small {
+  font-size: calc(11.5px * var(--fs));
+  color: var(--ink3);
+}
+
+/* the model menu: «Подключить ещё» as a list, each AI a row like the connected ones above */
+.mm2 .m2foot > .m2conns {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.menu .m2conn {
+  width: 100%;
+  padding: 8px 10px !important;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.menu .m2conn:hover {
+  background: var(--hover);
+}
+.m2conn > span {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 700;
+  font-size: calc(13px * var(--fs));
+}
+.m2conn > span::before {
+  content: "";
+  align-self: center;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pc);
+}
+.m2conn small {
+  font-weight: 500;
+  font-size: calc(11.5px * var(--fs));
+  color: var(--ink3);
+  white-space: nowrap;
+}
+.m2conn em {
+  flex: none;
+  font-style: normal;
+  font-weight: 600;
+  font-size: calc(12px * var(--fs));
+  color: var(--acc);
 }
