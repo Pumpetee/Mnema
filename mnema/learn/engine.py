@@ -136,8 +136,8 @@ TAG_RU = {"money": "деньги", "health": "здоровье", "private": "л�
 def decide_why(it: dict, settings: dict, can_ask: bool = False) -> tuple[str, str]:
     """What to do with an item the owner hasn't decided yet — and why, in plain words.
 
-    There is no waiting queue. can_ask — it was said in a conversation in Mnema: what needs the owner (something
-    personal, a contradiction, "always ask" mode) is asked right there, once. Anywhere else Mnema decides by itself:
+    There is no waiting queue. can_ask — it was said in a conversation in Mnemai: what needs the owner (something
+    personal, a contradiction, "always ask" mode) is asked right there, once. Anywhere else Mnemai decides by itself:
     personal goes to a hidden part, the newer fact replaces the older one, a weak guess waits to be seen again."""
     mode = mode_for(it, settings)
     conf = round(it["confidence"] * 100)
@@ -440,7 +440,7 @@ def consider(
 
 
 def learn_episodes(vault: Vault, eps: list, source: str, brain=None) -> dict:
-    """Learn right now from fresh episodes. From a conversation in Mnema (source "mnema_chat", ref "<chat>#<n>") what
+    """Learn right now from fresh episodes. From a conversation in Mnemai (source "mnema_chat", ref "<chat>#<n>") what
     needs the owner is asked in that conversation: one question at a time, shown under the messages."""
     """Learn right now from fresh episodes (the wrapper chat): no cursors, live feed on."""
     from ..agent import profile as P

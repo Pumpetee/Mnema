@@ -1,4 +1,4 @@
-"""Questions from Mnema herself: only about a project the talk is about, not more often than once in 40–120 minutes."""
+"""Questions from Mnemai herself: only about a project the talk is about, not more often than once in 40–120 minutes."""
 
 import datetime as dt
 import os

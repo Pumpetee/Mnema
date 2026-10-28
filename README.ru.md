@@ -1,24 +1,24 @@
 <div align="center">
 
-<img src="docs/img/brand/logo.svg" width="112" alt="Mnema">
+<img src="docs/img/brand/logo.svg" width="112" alt="Mnemai">
 
-# Mnema
+# Mnemai
 
 <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2600&pause=900&color=A78BFA&center=true&vCenter=true&width=720&height=46&lines=%D0%9E%D0%B4%D0%BD%D0%B0%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F%20%D0%B2%D1%81%D0%B5%D1%85%20%D0%98%D0%98;%D0%91%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D0%BE%2C%20%D0%BD%D0%B0%20%D1%82%D0%B2%D0%BE%D1%91%D0%BC%20%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%B5%2C%20%D0%B1%D0%B5%D0%B7%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0" alt="Одна память для всех ИИ">
 
-<a href="https://github.com/Pumpetee/Mnema/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnema?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnema/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnema/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnema?style=flat-square&color=ec4899" alt="last commit"></a>
+<a href="https://github.com/Pumpetee/Mnemai/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnemai?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnemai/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnemai/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnemai/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnemai?style=flat-square&color=ec4899" alt="last commit"></a>
 
 <img src="https://img.shields.io/badge/MCP-Claude%20%C2%B7%20Cursor-7c3aed?style=flat-square&logo=modelcontextprotocol&logoColor=white" alt="MCP: Claude · Cursor"> <img src="https://img.shields.io/badge/Obsidian-%D1%82%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE%20%D1%87%D1%82%D0%B5%D0%BD%D0%B8%D0%B5-7c3aed?style=flat-square&logo=obsidian&logoColor=white" alt="Obsidian: только чтение"> <img src="https://img.shields.io/badge/Telegram-%D1%82%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE%20%D1%87%D1%82%D0%B5%D0%BD%D0%B8%D0%B5-229ED9?style=flat-square&logo=telegram&logoColor=white" alt="Telegram: только чтение"> <img src="https://img.shields.io/badge/AES--256-%D1%88%D0%B8%D1%84%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-15803d?style=flat-square" alt="AES-256: шифрование"> <img src="https://img.shields.io/badge/Markdown-%D1%82%D0%B2%D0%BE%D0%B8%20%D1%84%D0%B0%D0%B9%D0%BB%D1%8B-555555?style=flat-square&logo=markdown&logoColor=white" alt="Markdown: твои файлы"> <img src="https://img.shields.io/badge/Python-3.13-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python: 3.13">
 
-<a href="docs/guide/ru.md"><img src="https://img.shields.io/badge/%D0%A1%D0%BF%D1%80%D0%B0%D0%B2%D0%BE%D1%87%D0%BD%D0%B8%D0%BA%20Mnema-%D0%BA%D0%B0%D0%B6%D0%B4%D1%8B%D0%B9%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%20%D0%B8%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Справочник Mnema"></a>
+<a href="docs/guide/ru.md"><img src="https://img.shields.io/badge/%D0%A1%D0%BF%D1%80%D0%B0%D0%B2%D0%BE%D1%87%D0%BD%D0%B8%D0%BA%20Mnemai-%D0%BA%D0%B0%D0%B6%D0%B4%D1%8B%D0%B9%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%20%D0%B8%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Справочник Mnemai"></a>
 
-<a href="https://github.com/Pumpetee/Mnema"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnema"></a><br><sub>Наведи камеру, чтобы открыть репозиторий · github.com/Pumpetee/Mnema</sub>
+<a href="https://github.com/Pumpetee/Mnemai"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnemai"></a><br><sub>Наведи камеру, чтобы открыть репозиторий · github.com/Pumpetee/Mnemai</sub>
 
 </div>
 
 ## Языки
 
-Mnema говорит на девяти языках. Интерфейс, подсказки и ответы ИИ идут на выбранном, даже если пишешь на другом. Этот README и справочник Mnema есть на каждом из них.
+Mnemai говорит на девяти языках. Интерфейс, подсказки и ответы ИИ идут на выбранном, даже если пишешь на другом. Этот README и справочник Mnemai есть на каждом из них.
 
 <table>
 <tr><td align="center" width="10%"><img src="https://flagcdn.com/w80/gb.png" width="36" alt="English"><br><b>English</b><br><sub><a href="README.md">README</a> · <a href="docs/guide/en.md">Guide</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/ru.png" width="36" alt="Русский"><br><b>✓ Русский</b><br><sub><a href="README.ru.md">README</a> · <a href="docs/guide/ru.md">Справочник</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/cn.png" width="36" alt="中文"><br><b>中文</b><br><sub><a href="README.zh.md">README</a> · <a href="docs/guide/zh.md">指南</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/es.png" width="36" alt="Español"><br><b>Español</b><br><sub><a href="README.es.md">README</a> · <a href="docs/guide/es.md">Guía</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/in.png" width="36" alt="हिन्दी"><br><b>हिन्दी</b><br><sub><a href="README.hi.md">README</a> · <a href="docs/guide/hi.md">गाइड</a></sub></td></tr>
@@ -27,13 +27,13 @@ Mnema говорит на девяти языках. Интерфейс, под�
 
 <div align="center">
 
-Mnema помнит, кто ты, над чем работаешь, что решил и как тебе отвечать, — и подставляет это в любой ИИ. Память — папка обычных Markdown-файлов на твоём компьютере. Без облака и без аккаунта.
+Mnemai помнит, кто ты, над чем работаешь, что решил и как тебе отвечать, — и подставляет это в любой ИИ. Память — папка обычных Markdown-файлов на твоём компьютере. Без облака и без аккаунта.
 
-<a href="../../releases/latest/download/Mnema-Setup.exe"><img src="https://img.shields.io/badge/%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F-Windows-0078D4?style=for-the-badge" alt="Windows"></a> <a href="../../releases/latest/download/Mnema-macos-arm64.dmg"><img src="https://img.shields.io/badge/%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a> <a href="../../releases/latest/download/Mnema-x86_64.AppImage"><img src="https://img.shields.io/badge/%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Linux"></a>
+<a href="../../releases/latest/download/Mnemai-Setup.exe"><img src="https://img.shields.io/badge/%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F-Windows-0078D4?style=for-the-badge" alt="Windows"></a> <a href="../../releases/latest/download/Mnemai-macos-arm64.dmg"><img src="https://img.shields.io/badge/%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a> <a href="../../releases/latest/download/Mnemai-x86_64.AppImage"><img src="https://img.shields.io/badge/%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%B4%D0%BB%D1%8F-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Linux"></a>
 
-<sub><a href="../../releases">все файлы</a> · macOS Intel: <a href="../../releases/latest/download/Mnema-macos-x64.dmg">x64.dmg</a></sub>
+<sub><a href="../../releases">все файлы</a> · macOS Intel: <a href="../../releases/latest/download/Mnemai-macos-x64.dmg">x64.dmg</a></sub>
 
-<img src="docs/img/ru/hero.gif" width="880" alt="Вопрос, и ответ приходит из памяти: план недели таблицей, с ценой и правилом про встречи, которые Mnema уже знает">
+<img src="docs/img/ru/hero.gif" width="880" alt="Вопрос, и ответ приходит из памяти: план недели таблицей, с ценой и правилом про встречи, которые Mnemai уже знает">
 
 <sub>Спрашиваешь «что главное на неделе?» — план приходит таблицей, с решённой ценой и твоим правилом про встречи. Повторять их не пришлось.</sub>
 
@@ -56,11 +56,11 @@ Mnema помнит, кто ты, над чем работаешь, что реш
 
 ## 🧠 Она тебя знает
 
-<p align="center"><img src="docs/img/ru/memory.gif" width="860" alt="Портрет и карта памяти: темы пузырями, размер — сколько Mnema знает"></p>
+<p align="center"><img src="docs/img/ru/memory.gif" width="860" alt="Портрет и карта памяти: темы пузырями, размер — сколько Mnemai знает"></p>
 
-- **Портрет, который каждый ИИ читает первым:** кто ты, что строишь, как с тобой работать. Mnema пишет его сама, поправить можно руками.
+- **Портрет, который каждый ИИ читает первым:** кто ты, что строишь, как с тобой работать. Mnemai пишет его сама, поправить можно руками.
 - **Карта памяти:** каждая тема — пузырь, пульсирует — недавно менялась, замок — её видят не все ИИ.
-- **Старое не выдаётся за новое:** у каждого факта дата, статус старше месяца Mnema переспросит.
+- **Старое не выдаётся за новое:** у каждого факта дата, статус старше месяца Mnemai переспросит.
 - **Не одна папка:** подключи хранилище Obsidian или папку команды — только чтение, запись туда запрещена в самой программе.
 
 ## 🗣️ Консорциум: несколько ИИ, один ответ
@@ -76,13 +76,13 @@ Mnema помнит, кто ты, над чем работаешь, что реш
 <p align="center"><img src="docs/img/ru/meetings.gif" width="860" alt="Как идёт встреча: запись, расшифровка, итоги, память — у каждого шага свои настройки"></p>
 
 - **Две дорожки:** твой микрофон и звук компьютера, поэтому в расшифровке видно, кто говорит.
-- **Whisper на компьютере бесплатно** или облачный Whisper (≈ $0.36 за час) — тишину, выдуманные фразы и эхо Mnema вырезает.
+- **Whisper на компьютере бесплатно** или облачный Whisper (≈ $0.36 за час) — тишину, выдуманные фразы и эхо Mnemai вырезает.
 - **Итоги:** что решили, какие задачи и за кем — любой моделью на выбор, в том числе на компьютере.
 - **Готовые настройки:** Приватно, Баланс, Быстро задают весь путь сразу.
 
 ## 🌱 Учится сама
 
-<p align="center"><img src="docs/img/ru/learning.gif" width="860" alt="Ты говоришь что-то между делом, а в ленте видно, что Mnema прочитала, поняла и записала, и почему"></p>
+<p align="center"><img src="docs/img/ru/learning.gif" width="860" alt="Ты говоришь что-то между делом, а в ленте видно, что Mnemai прочитала, поняла и записала, и почему"></p>
 
 - **Уверена — записывает:** факт с уверенностью от 80% записывается сразу, сомнительный ждёт повтора.
 - **Личное — отдельно:** деньги, здоровье и личное попадают в помеченные карточки, их можно скрыть от любого ИИ.
@@ -90,18 +90,18 @@ Mnema помнит, кто ты, над чем работаешь, что реш
 
 ## ✈️ Читает Telegram, но ничего туда не пишет
 
-<p align="center"><img src="docs/img/ru/telegram.gif" width="860" alt="Telegram подключён только на чтение: ты выбираешь чаты, Mnema по ним учится"></p>
+<p align="center"><img src="docs/img/ru/telegram.gif" width="860" alt="Telegram подключён только на чтение: ты выбираешь чаты, Mnemai по ним учится"></p>
 
-- **Чаты выбираешь ты:** Mnema узнаёт тебя и людей вокруг только по ним.
-- **Только чтение, в самой программе:** клиент Telegram внутри Mnema умеет только читать, любая другая команда отклоняется до отправки.
-- **Всё на твоём компьютере:** вход зашифрован в хранилище системы, своих серверов у Mnema нет.
+- **Чаты выбираешь ты:** Mnemai узнаёт тебя и людей вокруг только по ним.
+- **Только чтение, в самой программе:** клиент Telegram внутри Mnemai умеет только читать, любая другая команда отклоняется до отправки.
+- **Всё на твоём компьютере:** вход зашифрован в хранилище системы, своих серверов у Mnemai нет.
 
 ## 📉 Экономит токены
 
-<p align="center"><img src="docs/img/ru/tokens.gif" width="560" alt="Вопрос по договору в 153 000 знаков: 29 643 входных токена на весь текст, 6 159 с Mnema"></p>
+<p align="center"><img src="docs/img/ru/tokens.gif" width="560" alt="Вопрос по договору в 153 000 знаков: 29 643 входных токена на весь текст, 6 159 с Mnemai"></p>
 
 - **Уходит только нужное:** память, документы и страницы читаются на компьютере, модели достаются нужные куски.
-- **Замер:** вопрос по договору в 153 000 знаков — весь текст занял 29 643 входных токена, Mnema отправила 6 159, и правильный ответ дал только вариант с Mnema.
+- **Замер:** вопрос по договору в 153 000 знаков — весь текст занял 29 643 входных токена, Mnemai отправила 6 159, и правильный ответ дал только вариант с Mnemai.
 - **Видно каждый раз:** под каждым ответом написано, сколько токенов сэкономлено.
 
 ## 🔐 Приватно по устройству
@@ -130,14 +130,14 @@ Mnema помнит, кто ты, над чем работаешь, что реш
 
 | Система | Файл | Как поставить |
 |---|---|---|
-| Windows 10 и 11 | [`Mnema-Setup.exe`](../../releases/latest/download/Mnema-Setup.exe) | Запусти. Права администратора не нужны. Там же переносной `.zip`. |
-| macOS 11 и новее | Apple Silicon: [`Mnema-macos-arm64.dmg`](../../releases/latest/download/Mnema-macos-arm64.dmg), Intel: [`Mnema-macos-x64.dmg`](../../releases/latest/download/Mnema-macos-x64.dmg) | Открой и перетащи Mnema в «Программы». |
-| Linux x86-64 (Ubuntu 22.04 и новее, Fedora, Debian…) | [`Mnema-x86_64.AppImage`](../../releases/latest/download/Mnema-x86_64.AppImage) | `chmod +x Mnema-*.AppImage` и запусти. Та же программа папкой: `.tar.gz`, внутри запусти `Mnema`. |
+| Windows 10 и 11 | [`Mnemai-Setup.exe`](../../releases/latest/download/Mnemai-Setup.exe) | Запусти. Права администратора не нужны. Там же переносной `.zip`. |
+| macOS 11 и новее | Apple Silicon: [`Mnemai-macos-arm64.dmg`](../../releases/latest/download/Mnemai-macos-arm64.dmg), Intel: [`Mnemai-macos-x64.dmg`](../../releases/latest/download/Mnemai-macos-x64.dmg) | Открой и перетащи Mnemai в «Программы». |
+| Linux x86-64 (Ubuntu 22.04 и новее, Fedora, Debian…) | [`Mnemai-x86_64.AppImage`](../../releases/latest/download/Mnemai-x86_64.AppImage) | `chmod +x Mnemai-*.AppImage` и запусти. Та же программа папкой: `.tar.gz`, внутри запусти `Mnemai`. |
 
 Пакеты пока без цифровой подписи, поэтому каждая система один раз предупредит:
 
 - **Windows** покажет «Windows защитила ваш компьютер». Нажми **Подробнее → Выполнить в любом случае**.
-- **macOS** скажет, что не может проверить разработчика. Нажми на Mnema в «Программах» правой кнопкой → **Открыть** или открой Системные настройки → Конфиденциальность и безопасность → **Всё равно открыть**.
+- **macOS** скажет, что не может проверить разработчика. Нажми на Mnemai в «Программах» правой кнопкой → **Открыть** или открой Системные настройки → Конфиденциальность и безопасность → **Всё равно открыть**.
 - **Linux**: для AppImage нужен FUSE 2 — `sudo apt install libfuse2` (на Ubuntu 24.04 — `libfuse2t64`). Или возьми `.tar.gz`.
 
 Чтобы проверить файл, сравни его sha256 с файлом `.sha256` рядом: `certutil -hashfile <файл> SHA256` на Windows, `shasum -a 256 <файл>` на macOS, `sha256sum <файл>` на Linux.
@@ -154,7 +154,7 @@ python -m venv .venv
 .venv\Scripts\pip install -r requirements-dev.txt
 .venv\Scripts\python tools\fetch_vendor.py      # llama.cpp, Xray, WebView2 с официальных релизов, с проверкой
 .venv\Scripts\python -m mnema.desktop           # запустить программу
-.venv\Scripts\python tools\package.py           # dist\Mnema-Setup-<версия>.exe и переносной архив
+.venv\Scripts\python tools\package.py           # dist\Mnemai-Setup-<версия>.exe и переносной архив
 ```
 
 macOS и Linux:
@@ -164,8 +164,8 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python tools/fetch_vendor.py           # llama.cpp и Xray для этой системы, с проверкой sha256
 .venv/bin/python -m mnema.desktop                # запустить программу
-.venv/bin/python tools/package.py                # macOS: dist/Mnema-<версия>-macos-arm64.dmg
-                                                 # Linux: dist/Mnema-<версия>-x86_64.AppImage и .tar.gz
+.venv/bin/python tools/package.py                # macOS: dist/Mnemai-<версия>-macos-arm64.dmg
+                                                 # Linux: dist/Mnemai-<версия>-x86_64.AppImage и .tar.gz
 ```
 
 Каждый push проверяется на Windows, macOS и Linux: собираются три пакета, каждый один раз запускается с окном и остаётся файлами прогона (`.github/workflows`).
@@ -217,7 +217,7 @@ AGPL-3.0. Бесплатно для личного использования и
 © 2026 Антон Санников
 
 <div align="center">
-<img src="docs/img/brand/logo.svg" width="40" alt="Mnema">
+<img src="docs/img/brand/logo.svg" width="40" alt="Mnemai">
 
-<sub>Если Mnema помнит для тебя что-то полезное, ⭐ поможет её найти другим.</sub>
+<sub>Если Mnemai помнит для тебя что-то полезное, ⭐ поможет её найти другим.</sub>
 </div>

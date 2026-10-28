@@ -1,6 +1,6 @@
 {
- "langs_intro": "Mnema habla nueve idiomas. La interfaz, la ayuda y las respuestas de la IA siguen el idioma que elijas, incluso cuando escribes en otro. Este README y la guía de Mnema existen en cada uno de ellos.",
- "guide_btn": "Guía de Mnema",
+ "langs_intro": "Mnemai habla nueve idiomas. La interfaz, la ayuda y las respuestas de la IA siguen el idioma que elijas, incluso cuando escribes en otro. Este README y la guía de Mnemai existen en cada uno de ellos.",
+ "guide_btn": "Guía de Mnemai",
  "guide_msg": "cada pantalla y cada ajuste",
  "badges": [
   "solo lectura",
@@ -12,7 +12,7 @@
   "Una memoria para todas las IA",
   "Gratis, en tu equipo, sin cuenta"
  ],
- "lead": "Mnema recuerda quién eres, en qué trabajas, qué has decidido y cómo te gusta que te respondan, y cada IA con la que hablas recibe ese contexto. La memoria es una carpeta de archivos Markdown sencillos en tu ordenador. Sin nube, sin cuenta.",
+ "lead": "Mnemai recuerda quién eres, en qué trabajas, qué has decidido y cómo te gusta que te respondan, y cada IA con la que hablas recibe ese contexto. La memoria es una carpeta de archivos Markdown sencillos en tu ordenador. Sin nube, sin cuenta.",
  "dl": [
   "Descargar para",
   "todos los archivos"
@@ -57,11 +57,11 @@
   [
    "🧠 Te conoce",
    "memory",
-   "Retrato y mapa de memoria: los temas son burbujas y el tamaño indica cuánto sabe Mnema",
+   "Retrato y mapa de memoria: los temas son burbujas y el tamaño indica cuánto sabe Mnemai",
    [
-    "**Un retrato que toda IA lee primero:** quién eres, qué estás construyendo, cómo te gusta trabajar. Mnema lo escribe a medida que aprende y tú puedes corregirlo a mano.",
+    "**Un retrato que toda IA lee primero:** quién eres, qué estás construyendo, cómo te gusta trabajar. Mnemai lo escribe a medida que aprende y tú puedes corregirlo a mano.",
     "**Un mapa de memoria:** cada tema es una burbuja, un pulso indica que cambió hace poco y un candado significa que algunas IA no lo ven.",
-    "**Los datos viejos no pasan por nuevos:** cada dato lleva su fecha, y Mnema vuelve a preguntar por un estado con más de un mes.",
+    "**Los datos viejos no pasan por nuevos:** cada dato lleva su fecha, y Mnemai vuelve a preguntar por un estado con más de un mes.",
     "**Más de una carpeta:** conecta un vault de Obsidian o una carpeta de equipo, en solo lectura: el propio programa bloquea la escritura ahí."
    ]
   ],
@@ -89,7 +89,7 @@
   [
    "🌱 Aprende solo",
    "learning",
-   "Mencionas algo de pasada y el feed muestra qué leyó, entendió y apuntó Mnema, y por qué",
+   "Mencionas algo de pasada y el feed muestra qué leyó, entendió y apuntó Mnemai, y por qué",
    [
     "**Seguro significa guardado:** un dato del que está seguro (80 % o más) se escribe al instante; uno dudoso espera a oírlo otra vez.",
     "**Lo personal va aparte:** dinero, salud y asuntos privados acaban en tarjetas etiquetadas que puedes ocultar a cualquier IA.",
@@ -99,20 +99,20 @@
   [
    "✈️ Lee Telegram, nunca escribe",
    "telegram",
-   "Telegram conectado en solo lectura: tú eliges los chats y Mnema aprende de ellos",
+   "Telegram conectado en solo lectura: tú eliges los chats y Mnemai aprende de ellos",
    [
-    "**Tú eliges los chats:** Mnema aprende sobre ti y las personas de tu entorno solo a partir de ellos.",
-    "**Solo lectura, por diseño:** el cliente de Telegram dentro de Mnema solo puede leer; cualquier otro comando se rechaza antes de enviarse.",
-    "**Se queda en tu ordenador:** la sesión se cifra en el almacén del sistema y Mnema no tiene servidores propios."
+    "**Tú eliges los chats:** Mnemai aprende sobre ti y las personas de tu entorno solo a partir de ellos.",
+    "**Solo lectura, por diseño:** el cliente de Telegram dentro de Mnemai solo puede leer; cualquier otro comando se rechaza antes de enviarse.",
+    "**Se queda en tu ordenador:** la sesión se cifra en el almacén del sistema y Mnemai no tiene servidores propios."
    ]
   ],
   [
    "📉 Ahorra tokens",
    "tokens",
-   "Una pregunta sobre un contrato de 153 000 caracteres: 29 643 tokens de entrada con el texto completo, 6159 con Mnema",
+   "Una pregunta sobre un contrato de 153 000 caracteres: 29 643 tokens de entrada con el texto completo, 6159 con Mnemai",
    [
     "**Solo sale lo importante:** la memoria, los documentos y las páginas web se leen en tu ordenador y el modelo recibe las partes relevantes.",
-    "**Medido:** en una pregunta sobre un contrato de 153 000 caracteres, el texto completo costó 29 643 tokens de entrada; Mnema envió 6159, y solo la respuesta de Mnema fue correcta.",
+    "**Medido:** en una pregunta sobre un contrato de 153 000 caracteres, el texto completo costó 29 643 tokens de entrada; Mnemai envió 6159, y solo la respuesta de Mnemai fue correcta.",
     "**Visible cada vez:** debajo de cada respuesta ves cuántos tokens se ahorraron."
    ],
    560
@@ -164,6 +164,6 @@
   "Seguridad"
  ],
  "lic": "Licencia",
- "foot": "Si Mnema recuerda algo útil para ti, una ⭐ ayuda a que otros lo encuentren.",
+ "foot": "Si Mnemai recuerda algo útil para ti, una ⭐ ayuda a que otros lo encuentren.",
  "qr": "Escanea para abrir el repositorio"
 }

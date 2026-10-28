@@ -91,7 +91,7 @@ def save(vault: Vault, chat_id: str, files: list[dict]) -> list[dict]:
             except docs.LockedPdf:
                 p.unlink(missing_ok=True)
                 raise ValueError(
-                    f"PDF «{name}» защищён паролем: Mnema не может его прочитать. Сними пароль (например, открой "
+                    f"PDF «{name}» защищён паролем: Mnemai не может его прочитать. Сними пароль (например, открой "
                     "и выбери «Печать → Сохранить как PDF») и прикрепи снова."
                 ) from None
             except Exception as e:

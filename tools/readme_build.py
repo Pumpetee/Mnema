@@ -23,7 +23,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
-REPO = "Pumpetee/Mnema"
+REPO = "Pumpetee/Mnemai"
 
 
 def section(text: str, title: str) -> str:
@@ -59,16 +59,16 @@ SI = "https://cdn.simpleicons.org"
 L = {
     "en": {
         "file": "README.md",
-        "langs_intro": "Mnema speaks nine languages. The interface, the help and the AI's answers follow the one you pick, even when you write in another. This README and the Mnema guide exist in each of them.",
+        "langs_intro": "Mnemai speaks nine languages. The interface, the help and the AI's answers follow the one you pick, even when you write in another. This README and the Mnemai guide exist in each of them.",
         "qr": "Scan to open the repository",
-        "guide_btn": "Mnema guide",
+        "guide_btn": "Mnemai guide",
         "guide_msg": "every screen and setting",
         "badges": ["read only", "read only", "encryption", "your files"],
         "typing": [
             "One memory for every AI",
             "Free, on your computer, no account",
         ],
-        "lead": "Mnema remembers who you are, what you are working on, what you decided and how you like answers — and every AI you talk to gets that context. The memory is a folder of plain Markdown files on your computer. No cloud, no account.",
+        "lead": "Mnemai remembers who you are, what you are working on, what you decided and how you like answers — and every AI you talk to gets that context. The memory is a folder of plain Markdown files on your computer. No cloud, no account.",
         "dl": ("Download for", "all files"),
         "hero_alt": "A question, and the answer comes from memory: the week plan as a table, with the price and the meeting rule it already knows",
         "hero_cap": "You ask «what matters this week?» — the plan comes as a table, with the agreed price and your rule about meetings. You never retyped them.",
@@ -86,11 +86,11 @@ L = {
             (
                 "🧠 It knows you",
                 "memory",
-                "Portrait and memory map: topics as bubbles, the size is how much Mnema knows",
+                "Portrait and memory map: topics as bubbles, the size is how much Mnemai knows",
                 [
-                    "**A portrait every AI reads first:** who you are, what you are building, how you like to work. Mnema writes it as it learns, you can fix it by hand.",
+                    "**A portrait every AI reads first:** who you are, what you are building, how you like to work. Mnemai writes it as it learns, you can fix it by hand.",
                     "**A memory map:** each topic is a bubble, a pulse means it changed recently, a lock means some AIs don't see it.",
-                    "**Old facts don't pass for new ones:** every fact carries its date, and Mnema asks again about a status older than a month.",
+                    "**Old facts don't pass for new ones:** every fact carries its date, and Mnemai asks again about a status older than a month.",
                     "**More than one folder:** connect an Obsidian vault or a team folder — read only, the program itself blocks writing there.",
                 ],
             ),
@@ -118,7 +118,7 @@ L = {
             (
                 "🌱 It learns by itself",
                 "learning",
-                "You mention something in passing, and the feed shows what Mnema read, understood and wrote down, and why",
+                "You mention something in passing, and the feed shows what Mnemai read, understood and wrote down, and why",
                 [
                     "**Sure means saved:** a fact it is sure of (80% or more) is written at once, a doubtful one waits to be heard again.",
                     "**Personal goes apart:** money, health and private matters land in tagged cards you can hide from any AI.",
@@ -128,20 +128,20 @@ L = {
             (
                 "✈️ Reads Telegram, never writes there",
                 "telegram",
-                "Telegram connected read only: you pick the chats, Mnema learns from them",
+                "Telegram connected read only: you pick the chats, Mnemai learns from them",
                 [
-                    "**You pick the chats:** Mnema learns about you and the people around you only from those.",
-                    "**Read only, by design:** the Telegram client inside Mnema can only read; any other command is refused before it is sent.",
-                    "**Stays on your computer:** the login is encrypted in the system's store, and Mnema has no servers of its own.",
+                    "**You pick the chats:** Mnemai learns about you and the people around you only from those.",
+                    "**Read only, by design:** the Telegram client inside Mnemai can only read; any other command is refused before it is sent.",
+                    "**Stays on your computer:** the login is encrypted in the system's store, and Mnemai has no servers of its own.",
                 ],
             ),
             (
                 "📉 Saves tokens",
                 "tokens",
-                "A question about a 153,000-character contract: 29,643 input tokens for the whole text, 6,159 with Mnema",
+                "A question about a 153,000-character contract: 29,643 input tokens for the whole text, 6,159 with Mnemai",
                 [
                     "**Only what matters goes out:** memory, documents and web pages are read on your computer, and the model gets the relevant parts.",
-                    "**Measured:** on a question about a 153,000-character contract the whole text took 29,643 input tokens; Mnema sent 6,159, and only the Mnema answer was right.",
+                    "**Measured:** on a question about a 153,000-character contract the whole text took 29,643 input tokens; Mnemai sent 6,159, and only the Mnemai answer was right.",
                     "**Visible every time:** under each answer you see how many tokens were saved.",
                 ],
                 560,
@@ -170,22 +170,22 @@ L = {
         ],
         "fold": ["Install", "Build from source", "How it is built", "Security"],
         "lic": "License",
-        "foot": "If Mnema remembers something useful for you, a ⭐ helps others find it.",
+        "foot": "If Mnemai remembers something useful for you, a ⭐ helps others find it.",
     },
     "ru": {
         "file": "README.ru.md",
-        "langs_intro": "Mnema говорит на девяти языках. Интерфейс, подсказки и ответы ИИ идут на выбранном, даже если пишешь на другом. Этот README и справочник Mnema есть на каждом из них.",
+        "langs_intro": "Mnemai говорит на девяти языках. Интерфейс, подсказки и ответы ИИ идут на выбранном, даже если пишешь на другом. Этот README и справочник Mnemai есть на каждом из них.",
         "qr": "Наведи камеру, чтобы открыть репозиторий",
-        "guide_btn": "Справочник Mnema",
+        "guide_btn": "Справочник Mnemai",
         "guide_msg": "каждый экран и настройка",
         "badges": ["только чтение", "только чтение", "шифрование", "твои файлы"],
         "typing": [
             "Одна память для всех ИИ",
             "Бесплатно, на твоём компьютере, без аккаунта",
         ],
-        "lead": "Mnema помнит, кто ты, над чем работаешь, что решил и как тебе отвечать, — и подставляет это в любой ИИ. Память — папка обычных Markdown-файлов на твоём компьютере. Без облака и без аккаунта.",
+        "lead": "Mnemai помнит, кто ты, над чем работаешь, что решил и как тебе отвечать, — и подставляет это в любой ИИ. Память — папка обычных Markdown-файлов на твоём компьютере. Без облака и без аккаунта.",
         "dl": ("Скачать для", "все файлы"),
-        "hero_alt": "Вопрос, и ответ приходит из памяти: план недели таблицей, с ценой и правилом про встречи, которые Mnema уже знает",
+        "hero_alt": "Вопрос, и ответ приходит из памяти: план недели таблицей, с ценой и правилом про встречи, которые Mnemai уже знает",
         "hero_cap": "Спрашиваешь «что главное на неделе?» — план приходит таблицей, с решённой ценой и твоим правилом про встречи. Повторять их не пришлось.",
         "langs": "Языки",
         "what": "Что умеет",
@@ -201,11 +201,11 @@ L = {
             (
                 "🧠 Она тебя знает",
                 "memory",
-                "Портрет и карта памяти: темы пузырями, размер — сколько Mnema знает",
+                "Портрет и карта памяти: темы пузырями, размер — сколько Mnemai знает",
                 [
-                    "**Портрет, который каждый ИИ читает первым:** кто ты, что строишь, как с тобой работать. Mnema пишет его сама, поправить можно руками.",
+                    "**Портрет, который каждый ИИ читает первым:** кто ты, что строишь, как с тобой работать. Mnemai пишет его сама, поправить можно руками.",
                     "**Карта памяти:** каждая тема — пузырь, пульсирует — недавно менялась, замок — её видят не все ИИ.",
-                    "**Старое не выдаётся за новое:** у каждого факта дата, статус старше месяца Mnema переспросит.",
+                    "**Старое не выдаётся за новое:** у каждого факта дата, статус старше месяца Mnemai переспросит.",
                     "**Не одна папка:** подключи хранилище Obsidian или папку команды — только чтение, запись туда запрещена в самой программе.",
                 ],
             ),
@@ -225,7 +225,7 @@ L = {
                 "Как идёт встреча: запись, расшифровка, итоги, память — у каждого шага свои настройки",
                 [
                     "**Две дорожки:** твой микрофон и звук компьютера, поэтому в расшифровке видно, кто говорит.",
-                    "**Whisper на компьютере бесплатно** или облачный Whisper (≈ $0.36 за час) — тишину, выдуманные фразы и эхо Mnema вырезает.",
+                    "**Whisper на компьютере бесплатно** или облачный Whisper (≈ $0.36 за час) — тишину, выдуманные фразы и эхо Mnemai вырезает.",
                     "**Итоги:** что решили, какие задачи и за кем — любой моделью на выбор, в том числе на компьютере.",
                     "**Готовые настройки:** Приватно, Баланс, Быстро задают весь путь сразу.",
                 ],
@@ -233,7 +233,7 @@ L = {
             (
                 "🌱 Учится сама",
                 "learning",
-                "Ты говоришь что-то между делом, а в ленте видно, что Mnema прочитала, поняла и записала, и почему",
+                "Ты говоришь что-то между делом, а в ленте видно, что Mnemai прочитала, поняла и записала, и почему",
                 [
                     "**Уверена — записывает:** факт с уверенностью от 80% записывается сразу, сомнительный ждёт повтора.",
                     "**Личное — отдельно:** деньги, здоровье и личное попадают в помеченные карточки, их можно скрыть от любого ИИ.",
@@ -243,20 +243,20 @@ L = {
             (
                 "✈️ Читает Telegram, но ничего туда не пишет",
                 "telegram",
-                "Telegram подключён только на чтение: ты выбираешь чаты, Mnema по ним учится",
+                "Telegram подключён только на чтение: ты выбираешь чаты, Mnemai по ним учится",
                 [
-                    "**Чаты выбираешь ты:** Mnema узнаёт тебя и людей вокруг только по ним.",
-                    "**Только чтение, в самой программе:** клиент Telegram внутри Mnema умеет только читать, любая другая команда отклоняется до отправки.",
-                    "**Всё на твоём компьютере:** вход зашифрован в хранилище системы, своих серверов у Mnema нет.",
+                    "**Чаты выбираешь ты:** Mnemai узнаёт тебя и людей вокруг только по ним.",
+                    "**Только чтение, в самой программе:** клиент Telegram внутри Mnemai умеет только читать, любая другая команда отклоняется до отправки.",
+                    "**Всё на твоём компьютере:** вход зашифрован в хранилище системы, своих серверов у Mnemai нет.",
                 ],
             ),
             (
                 "📉 Экономит токены",
                 "tokens",
-                "Вопрос по договору в 153 000 знаков: 29 643 входных токена на весь текст, 6 159 с Mnema",
+                "Вопрос по договору в 153 000 знаков: 29 643 входных токена на весь текст, 6 159 с Mnemai",
                 [
                     "**Уходит только нужное:** память, документы и страницы читаются на компьютере, модели достаются нужные куски.",
-                    "**Замер:** вопрос по договору в 153 000 знаков — весь текст занял 29 643 входных токена, Mnema отправила 6 159, и правильный ответ дал только вариант с Mnema.",
+                    "**Замер:** вопрос по договору в 153 000 знаков — весь текст занял 29 643 входных токена, Mnemai отправила 6 159, и правильный ответ дал только вариант с Mnemai.",
                     "**Видно каждый раз:** под каждым ответом написано, сколько токенов сэкономлено.",
                 ],
                 560,
@@ -285,7 +285,7 @@ L = {
         ],
         "fold": ["Установка", "Сборка из исходников", "Как устроено", "Безопасность"],
         "lic": "Лицензия",
-        "foot": "Если Mnema помнит для тебя что-то полезное, ⭐ поможет её найти другим.",
+        "foot": "Если Mnemai помнит для тебя что-то полезное, ⭐ поможет её найти другим.",
     },
 }
 
@@ -348,8 +348,8 @@ def build(lang: str) -> str:
 
     out = []
     out.append('<div align="center">\n')
-    out.append('<img src="docs/img/brand/logo.svg" width="112" alt="Mnema">\n')
-    out.append("# Mnema\n")
+    out.append('<img src="docs/img/brand/logo.svg" width="112" alt="Mnemai">\n')
+    out.append("# Mnemai\n")
     out.append(f'<img src="{typing(c["typing"])}" alt="{c["typing"][0]}">\n')
     rel = f"https://github.com/{REPO}/releases/latest"
     out.append(
@@ -394,12 +394,12 @@ def build(lang: str) -> str:
     out.append(
         " ".join(
             [
-                f'<a href="../../releases/latest/download/Mnema-Setup.exe"><img src="{badge(dl, "Windows", "0078D4", "", "for-the-badge")}" alt="Windows"></a>',
-                f'<a href="../../releases/latest/download/Mnema-macos-arm64.dmg"><img src="{badge(dl, "macOS", "111111", "apple", "for-the-badge")}" alt="macOS"></a>',
-                f'<a href="../../releases/latest/download/Mnema-x86_64.AppImage"><img src="{badge(dl, "Linux", "E95420", "linux", "for-the-badge")}" alt="Linux"></a>',
+                f'<a href="../../releases/latest/download/Mnemai-Setup.exe"><img src="{badge(dl, "Windows", "0078D4", "", "for-the-badge")}" alt="Windows"></a>',
+                f'<a href="../../releases/latest/download/Mnemai-macos-arm64.dmg"><img src="{badge(dl, "macOS", "111111", "apple", "for-the-badge")}" alt="macOS"></a>',
+                f'<a href="../../releases/latest/download/Mnemai-x86_64.AppImage"><img src="{badge(dl, "Linux", "E95420", "linux", "for-the-badge")}" alt="Linux"></a>',
             ]
         )
-        + f'\n\n<sub><a href="../../releases">{alltxt}</a> · macOS Intel: <a href="../../releases/latest/download/Mnema-macos-x64.dmg">x64.dmg</a></sub>\n'
+        + f'\n\n<sub><a href="../../releases">{alltxt}</a> · macOS Intel: <a href="../../releases/latest/download/Mnemai-macos-x64.dmg">x64.dmg</a></sub>\n'
     )
     out.append(f'<img src="{img}/hero.gif" width="880" alt="{c["hero_alt"]}">\n')
     out.append(f"<sub>{c['hero_cap']}</sub>\n")
@@ -474,7 +474,7 @@ def build(lang: str) -> str:
 
     out.append(f"## {c['lic']}\n\n{lic}\n")
     out.append(
-        f'<div align="center">\n<img src="docs/img/brand/logo.svg" width="40" alt="Mnema">\n\n<sub>{c["foot"]}</sub>\n</div>\n'
+        f'<div align="center">\n<img src="docs/img/brand/logo.svg" width="40" alt="Mnemai">\n\n<sub>{c["foot"]}</sub>\n</div>\n'
     )
     text = "\n".join(out)
     return text
@@ -482,13 +482,13 @@ def build(lang: str) -> str:
 
 # ---------------------------------------------------------------- translating the other eight, once
 
-PROMPT_STRINGS = """You translate the texts of the GitHub README of Mnema — a free desktop app that keeps a person's memory
+PROMPT_STRINGS = """You translate the texts of the GitHub README of Mnemai — a free desktop app that keeps a person's memory
 for every AI (Claude, ChatGPT, Gemini, local models) as Markdown files on their own computer — into {lang}.
 
 Below is a JSON object in English. Return ONLY a JSON object with exactly the same structure: the same keys, the same
 list lengths, the same order. Translate every human-readable text. Keep unchanged: emoji, numbers, Markdown (**bold**),
 «quotes» style adapted to {lang}, the animation ids (memory, consortium, meetings, learning, telegram, tokens, lock,
-privacy) and any number that is a width. Keep brand and product names (Mnema, Claude, Claude Code, ChatGPT, Gemini,
+privacy) and any number that is a width. Keep brand and product names (Mnemai, Claude, Claude Code, ChatGPT, Gemini,
 OpenRouter, Ollama, Cursor, Obsidian, Markdown, Telegram, Whisper, KeePass, AES-256, MCP, API, PDF, Word, Excel,
 QuickBooks, Windows, macOS, Linux). The «typing» lines are short slogans: keep them short (under 40 characters).
 Address the reader informally where the language allows it, like a friendly modern app.
@@ -496,7 +496,7 @@ Address the reader informally where the language allows it, like a friendly mode
 JSON:
 {items}"""
 
-PROMPT_PART = """Translate this part of the GitHub README of Mnema (a desktop app that keeps memory for every AI) from
+PROMPT_PART = """Translate this part of the GitHub README of Mnemai (a desktop app that keeps memory for every AI) from
 English into {lang}. Return ONLY the translated Markdown. Keep the Markdown structure, tables, links, code blocks
 and commands exactly; do not translate code, commands, file names, paths, URLs, product names.
 

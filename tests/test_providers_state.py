@@ -224,7 +224,7 @@ class ModelOrder(unittest.TestCase):
 
 @unittest.skipUnless(sys.platform == "win32", "Windows places")
 class FindClaudeCode(unittest.TestCase):
-    """The tester's case: Claude Code is there, but not on PATH — Mnema must still find it."""
+    """The tester's case: Claude Code is there, but not on PATH — Mnemai must still find it."""
 
     def setUp(self):
         self.home = Path(tempfile.mkdtemp())

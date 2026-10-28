@@ -1,4 +1,4 @@
-"""Voice command: the owner speaks, Mnema recognises the words on this computer and sends them as a message.
+"""Voice command: the owner speaks, Mnemai recognises the words on this computer and sends them as a message.
 
 Only the microphone is recorded (not the computer's sound, unlike the meeting scribe), into a temporary file that is
 deleted right after recognition. The same faster-whisper model as the scribe, already loaded if it was used.

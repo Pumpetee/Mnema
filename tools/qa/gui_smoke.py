@@ -1,6 +1,6 @@
 """The built program opens its window and serves the memory — on the system it runs on (CI: Windows, macOS, Linux).
 
-    python tools/qa/gui_smoke.py <path to Mnema program> <path to mnema-cli>
+    python tools/qa/gui_smoke.py <path to Mnemai program> <path to mnemai-cli>
     python tools/qa/gui_smoke.py --source        # the same from the source tree
 
 A throw-away home and memory folder; the program starts as the owner would start it (window, tray), must write its

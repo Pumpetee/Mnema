@@ -1,4 +1,4 @@
-"""Mnema's own encryption through the interface: turn on, the password screen after a restart, a wrong and a right
+"""Mnemai's own encryption through the interface: turn on, the password screen after a restart, a wrong and a right
 password, the files on disk, change of password, turning it off."""
 
 import tempfile

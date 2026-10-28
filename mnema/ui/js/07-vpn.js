@@ -61,7 +61,7 @@ async function bindVpnButtons(box, onConnect, onManual) {
         if (hit && hit.tunnel) {
           await onConnect("", name);
           msg.className = "vpnmsg ok";
-          msg.innerHTML = `${ic("check")}<span><b>${esc(name)}</b> ${tr("работает на всю систему — Mnema идёт через него сама. Больше ничего не нужно.")}</span>`;
+          msg.innerHTML = `${ic("check")}<span><b>${esc(name)}</b> ${tr("работает на всю систему — Mnemai идёт через него сама. Больше ничего не нужно.")}</span>`;
           return;
         }
         if (hit) {
@@ -71,7 +71,7 @@ async function bindVpnButtons(box, onConnect, onManual) {
           return;
         }
         msg.className = "vpnmsg no";
-        msg.innerHTML = `${ic("x")}<span>${a[1] === "tunnel" ? `${esc(name)} ${tr("не запущен. Открой его и подключись — Mnema пойдёт через него сама, настраивать ничего не нужно.")}` : `${esc(name)} ${tr("не найден. Открой")} ${esc(name)}, ${tr("включи подключение и нажми эту кнопку ещё раз.")}`}</span><button class="btn l sm" data-again>${tr("Проверить ещё раз")}</button>`;
+        msg.innerHTML = `${ic("x")}<span>${a[1] === "tunnel" ? `${esc(name)} ${tr("не запущен. Открой его и подключись — Mnemai пойдёт через него сама, настраивать ничего не нужно.")}` : `${esc(name)} ${tr("не найден. Открой")} ${esc(name)}, ${tr("включи подключение и нажми эту кнопку ещё раз.")}`}</span><button class="btn l sm" data-again>${tr("Проверить ещё раз")}</button>`;
         $("[data-again]", msg).onclick = () => b.click();
       }),
   );

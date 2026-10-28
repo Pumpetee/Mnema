@@ -84,7 +84,7 @@ const MINI_FLOW = {
   },
   autos: {
     f: ["set", "Windows"],
-    t: ["mem", "Mnema"],
+    t: ["mem", "Mnemai"],
     on: ["запуск", "go"],
     off: ["", "stop"],
     re: "включение компьютера",
@@ -105,7 +105,7 @@ const MINI_CAP = {
   pauto: ["Узнала задачу — готовит по рецепту", "Рецепты сама не берёт"],
   englow: ["Окна и браузер не тормозят", "Модель берёт всё, что может"],
 };
-// ---------------------------------------------------------------- every switch: its own little scene + how Mnema reacts
+// ---------------------------------------------------------------- every switch: its own little scene + how Mnemai reacts
 // [scene, data, reaction when on, reaction when off]
 const MR = {
   no_filler: [
@@ -211,7 +211,7 @@ function miniScene(key, on, label) {
       : null);
   if (!f) return "";
   if (f.meter)
-    return `<div class="mini mmeter ${on ? "is-on" : "is-off"}"><div class="mrowm"><span>Mnema</span><i><b style="--w:${on ? 28 : 88}%"></b></i></div><div class="mrowm"><span>${tr("Браузер")}</span><i><b class="o" style="--w:${on ? 64 : 12}%"></b></i></div><div class="mrowm"><span>${tr("Окна")}</span><i><b class="o" style="--w:${on ? 48 : 8}%"></b></i></div></div>`;
+    return `<div class="mini mmeter ${on ? "is-on" : "is-off"}"><div class="mrowm"><span>Mnemai</span><i><b style="--w:${on ? 28 : 88}%"></b></i></div><div class="mrowm"><span>${tr("Браузер")}</span><i><b class="o" style="--w:${on ? 64 : 12}%"></b></i></div><div class="mrowm"><span>${tr("Окна")}</span><i><b class="o" style="--w:${on ? 48 : 8}%"></b></i></div></div>`;
   const [pk, mode] = on ? f.on : f.off;
   return `<div class="mini mflow ${on ? "is-on" : "is-off"} m-${mode}"><div class="mnode">${ic(f.f[0])}<span>${esc(tr(f.f[1]))}</span></div><div class="mpipe"><i class="mline"></i>${pk ? `<em class="mpk">${esc(pk)}</em>` : ""}${mode === "block" ? '<b class="mx">×</b>' : ""}</div><div class="mnode">${ic(f.t[0])}<span>${esc(tr(f.t[1]))}</span></div></div>`;
 }

@@ -1,5 +1,5 @@
 """The QR code to the repository for the README (shown on a screen at a conference): rounded dots, the three corner
-squares in the brand violet (square: rounded ones are missed by some readers), the Mnema mark in the middle
+squares in the brand violet (square: rounded ones are missed by some readers), the Mnemai mark in the middle
 (error correction H keeps it readable).
 
     python tools/qr_build.py   →  docs/img/brand/qr.svg   (needs segno: pip install segno)
@@ -13,7 +13,7 @@ from pathlib import Path
 import segno
 
 ROOT = Path(__file__).resolve().parents[1]
-URL = "https://github.com/Pumpetee/Mnema"
+URL = "https://github.com/Pumpetee/Mnemai"
 OUT = ROOT / "docs" / "img" / "brand" / "qr.svg"
 
 

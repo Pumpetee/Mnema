@@ -26,7 +26,7 @@ def get(vault: Vault, path: str, q: dict):
             "session": CH.current_session(vault),
             "session_names": CH.session_names(vault),
         }
-    if path == "/api/knowledge":  # «Справочник Mnema»: the knowledge base, section by section
+    if path == "/api/knowledge":  # «Справочник Mnemai»: the knowledge base, section by section
         from .chat.selfknow import kb_sections
 
         return 200, {"sections": [{"title": t, "text": x} for t, x in kb_sections()]}
@@ -102,7 +102,7 @@ def get(vault: Vault, path: str, q: dict):
         from . import crypt
 
         return 200, crypt.status(vault.root)
-    if path == "/api/crypto/key":  # the console helper (MCP) of this computer asks the running Mnema
+    if path == "/api/crypto/key":  # the console helper (MCP) of this computer asks the running Mnemai
         from . import crypt
 
         return 200, {"key": crypt.key_b64(vault.root)}
@@ -125,7 +125,7 @@ def get(vault: Vault, path: str, q: dict):
         from .learn import tg_api
 
         return 200, tg_api.status(vault)
-    if path == "/api/quiz":  # «Насколько Mnema тебя знает»: facts from the memory, one by one
+    if path == "/api/quiz":  # «Насколько Mnemai тебя знает»: facts from the memory, one by one
         from . import play
 
         return 200, play.quiz(vault)
@@ -473,7 +473,7 @@ def post(vault: Vault, path: str, b: dict):
             str(b.get("model", "")),
             {k: b.get(k) for k in ("format", "roles", "summarizer", "length", "search", "challenge")},
         )
-    if path == "/api/vpn":  # a VPN key: Mnema connects through it itself (vpnkey.py)
+    if path == "/api/vpn":  # a VPN key: Mnemai connects through it itself (vpnkey.py)
         from . import vpnkey
 
         a = str(b.get("action", ""))
@@ -559,7 +559,7 @@ def post(vault: Vault, path: str, b: dict):
         from .learn import tg_api
 
         return 200, tg_api.configure(vault, b)
-    if path == "/api/compare":  # «С памятью и без»: the same question, a plain chat and Mnema, side by side
+    if path == "/api/compare":  # «С памятью и без»: the same question, a plain chat and Mnemai, side by side
         from . import play
 
         return 200, play.compare(vault, str(b.get("question") or ""), b.get("models") or None)
@@ -573,7 +573,7 @@ def post(vault: Vault, path: str, b: dict):
         from . import play
 
         return 200, play.interview_save(vault, b.get("answers") or {})
-    if path == "/api/share/save":  # «Поделиться»: the card as a picture in Pictures/Mnema, shown in its folder
+    if path == "/api/share/save":  # «Поделиться»: the card as a picture in Pictures/Mnemai, shown in its folder
         import base64
         import re as _re
         import time as _time
@@ -584,9 +584,9 @@ def post(vault: Vault, path: str, b: dict):
         data = base64.b64decode(str(b.get("png") or "").split(",", 1)[-1])
         if not data.startswith(b"\x89PNG"):
             raise ValueError("это не картинка")
-        folder = _P.home() / "Pictures" / "Mnema"
+        folder = _P.home() / "Pictures" / "Mnemai"
         folder.mkdir(parents=True, exist_ok=True)
-        name = _re.sub(r"[^\w -]+", "", str(b.get("name") or "mnema"))[:40].strip() or "mnema"
+        name = _re.sub(r"[^\w -]+", "", str(b.get("name") or "mnemai"))[:40].strip() or "mnemai"
         p = folder / f"{name} {_time.strftime('%Y-%m-%d %H-%M-%S')}.png"
         p.write_bytes(data)
         osapi.reveal(p)
@@ -904,7 +904,7 @@ def post(vault: Vault, path: str, b: dict):
 
 
 def crypto_post(vault: Vault, b: dict):
-    """Mnema's own encryption: on, off, the password at start, a new password, remember on this computer."""
+    """Mnemai's own encryption: on, off, the password at start, a new password, remember on this computer."""
     from . import crypt
     from .api import APP_HOOKS
 

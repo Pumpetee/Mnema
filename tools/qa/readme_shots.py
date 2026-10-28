@@ -34,7 +34,7 @@ T = (lambda ru, en: ru) if RU else (lambda ru, en: en)
 # ---------------------------------------------------------------- the demo memory
 import shutil  # noqa: E402
 
-DEMO = Path(os.environ.get("PUBLIC", "C:/Users/Public")) / "Documents" / "Mnema demo"
+DEMO = Path(os.environ.get("PUBLIC", "C:/Users/Public")) / "Documents" / "Mnemai demo"
 shutil.rmtree(DEMO, ignore_errors=True)
 v = Vault(DEMO / T("Память", "Memory"))
 init_vault(v)
@@ -164,7 +164,7 @@ MORE = {
 for card, lines in MORE.items():
     for line in lines:
         remember(v, line, "card:" + card)
-# his own portrait, as if written by Mnema after a few weeks
+# his own portrait, as if written by Mnemai after a few weeks
 prof = (v.root / "70 Memory" / "Profile.md").read_text(encoding="utf-8")
 intro = T(
     "Иван — основатель стартапа из Казани. Строит «Гараж», CRM для автосервисов: пилот в пяти СТО, старт продаж 3 ноября. Любит списки и примеры.",
@@ -214,7 +214,7 @@ CONS = {
     ),
 }
 
-# «С памятью и без»: the same AI as a plain chat and through Mnema
+# «С памятью и без»: the same AI as a plain chat and through Mnemai
 COMPARE_PLAIN = {
     "anthropic": T(
         "Я не знаю, кто вы, и не вижу ваших дел. Расскажите о себе — и я помогу составить план на неделю.",
@@ -495,7 +495,7 @@ with sync_playwright() as p:
     def close_modals():
         page.evaluate("document.querySelectorAll('.modal').forEach(e => e.remove())")
 
-    # 9. «С памятью и без»: the same question, a plain chat and Mnema side by side
+    # 9. «С памятью и без»: the same question, a plain chat and Mnemai side by side
     page.goto(base + "#chat")
     page.wait_for_timeout(1500)
     clean(page)

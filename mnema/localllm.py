@@ -3,7 +3,7 @@
 - The engine (llama-server from the official llama.cpp CPU build) ships inside the program.
 - Models are GGUF files from Hugging Face, downloaded on demand into ~/.mnema/models with resume, live percent,
   speed and time left. Sizes in the catalog are the real file sizes; the download is checked against them.
-- Before downloading Mnema measures the real download speed (first ~2 MB) and checks memory and disk, so it can
+- Before downloading Mnemai measures the real download speed (first ~2 MB) and checks memory and disk, so it can
   say how long it will take and whether this computer will cope.
 - The server starts on first use, listens on 127.0.0.1 only and speaks the OpenAI-compatible API.
 """
@@ -177,7 +177,7 @@ CATALOG = [
     },
 ]
 BY_ID = {m["id"]: m for m in CATALOG}
-UA = {"User-Agent": "Mnema/0.3 (local model download)"}
+UA = {"User-Agent": "Mnemai/0.3 (local model download)"}
 
 
 def home() -> Path:
@@ -410,7 +410,7 @@ def download_error(e: BaseException, done: int = 0, total: int = 0) -> str:
     if isinstance(e, (urllib.error.URLError, ConnectionError, TimeoutError)) or "WinError" in str(e):
         return human(e, "сервером моделей") + " " + again
     if isinstance(e, RuntimeError) and (_re.search(r"[А-Яа-яЁё]", str(e)) or "cut" in str(e)):
-        return f"Загрузка прервалась{pct}. {again}"  # stopped early: Mnema's own check
+        return f"Загрузка прервалась{pct}. {again}"  # stopped early: Mnemai's own check
     return human(e, "сервером моделей") + " " + again
 
 

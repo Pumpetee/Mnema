@@ -137,7 +137,7 @@ SIMPLE = {
 }
 
 DEFAULT = {
-    # Mnema as memory: on — AIs get the owner's memory and Mnema learns; off — plain chat, nothing is given or written.
+    # Mnemai as memory: on — AIs get the owner's memory and Mnemai learns; off — plain chat, nothing is given or written.
     # A memory folder made on the first screen starts with it off (the tour offers to turn it on); folders that
     # existed before the switch keep memory on.
     "memory_on": True,
@@ -148,7 +148,7 @@ DEFAULT = {
     "custom": "",  # free text added to the instructions
     "default_model": "",  # "provider:model"
     "team_vault": "",  # before 1.4: one shared folder; read as the first of extra_folders
-    "extra_folders": [],  # more folders the memory reaches into (notes, an Obsidian vault, another Mnema memory)
+    "extra_folders": [],  # more folders the memory reaches into (notes, an Obsidian vault, another Mnemai memory)
     "tg_read": {},  # reading the owner's chats through the Telegram API (learn/tg_api.py): api_id, phone, who logged in
     "self_ask": True,  # a question of her own now and then when the talk is about a project (chat/selfask.py)
     "self_ask_next": "",  # not before this time: 40–120 minutes after the last such question
@@ -200,7 +200,7 @@ def memory_on(vault: Vault) -> bool:
         return True
 
 
-MEMORY_OFF = "Память Mnema выключена: ИИ ничего о тебе не знают, и ничего не запоминается. Включить — Настройки → Обучение → «Память»."
+MEMORY_OFF = "Память Mnemai выключена: ИИ ничего о тебе не знают, и ничего не запоминается. Включить — Настройки → Обучение → «Память»."
 
 
 def load(vault: Vault) -> dict:
@@ -321,7 +321,7 @@ def export_pack(prof: dict, name: str = "Мой набор") -> dict:
 
 def import_pack(vault: Vault, pack: dict) -> dict:
     if not isinstance(pack, dict) or pack.get("mnema_pack") != 1:
-        raise ValueError("это не набор Mnema")
+        raise ValueError("это не набор Mnemai")
     known = defaults()
     return save(
         vault,

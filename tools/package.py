@@ -1,4 +1,4 @@
-"""Mnema packager: looks at the operating system it runs on and builds the package for it.
+"""Mnemai packager: looks at the operating system it runs on and builds the package for it.
 
     python tools/package.py              # build for this system
     python tools/package.py --skip-tests
@@ -6,10 +6,10 @@
 The target computer is assumed to have nothing installed: no Python, no runtimes. Everything the program needs is
 inside the package; what Windows itself must provide is checked against what a clean Windows 10/11 has.
 
-Windows  → dist/Mnema-Setup-<version>.exe (installer) and dist/Mnema-<version>-windows-x64.zip (portable)
-macOS    → dist/Mnema-<version>-macos-<arm64|x64>.dmg — Mnema.app, drag it to Applications
-Linux    → dist/Mnema-<version>-<x86_64|aarch64>.AppImage (one file, with its .zsync for updates) and the same as a
-           .tar.gz folder (Mnema-<version>-linux-<arch>.tar.gz)
+Windows  → dist/Mnemai-Setup-<version>.exe (installer) and dist/Mnemai-<version>-windows-x64.zip (portable)
+macOS    → dist/Mnemai-<version>-macos-<arm64|x64>.dmg — Mnemai.app, drag it to Applications
+Linux    → dist/Mnemai-<version>-<x86_64|aarch64>.AppImage (one file, with its .zsync for updates) and the same as a
+           .tar.gz folder (Mnemai-<version>-linux-<arch>.tar.gz)
 
 Every package is started once after the build: its own CLI makes a memory folder and serves it, and the local model
 engine inside answers --version. Each file gets a .sha256 beside it.
@@ -67,7 +67,7 @@ def windows_prerequisites() -> None:
 
         wv.parent.mkdir(parents=True, exist_ok=True)
         req = urllib.request.Request(
-            "https://go.microsoft.com/fwlink/p/?LinkId=2124703", headers={"User-Agent": "Mnema"}
+            "https://go.microsoft.com/fwlink/p/?LinkId=2124703", headers={"User-Agent": "Mnemai"}
         )
         wv.write_bytes(net.urlopen(req, timeout=120).read())
         say("скачал установщик Microsoft WebView2")
@@ -101,14 +101,14 @@ def check_windows_dependencies(app: Path) -> list[str]:
     return problems
 
 
-README = """Mnema {v} — память о тебе для любого ИИ / your memory for any AI
+README = """Mnemai {v} — память о тебе для любого ИИ / your memory for any AI
 
-Как запустить: распакуй папку куда угодно и открой Mnema.exe.
+Как запустить: распакуй папку куда угодно и открой Mnemai.exe.
 Ничего заранее ставить не нужно. Если в Windows нет компонента Microsoft WebView2,
-Mnema поставит его сама при первом запуске (нужен интернет, один раз).
+Mnemai поставит его сама при первом запуске (нужен интернет, один раз).
 
-How to run: unpack anywhere and open Mnema.exe. Nothing to install beforehand.
-If Windows lacks Microsoft WebView2, Mnema installs it on first start (internet needed once).
+How to run: unpack anywhere and open Mnemai.exe. Nothing to install beforehand.
+If Windows lacks Microsoft WebView2, Mnemai installs it on first start (internet needed once).
 
 Windows 10 / 11, 64-bit.
 Данные / data: ~/.mnema (настройки) и папка памяти, которую выберешь при первом запуске.
@@ -128,7 +128,7 @@ def build_windows(skip_tests: bool) -> Path:
             raise SystemExit("тесты не прошли — пакет не собираю")
     out = ROOT / "dist"
     work = ROOT / "build-package"
-    shutil.rmtree(out / "Mnema", ignore_errors=True)
+    shutil.rmtree(out / "Mnemai", ignore_errors=True)
     say("сборка программы (PyInstaller)")
     subprocess.run(
         [
@@ -146,7 +146,7 @@ def build_windows(skip_tests: bool) -> Path:
         check=True,
         capture_output=True,
     )
-    app = out / "Mnema"
+    app = out / "Mnemai"
     problems = check_windows_dependencies(app)
     if problems:
         print("\n".join(problems[:40]))
@@ -154,13 +154,13 @@ def build_windows(skip_tests: bool) -> Path:
     say("зависимости: всё внутри пакета или есть в любой Windows 10/11")
     (app / "README.txt").write_text(README.format(v=version()), encoding="utf-8")
     (app / "version.txt").write_text(version(), encoding="utf-8")  # the installer's detector reads it
-    z = out / f"Mnema-{version()}-windows-x64.zip"
+    z = out / f"Mnemai-{version()}-windows-x64.zip"
     z.unlink(missing_ok=True)
     say("архив")
     with zipfile.ZipFile(z, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
         for p in sorted(app.rglob("*")):
             if p.is_file():
-                zf.write(p, Path("Mnema") / p.relative_to(app))
+                zf.write(p, Path("Mnemai") / p.relative_to(app))
     h = hashlib.sha256(z.read_bytes()).hexdigest()
     (out / (z.name + ".sha256")).write_text(f"{h}  {z.name}\n", encoding="utf-8")
     say(f"готово: {z} · {z.stat().st_size / 1e6:.0f} МБ · sha256 {h[:16]}…")
@@ -182,7 +182,7 @@ def iscc() -> Path | None:
 
 
 def build_installer() -> Path | None:
-    """dist/Mnema-Setup-<version>.exe — installs for the user, finds and clears older versions (packaging/mnema.iss)."""
+    """dist/Mnemai-Setup-<version>.exe — installs for the user, finds and clears older versions (packaging/mnema.iss)."""
     c = iscc()
     if not c:
         say("установщик не собран: нет Inno Setup 6 (ISCC.exe). Поставь его или укажи путь в ISCC")
@@ -199,7 +199,7 @@ def build_installer() -> Path | None:
     if r.returncode:
         print(r.stdout[-3000:], r.stderr[-3000:])
         raise SystemExit("установщик не собрался")
-    exe = ROOT / "dist" / f"Mnema-Setup-{version()}.exe"
+    exe = ROOT / "dist" / f"Mnemai-Setup-{version()}.exe"
     h = hashlib.sha256(exe.read_bytes()).hexdigest()
     (exe.parent / (exe.name + ".sha256")).write_text(f"{h}  {exe.name}\n", encoding="utf-8")
     say(f"готово: {exe} · {exe.stat().st_size / 1e6:.0f} МБ · sha256 {h[:16]}…")
@@ -221,8 +221,8 @@ def run_tests(py: Path) -> None:
 
 def pyinstaller(py: Path) -> Path:
     out, work = ROOT / "dist", ROOT / "build-package"
-    shutil.rmtree(out / "Mnema", ignore_errors=True)
-    shutil.rmtree(out / "Mnema.app", ignore_errors=True)
+    shutil.rmtree(out / "Mnemai", ignore_errors=True)
+    shutil.rmtree(out / "Mnemai.app", ignore_errors=True)
     from mnema.desktop import icon_image
 
     icon_image(512).save(ROOT / "packaging" / "mnema.png")
@@ -300,21 +300,21 @@ def build_macos(skip_tests: bool) -> Path:
     if not skip_tests:
         run_tests(py)
     out = pyinstaller(py)
-    app = out / "Mnema.app"
+    app = out / "Mnemai.app"
     say("подпись (ad-hoc): без неё Apple Silicon не запускает программу")
     subprocess.run(["codesign", "--force", "--deep", "--sign", "-", str(app)], check=True)
-    smoke(app, app / "Contents" / "MacOS" / "mnema-cli")
+    smoke(app, app / "Contents" / "MacOS" / "mnemai-cli")
     arch = "arm64" if platform.machine().lower() in ("arm64", "aarch64") else "x64"
-    dmg = out / f"Mnema-{version()}-macos-{arch}.dmg"
+    dmg = out / f"Mnemai-{version()}-macos-{arch}.dmg"
     dmg.unlink(missing_ok=True)
     stage = out / "dmg"
     shutil.rmtree(stage, ignore_errors=True)
     stage.mkdir()
-    subprocess.run(["ditto", str(app), str(stage / "Mnema.app")], check=True)
+    subprocess.run(["ditto", str(app), str(stage / "Mnemai.app")], check=True)
     (stage / "Applications").symlink_to("/Applications")
     say("образ диска (DMG)")
     subprocess.run(
-        ["hdiutil", "create", "-volname", "Mnema", "-srcfolder", str(stage), "-ov", "-format", "UDZO", str(dmg)],
+        ["hdiutil", "create", "-volname", "Mnemai", "-srcfolder", str(stage), "-ov", "-format", "UDZO", str(dmg)],
         check=True,
         capture_output=True,
     )
@@ -323,16 +323,16 @@ def build_macos(skip_tests: bool) -> Path:
     return dmg
 
 
-APP_ID = "io.github.pumpetee.mnema"  # the AppStream id: the catalogs know Mnema by it
+APP_ID = "io.github.pumpetee.mnema"  # the AppStream id: the catalogs know Mnemai by it
 DESKTOP = """[Desktop Entry]
 Type=Application
-Name=Mnema
+Name=Mnemai
 Comment=Your memory for every AI
-Exec=Mnema
+Exec=Mnemai
 Icon=mnema
 Categories=Office;Utility;
 Terminal=false
-StartupWMClass=Mnema
+StartupWMClass=Mnemai
 """
 
 
@@ -372,23 +372,23 @@ def build_linux(skip_tests: bool) -> Path:
     if not skip_tests:
         run_tests(py)
     out = pyinstaller(py)
-    folder = out / "Mnema"
-    smoke(folder, folder / "mnema-cli")
+    folder = out / "Mnemai"
+    smoke(folder, folder / "mnemai-cli")
     arch = "aarch64" if platform.machine().lower() in ("arm64", "aarch64") else "x86_64"
     (folder / "version.txt").write_text(version(), encoding="utf-8")
-    tgz = out / f"Mnema-{version()}-linux-{arch}.tar.gz"
+    tgz = out / f"Mnemai-{version()}-linux-{arch}.tar.gz"
     say("архив")
     with tarfile.open(tgz, "w:gz") as t:
-        t.add(folder, arcname="Mnema")
+        t.add(folder, arcname="Mnemai")
     sha_file(tgz)
     tool = appimagetool()
     if not tool:
         return tgz
-    appdir = out / "Mnema.AppDir"
+    appdir = out / "Mnemai.AppDir"
     shutil.rmtree(appdir, ignore_errors=True)
     shutil.copytree(folder, appdir / "usr" / "lib" / "mnema", symlinks=True)
     (appdir / "AppRun").write_text(
-        '#!/bin/sh\nHERE="$(dirname "$(readlink -f "$0")")"\nexec "$HERE/usr/lib/mnema/Mnema" "$@"\n', encoding="utf-8"
+        '#!/bin/sh\nHERE="$(dirname "$(readlink -f "$0")")"\nexec "$HERE/usr/lib/mnema/Mnemai" "$@"\n', encoding="utf-8"
     )
     (appdir / "AppRun").chmod(0o755)
     share = appdir / "usr" / "share"
@@ -408,11 +408,11 @@ def build_linux(skip_tests: bool) -> Path:
     )
     (share / "metainfo").mkdir(parents=True, exist_ok=True)
     (share / "metainfo" / f"{APP_ID}.metainfo.xml").write_text(meta, encoding="utf-8")
-    img = out / f"Mnema-{version()}-{arch}.AppImage"  # AppImages are Linux only: the name doesn't say it again
+    img = out / f"Mnemai-{version()}-{arch}.AppImage"  # AppImages are Linux only: the name doesn't say it again
     img.unlink(missing_ok=True)
     say("AppImage")
     # update information: AppImageUpdate and the like find the newest release on GitHub through the .zsync beside it
-    update = f"gh-releases-zsync|Pumpetee|Mnema|latest|Mnema-*-{arch}.AppImage.zsync"
+    update = f"gh-releases-zsync|Pumpetee|Mnemai|latest|Mnemai-*-{arch}.AppImage.zsync"
     r = subprocess.run(
         [str(tool), "--appimage-extract-and-run", "-u", update, str(appdir), str(img)],
         capture_output=True,
@@ -437,7 +437,7 @@ def build_linux(skip_tests: bool) -> Path:
 def main() -> None:
     system = platform.system()
     skip = "--skip-tests" in sys.argv
-    say(f"система: {system} {platform.machine()} · Mnema {version()}")
+    say(f"система: {system} {platform.machine()} · Mnemai {version()}")
     if system == "Windows":
         if platform.machine().lower() not in ("amd64", "x86_64"):
             raise SystemExit("нужна 64-битная Windows на x64")

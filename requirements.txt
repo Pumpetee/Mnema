@@ -14,7 +14,7 @@ opencv-python-headless==4.14.0.94  # for rapidocr; the last release with a wheel
 openpyxl==3.1.5         # Excel .xlsx
 xlrd==2.0.2             # Excel .xls
 python-pptx==1.0.2      # PowerPoint
-cryptography==48.0.1    # Mnema's own encryption of the memory folder; the last release with an Intel Mac wheel
+cryptography==48.0.1    # Mnemai's own encryption of the memory folder; the last release with an Intel Mac wheel
 PySocks==1.7.1          # SOCKS5 proxy bridge
 telethon==1.45.0        # Telegram: reading the owner's chats through the API (read only)
 python-socks[asyncio]==2.8.2  # Telegram through the owner's proxy or VPN

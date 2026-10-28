@@ -3,7 +3,7 @@
 Two kinds of VPN clients on Windows:
 - proxy clients (Hiddify, Happ, v2rayN, NekoRay, Clash…) open a local proxy port on 127.0.0.1. We look at which
   programs listen on this computer, try each port as HTTP and as SOCKS5 and keep the ones that actually reach the AI;
-- tunnel clients (OpenVPN, WireGuard, Outline, AmneziaVPN…) wrap the whole system: when they are on, Mnema goes
+- tunnel clients (OpenVPN, WireGuard, Outline, AmneziaVPN…) wrap the whole system: when they are on, Mnemai goes
   through them by itself and nothing has to be filled in.
 """
 

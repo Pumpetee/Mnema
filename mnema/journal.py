@@ -91,7 +91,7 @@ def journal_line(vault: Vault, client: str, rel: str, summary: str) -> None:
     head = (
         ""
         if f.exists()
-        else f"# Журнал — {time.strftime('%d.%m.%Y')}\n\nЧто записано в память и кем. Откатить — в Mnema, «История».\n\n"
+        else f"# Журнал — {time.strftime('%d.%m.%Y')}\n\nЧто записано в память и кем. Откатить — в Mnemai, «История».\n\n"
     )
     from .fsutil import append_text
 

@@ -1,7 +1,7 @@
 """Encryption of the memory folder — an option, by Windows itself (EFS).
 
 The files on disk are encrypted with the key of the owner's Windows account: without signing in to it they can't be
-read, even with the disk taken out. For the owner, Mnema, editors and the sync clients nothing changes, because Windows
+read, even with the disk taken out. For the owner, Mnemai, editors and the sync clients nothing changes, because Windows
 decrypts on the fly for this account only. The price: the key lives in the Windows account. If Windows is reinstalled
 without a saved recovery key, the files can't be opened — hence the «save the recovery key» button.
 
@@ -88,7 +88,7 @@ def disable(vault: Vault) -> dict:
 
 def backup_key() -> str:
     """Windows asks for a password in its own window and saves the recovery key next to the owner's documents."""
-    target = Path.home() / "Documents" / "Mnema — ключ восстановления"
+    target = Path.home() / "Documents" / "Mnemai — ключ восстановления"
     subprocess.Popen(
         ["cmd", "/c", "cipher", "/x", str(target), "&", "pause"],
         creationflags=getattr(subprocess, "CREATE_NEW_CONSOLE", 0),

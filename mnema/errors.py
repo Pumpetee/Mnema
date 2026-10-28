@@ -87,7 +87,7 @@ def http(code: int, body: str, who: str, model: str = "") -> str:
 
 
 def human(e: BaseException, who: str = "сервис", model: str = "", vpn: str = "") -> str:
-    """vpn — the name of the VPN key Mnema connects through, if any: then the tunnel is the first suspect."""
+    """vpn — the name of the VPN key Mnemai connects through, if any: then the tunnel is the first suspect."""
     via = (
         f"Связь идёт через VPN «{vpn}» — похоже, его сервер не отвечает: проверь ключ или выключи его — {NET}."
         if vpn
@@ -115,7 +115,7 @@ def human(e: BaseException, who: str = "сервис", model: str = "", vpn: str
     ):
         return via or f"Связь с {who} прервалась. Повтори — если не поможет, проверь интернет или прокси — {NET}."
     if re.search(r"[А-Яа-яЁё]", text) and not re.search(r"\[WinError|Errno|codec", text):
-        return text[:400]  # Mnema's own message, already for the owner
+        return text[:400]  # Mnemai's own message, already for the owner
     if isinstance(e, MemoryError):
         return "Не хватило оперативной памяти: закрой лишние программы и повтори."
     return f"Не получилось получить ответ от {who}. Повтори; если не поможет — выбери другую модель слева вверху."

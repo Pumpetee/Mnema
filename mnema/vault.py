@@ -301,7 +301,7 @@ def read_text(p: Path) -> str:
 class Vault:
     def __init__(self, root: str | Path):
         self.root = Path(root).expanduser().resolve()
-        if (self.root / SERVICE_DIR / "crypto.json").exists():  # encrypted by Mnema: its key, if it is here
+        if (self.root / SERVICE_DIR / "crypto.json").exists():  # encrypted by Mnemai: its key, if it is here
             from . import crypt
 
             crypt.attach(self.root)

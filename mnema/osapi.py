@@ -1,6 +1,6 @@
 """What differs between Windows, macOS and Linux, in one place: program names, hidden child processes, opening a folder,
 the computer's memory, where other programs keep their settings, the system theme and language, a message box,
-start at login and the single-instance lock. The rest of Mnema asks here instead of checking the system itself.
+start at login and the single-instance lock. The rest of Mnemai asks here instead of checking the system itself.
 """
 
 from __future__ import annotations
@@ -178,7 +178,7 @@ def ui_lang() -> str:
         return "en"
 
 
-def message(text: str, error: bool = False, title: str = "Mnema") -> None:
+def message(text: str, error: bool = False, title: str = "Mnemai") -> None:
     """A plain message box before any window exists (a failed start, a missing component)."""
     try:
         if IS_WIN:
@@ -235,7 +235,7 @@ def autostart_enabled() -> bool:
 
         try:
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER, _RUN_KEY) as k:
-                winreg.QueryValueEx(k, "Mnema")
+                winreg.QueryValueEx(k, "Mnemai")
                 return True
         except OSError:
             return False
@@ -249,10 +249,10 @@ def set_autostart(on: bool) -> None:
 
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, _RUN_KEY, 0, winreg.KEY_SET_VALUE) as k:
             if on:
-                winreg.SetValueEx(k, "Mnema", 0, winreg.REG_SZ, subprocess.list2cmdline(args))
+                winreg.SetValueEx(k, "Mnemai", 0, winreg.REG_SZ, subprocess.list2cmdline(args))
             else:
                 try:
-                    winreg.DeleteValue(k, "Mnema")
+                    winreg.DeleteValue(k, "Mnemai")
                 except OSError:
                     pass
         return
@@ -266,7 +266,7 @@ def set_autostart(on: bool) -> None:
     else:
         cmd = " ".join('"' + a.replace('"', '\\"') + '"' for a in args)
         f.write_text(
-            "[Desktop Entry]\nType=Application\nName=Mnema\nComment=Your memory for every AI\n"
+            "[Desktop Entry]\nType=Application\nName=Mnemai\nComment=Your memory for every AI\n"
             f"Exec={cmd}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n",
             encoding="utf-8",
         )

@@ -23,7 +23,7 @@ function lmAddPanel(pop, redraw) {
     <div class="ls"><div class="lsn">3</div><div class="lsart a3"><span class="lslink">…/resolve/main/model-Q4_K_M.gguf</span><span class="lsok">${ic("check")}</span></div><b>${tr("Вставь ссылку или выбери файл")}</b><span>${tr("Скопируй адрес файла со страницы или скачай его сам и укажи здесь.")}</span></div>
    </div>
    <div class="row" style="margin-top:12px"><input class="inp" id="lmurl" placeholder="https://huggingface.co/…/model-Q4_K_M.gguf" style="flex:1;min-width:260px"><button class="btn" id="lmurlb">${tr("Скачать по ссылке")}</button></div>
-   <div class="row" style="margin-top:8px"><button class="btn l" id="lmfile">${ic("folder")}${tr("Выбрать файл на компьютере…")}</button><span class="hint">${tr("Файл останется на месте, Mnema его не копирует и не удаляет.")}</span></div><div class="hint lmaddr"></div>`;
+   <div class="row" style="margin-top:8px"><button class="btn l" id="lmfile">${ic("folder")}${tr("Выбрать файл на компьютере…")}</button><span class="hint">${tr("Файл останется на месте, Mnemai его не копирует и не удаляет.")}</span></div><div class="hint lmaddr"></div>`;
   $("#lmadd", pop).after(box);
   box.scrollIntoView({ block: "nearest", behavior: "smooth" });
   const res = (t) => {

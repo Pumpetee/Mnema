@@ -1,4 +1,4 @@
-"""The Mnema guide in nine languages, from the knowledge base the program answers from (mnema/knowledge/mnema.md).
+"""The Mnemai guide in nine languages, from the knowledge base the program answers from (mnema/knowledge/mnema.md).
 
     python tools/guide_build.py            →  docs/guide/<lang>.md (ru as written, the others translated)
     python tools/guide_build.py de,ja      →  only these languages
@@ -33,72 +33,72 @@ LANGS = {
         "English",
         "English",
         "Guide",
-        "Mnema guide",
-        "How Mnema works, screen by screen and setting by setting. Mnema answers questions about itself from this same text.",
+        "Mnemai guide",
+        "How Mnemai works, screen by screen and setting by setting. Mnemai answers questions about itself from this same text.",
         "Contents",
     ),
     "ru": (
         "Russian",
         "Русский",
         "Справочник",
-        "Справочник Mnema",
-        "Как устроена и работает Mnema, экран за экраном и настройка за настройкой. По этому же тексту Mnema отвечает на вопросы о себе.",
+        "Справочник Mnemai",
+        "Как устроена и работает Mnemai, экран за экраном и настройка за настройкой. По этому же тексту Mnemai отвечает на вопросы о себе.",
         "Содержание",
     ),
     "zh": (
         "Simplified Chinese",
         "中文",
         "指南",
-        "Mnema 指南",
-        "Mnema 的工作方式，逐个界面、逐项设置说明。Mnema 回答关于自身的问题时，用的就是这份文字。",
+        "Mnemai 指南",
+        "Mnemai 的工作方式，逐个界面、逐项设置说明。Mnemai 回答关于自身的问题时，用的就是这份文字。",
         "目录",
     ),
     "es": (
         "Spanish",
         "Español",
         "Guía",
-        "Guía de Mnema",
-        "Cómo funciona Mnema, pantalla por pantalla y ajuste por ajuste. Mnema responde preguntas sobre sí misma con este mismo texto.",
+        "Guía de Mnemai",
+        "Cómo funciona Mnemai, pantalla por pantalla y ajuste por ajuste. Mnemai responde preguntas sobre sí misma con este mismo texto.",
         "Contenido",
     ),
     "hi": (
         "Hindi",
         "हिन्दी",
         "गाइड",
-        "Mnema गाइड",
-        "Mnema कैसे काम करता है — हर स्क्रीन और हर सेटिंग। Mnema अपने बारे में सवालों के जवाब इसी पाठ से देता है।",
+        "Mnemai गाइड",
+        "Mnemai कैसे काम करता है — हर स्क्रीन और हर सेटिंग। Mnemai अपने बारे में सवालों के जवाब इसी पाठ से देता है।",
         "विषय-सूची",
     ),
     "pt": (
         "Portuguese (Brazil)",
         "Português",
         "Guia",
-        "Guia do Mnema",
-        "Como o Mnema funciona, tela por tela e configuração por configuração. O Mnema responde perguntas sobre si mesmo com este mesmo texto.",
+        "Guia do Mnemai",
+        "Como o Mnemai funciona, tela por tela e configuração por configuração. O Mnemai responde perguntas sobre si mesmo com este mesmo texto.",
         "Conteúdo",
     ),
     "fr": (
         "French",
         "Français",
         "Guide",
-        "Guide de Mnema",
-        "Comment fonctionne Mnema, écran par écran et réglage par réglage. Mnema répond aux questions sur lui-même à partir de ce même texte.",
+        "Guide de Mnemai",
+        "Comment fonctionne Mnemai, écran par écran et réglage par réglage. Mnemai répond aux questions sur lui-même à partir de ce même texte.",
         "Sommaire",
     ),
     "de": (
         "German",
         "Deutsch",
         "Handbuch",
-        "Mnema-Handbuch",
-        "Wie Mnema funktioniert, Bildschirm für Bildschirm und Einstellung für Einstellung. Mnema beantwortet Fragen über sich selbst aus genau diesem Text.",
+        "Mnemai-Handbuch",
+        "Wie Mnemai funktioniert, Bildschirm für Bildschirm und Einstellung für Einstellung. Mnemai beantwortet Fragen über sich selbst aus genau diesem Text.",
         "Inhalt",
     ),
     "ja": (
         "Japanese",
         "日本語",
         "ガイド",
-        "Mnema ガイド",
-        "Mnema の仕組みを画面ごと・設定ごとに説明します。Mnema は自分についての質問にこの同じ文章から答えます。",
+        "Mnemai ガイド",
+        "Mnemai の仕組みを画面ごと・設定ごとに説明します。Mnemai は自分についての質問にこの同じ文章から答えます。",
         "目次",
     ),
 }
@@ -114,7 +114,7 @@ FLAGS = {
     "ja": "jp",
 }
 
-PROMPT = """You translate one section of the user guide of Mnema — a desktop app that keeps a person's memory for every
+PROMPT = """You translate one section of the user guide of Mnemai — a desktop app that keeps a person's memory for every
 AI (Claude, ChatGPT, Gemini, local models), learns from conversations and stores everything as Markdown files on
 their computer. Translate the Russian Markdown below into {lang}.
 
@@ -123,11 +123,11 @@ Rules:
 - Keep the Markdown exactly: the «## » heading, tables, lists, bold, code. Translate table cells too.
 - Names of buttons, menus, settings and screens in quotes are the app's interface: translate them the way a modern
   app in {lang} would label them, keep them in quotes.
-- Keep brand and product names (Mnema, Claude, Claude Code, ChatGPT, Gemini, OpenAI, Anthropic, OpenRouter, Ollama,
+- Keep brand and product names (Mnemai, Claude, Claude Code, ChatGPT, Gemini, OpenAI, Anthropic, OpenRouter, Ollama,
   Cursor, Obsidian, Markdown, Telegram, Whisper, Windows, macOS, Linux, MCP, API, VPN, PDF, Word, Excel).
 - Do not translate file names, folder names inside the memory (00 Inbox, 70 Memory/…), paths, code, URLs, model ids,
   keyboard keys.
-- Mnema is "she" in Russian; in {lang} use the natural form for a program. Address the reader informally where the
+- Mnemai is "she" in Russian; in {lang} use the natural form for a program. Address the reader informally where the
   language allows it.
 
 Section:
@@ -209,7 +209,7 @@ def page(lang: str, secs: list[str]) -> str:
     readme = "../../README.md" if lang == "en" else f"../../README.{lang}.md"
     body = "\n\n".join(secs)
     out = (
-        f'<div align="center">\n\n<img src="../img/brand/logo.svg" width="72" alt="Mnema">\n\n# {title}\n\n{lead}\n\n'
+        f'<div align="center">\n\n<img src="../img/brand/logo.svg" width="72" alt="Mnemai">\n\n# {title}\n\n{lead}\n\n'
         f"<sub>{links}</sub>\n\n<sub><a href=\"{readme}\">README</a></sub>\n\n</div>\n\n## {contents}\n\n{toc}\n\n{body}\n"
     )
     return out

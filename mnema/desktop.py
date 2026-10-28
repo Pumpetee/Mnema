@@ -1,4 +1,4 @@
-"""Mnema as a program: its own window, an icon in the tray (the menu bar on macOS), starts at login if you want,
+"""Mnemai as a program: its own window, an icon in the tray (the menu bar on macOS), starts at login if you want,
 learns in the background. Windows, macOS and Linux.
 
 Closing the window hides it — learning goes on. "Выход" in the tray menu stops everything.
@@ -31,7 +31,7 @@ from .memory import init_vault, token
 from .vault import Vault
 from .fsutil import read_json, write_json
 
-APP = "Mnema"
+APP = "Mnemai"
 
 
 # ---------------------------------------------------------------- small helpers
@@ -228,13 +228,13 @@ input,select{background:var(--card);color:var(--ink)}
 .reveal{position:fixed;inset:0;z-index:20;pointer-events:none;animation:reveal .7s cubic-bezier(.6,0,.2,1) forwards}@keyframes reveal{from{clip-path:circle(0 at var(--x) var(--y))}to{clip-path:circle(150vmax at var(--x) var(--y))}}
 </style></head><body><div class="bg"><i></i><i></i><i></i></div>
 <div class="splash" id="splash"><div><div class="lg"></div><div class="wm" id="wm"></div><div class="tg">memory for any AI</div></div></div>
-<div class="box"><div class="brand"><i></i>Mnema<div class="dots"><b class="on"></b><b></b><b></b><b></b></div></div>
-<div class="step" id="s0" data-noi18n><h1>Light or dark?</h1><p>Pick how Mnema looks. You can change it any time.</p><div class="themes" id="themes">
+<div class="box"><div class="brand"><i></i>Mnemai<div class="dots"><b class="on"></b><b></b><b></b><b></b></div></div>
+<div class="step" id="s0" data-noi18n><h1>Light or dark?</h1><p>Pick how Mnemai looks. You can change it any time.</p><div class="themes" id="themes">
 <button data-th="light"><div class="pv l"><i class="sb"></i><i class="b1"></i><i class="b2"></i><i class="b3"></i></div><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Light</b></button>
 <button data-th="dark"><div class="pv d"><i class="sb"></i><i class="b1"></i><i class="b2"></i><i class="b3"></i></div><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg>Dark</b></button>
 <button data-th="system"><div class="pv a"><i class="sb"></i><i class="b1"></i><i class="b2"></i><i class="b3"></i></div><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 000-17z" fill="currentColor" stroke="none"/></svg>Like Windows</b></button></div>
 <p class="thhint" id="thhint">Click a card to see how it looks.</p><div class="nav"><span></span><button id="n0">Continue</button></div></div>
-<div class="step" id="s1" data-noi18n hidden><h1>Choose your language</h1><p>Mnema will speak with you in this language.</p><div class="langs" id="langs"></div>
+<div class="step" id="s1" data-noi18n hidden><h1>Choose your language</h1><p>Mnemai will speak with you in this language.</p><div class="langs" id="langs"></div>
 <div class="ailang" id="ailang" hidden><div class="aii"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8L18 21l-.8-2.4-2-.8 2-.8z"/></svg></div><div><b id="ait"></b><small id="ais"></small></div></div>
 <div class="nav"><button class="l" id="b1">Back</button><button id="n1" disabled>Continue</button></div></div>
 <div class="step" id="s2" hidden><div class="hello" id="hello"><span class="hand">👋</span><span id="hellot"></span></div><h1>Как к тебе обращаться?</h1><p>Так ИИ будут звать тебя в ответах. Можно поменять в настройках.</p>
@@ -298,7 +298,7 @@ document.querySelectorAll('[data-th]').forEach((b,i)=>{b.style.animationDelay=(2
   document.getElementById('thhint').textContent=THEME==='system'?'Follows Windows: light by day, dark at night if Windows does so.':'This is how it will look. Try another or continue.'}});
 document.querySelectorAll('[data-th]').forEach(b=>b.classList.toggle('on',b.dataset.th===THEME));
 document.getElementById('n0').onclick=()=>show(1);
-document.getElementById('wm').innerHTML='Mnema'.split('').map((c,i)=>`<span style="animation-delay:${.55+i*.08}s">${c}</span>`).join('');
+document.getElementById('wm').innerHTML='Mnemai'.split('').map((c,i)=>`<span style="animation-delay:${.55+i*.08}s">${c}</span>`).join('');
 setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.remove()},2500);
 document.querySelectorAll('#langs button').forEach((b,i)=>b.style.animationDelay=(.05+i*.05)+'s');
 const HI={ru:'Приятно познакомиться',en:'Nice to meet you',zh:'很高兴认识你',es:'Encantado de conocerte',hi:'आपसे मिलकर खुशी हुई',ar:'تشرفت بمعرفتك',pt:'Prazer em conhecer',fr:'Ravi de te rencontrer',de:'Schön, dich kennenzulernen',ja:'はじめまして'};
@@ -330,10 +330,10 @@ const markV=d=>vg.querySelectorAll('[data-vn]').forEach(b=>{const a=VPN.find(x=>
 document.getElementById('pxbox').addEventListener('toggle',e=>{if(e.target.open)scan().then(markV)});
 vg.querySelectorAll('[data-vn]').forEach(b=>b.onclick=async()=>{const a=VPN.find(x=>x[0]===b.dataset.vn),r=document.getElementById('vpnr');vg.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));
   r.innerHTML=`<div class="vr"><div>${T('Ищу')} ${a[0]}…</div></div>`;const d=await scan(true);markV(d);const hit=match(d,a);
-  if(hit&&hit.tunnel){['pxh','pxp','pxu','pxw'].forEach(id=>document.getElementById(id).value='');r.innerHTML=`<div class="vr sys"><i></i><div><b>${a[0]}</b> <small>${T('работает на всю систему — Mnema пойдёт через него сама. Поля оставь пустыми.')}</small></div></div>`;return}
+  if(hit&&hit.tunnel){['pxh','pxp','pxu','pxw'].forEach(id=>document.getElementById(id).value='');r.innerHTML=`<div class="vr sys"><i></i><div><b>${a[0]}</b> <small>${T('работает на всю систему — Mnemai пойдёт через него сама. Поля оставь пустыми.')}</small></div></div>`;return}
   if(hit){const u=new URL(hit.url.replace('socks5:','http:'));document.getElementById('pxt').value=hit.url.split(':')[0];document.getElementById('pxh').value=u.hostname;document.getElementById('pxp').value=u.port;
     r.innerHTML=`<div class="vr ok"><i></i><div><b>${a[0]}</b> <small>${T('подключён')}: ${hit.url.replace('://',' · ')} · ${hit.ms} ms</small></div></div>`;return}
-  r.innerHTML=`<div class="vr"><div>${a[1]==='tunnel'?a[0]+' '+T('не запущен. Открой его и подключись — Mnema пойдёт через него сама.'):a[0]+' '+T('не найден. Открой')+' '+a[0]+', '+T('включи подключение и нажми эту кнопку ещё раз.')}</div></div>`});
+  r.innerHTML=`<div class="vr"><div>${a[1]==='tunnel'?a[0]+' '+T('не запущен. Открой его и подключись — Mnemai пойдёт через него сама.'):a[0]+' '+T('не найден. Открой')+' '+a[0]+', '+T('включи подключение и нажми эту кнопку ещё раз.')}</div></div>`});
 document.getElementById('pxc').onclick=async()=>{const r=document.getElementById('pxr');if(!g('pxh')){r.textContent=T('Укажи адрес прокси');return}r.textContent=T('проверяю…');
   const x=await pywebview.api.proxy_check(px(),document.getElementById('pxw').value);r.textContent=x.ok?T('Работает')+' · '+x.via+' · '+x.ms+' ms':T('Не работает')+': '+x.error;r.style.color=x.ok?'#1f8a4c':'#c2413d'};
 const PARTY={ru:['достижение · первое','Память создана','Теперь любой ИИ будет знать тебя'],en:['achievement · first','Memory created','Now any AI will know you']};
@@ -358,7 +358,7 @@ MISSING_TEXT = {
         "Не нашла папку памяти",
         "Память была здесь:",
         "Если ты перенёс или переименовал папку, укажи, где она сейчас. Если это внешний диск — подключи его и "
-        "нажми «Проверить снова». Ничего не удалено: Mnema не трогала папку.",
+        "нажми «Проверить снова». Ничего не удалено: Mnemai не трогала папку.",
         "Указать, где она",
         "Проверить снова",
         "Начать новую память",
@@ -367,7 +367,7 @@ MISSING_TEXT = {
         "Your memory folder is missing",
         "It used to be here:",
         "If you moved or renamed the folder, show where it is now. If it is on an external drive, plug it in and "
-        "press «Check again». Nothing was deleted: Mnema did not touch the folder.",
+        "press «Check again». Nothing was deleted: Mnemai did not touch the folder.",
         "Show where it is",
         "Check again",
         "Start new memory",
@@ -409,14 +409,14 @@ document.getElementById('anew').onclick=()=>pywebview.api.start_new();
 
 SETUP_RU = {  # the first two screens are in English for everyone, but in Russian on a Russian Windows
     "<h1>Light or dark?</h1>": "<h1>Светлая или тёмная?</h1>",
-    "Pick how Mnema looks. You can change it any time.": "Выбери, как будет выглядеть Mnema. Поменять можно в любой момент.",
+    "Pick how Mnemai looks. You can change it any time.": "Выбери, как будет выглядеть Mnemai. Поменять можно в любой момент.",
     "</svg>Light</b>": "</svg>Светлая</b>",
     "</svg>Dark</b>": "</svg>Тёмная</b>",
     "</svg>Like Windows</b>": "</svg>Как в Windows</b>",
     "Click a card to see how it looks.": "Нажми на карточку — покажу, как это будет выглядеть.",
     '<button id="n0">Continue</button>': '<button id="n0">Дальше</button>',
     "<h1>Choose your language</h1>": "<h1>Выбери язык</h1>",
-    "Mnema will speak with you in this language.": "На этом языке Mnema будет говорить с тобой.",
+    "Mnemai will speak with you in this language.": "На этом языке Mnemai будет говорить с тобой.",
     '<button class="l" id="b1">Back</button>': '<button class="l" id="b1">Назад</button>',
     '<button id="n1" disabled>Continue</button>': '<button id="n1" disabled>Дальше</button>',
     "'Follows Windows: light by day, dark at night if Windows does so.'": "'Как в Windows: днём светлая, ночью тёмная, если так настроена Windows.'",
@@ -489,9 +489,9 @@ class App:
                     return "Этой папки нет. Проверь, подключён ли диск." if self._lang() == "ru" else "No such folder."
                 if not v.exists():
                     return (
-                        "Здесь нет памяти Mnema: нет файла «70 Memory/Profile.md». Выбери папку, где лежат «70 Memory» и «.mnema»."
+                        "Здесь нет памяти Mnemai: нет файла «70 Memory/Profile.md». Выбери папку, где лежат «70 Memory» и «.mnema»."
                         if self._lang() == "ru"
-                        else "There is no Mnema memory here: «70 Memory/Profile.md» is missing."
+                        else "There is no Mnemai memory here: «70 Memory/Profile.md» is missing."
                     )
                 self._app.open_vault(v, demo=False)
             except Exception as e:
@@ -540,7 +540,7 @@ class App:
             try:
                 p = Path(path.strip()).expanduser()
                 if not p.is_absolute():
-                    example = "C:\\Users\\Имя\\Mnema" if OS.IS_WIN else "~/Mnema"
+                    example = "C:\\Users\\Имя\\Mnemai" if OS.IS_WIN else "~/Mnemai"
                     return f"Нужен полный путь к папке, например {example} — или нажми «Выбрать…»."
                 if p.drive and not Path(p.drive + "\\").exists():
                     return f"Диска {p.drive} нет на компьютере. Выбери другую папку."
@@ -567,7 +567,7 @@ class App:
                 if upgrade.is_app_dir(p) or any(upgrade.is_app_dir(x) for x in p.parents):
                     p = upgrade.free_memory_path()  # never inside a program folder: an update replaces it
                 if p.exists() and any(p.iterdir()) and not Vault(p).exists() and not (p / ".mnema").exists():
-                    p = p / "Mnema"  # never spill memory files into a non-empty folder
+                    p = p / "Mnemai"  # never spill memory files into a non-empty folder
                 v = Vault(p)
                 fresh = not v.exists()
                 init_vault(v)
@@ -696,7 +696,7 @@ class App:
         p = Path(str((body or {}).get("path") or "")).expanduser()
         v = Vault(p)
         if not v.exists():
-            return {"error": "Здесь нет памяти Mnema: нет файла «70 Memory/Profile.md»."}
+            return {"error": "Здесь нет памяти Mnemai: нет файла «70 Memory/Profile.md»."}
         self.open_vault(v, demo=False, delay=0.4)
         return {"ok": True}
 
@@ -729,7 +729,7 @@ class App:
             return {"ok": True, "closing": True, "next": nxt or ""}
         if b.get("delete") and p.exists():
             if not Vault(p).exists():
-                return {"error": "Здесь нет памяти Mnema — папку не трогаю."}
+                return {"error": "Здесь нет памяти Mnemai — папку не трогаю."}
             if not osapi.to_trash(p):
                 return {"error": "Не получилось переместить папку в корзину. Закрой файлы из неё и повтори."}
         cfg = load_config()
@@ -870,7 +870,7 @@ class App:
     def refresh_tray(self):
         if not self.tray:
             return
-        self.tray.title = f"Mnema — {'на паузе' if self.paused() else 'учится'}"
+        self.tray.title = f"Mnemai — {'на паузе' if self.paused() else 'учится'}"
         self.tray.update_menu()
 
     def open_proxy(self, *_):
@@ -887,7 +887,7 @@ class App:
             return bool(self.vault) and not crypt.locked(self.vault.root)
 
         return [
-            ("Открыть Mnema", lambda *_: self.show(), None, None),
+            ("Открыть Mnemai", lambda *_: self.show(), None, None),
             ("Учиться сейчас", self.learn_now, has, None),
             (lambda *_: "Продолжить обучение" if self.paused() else "Пауза обучения", self.toggle_pause, has, None),
             ("Прокси…", self.open_proxy, has, None),
@@ -910,13 +910,13 @@ class App:
                     items.append(pystray.Menu.SEPARATOR)
                     continue
                 label, act, enabled, checked = it
-                kw = {"default": True} if label == "Открыть Mnema" else {}
+                kw = {"default": True} if label == "Открыть Mnemai" else {}
                 if enabled:
                     kw["enabled"] = enabled
                 if checked:
                     kw["checked"] = checked
                 items.append(pystray.MenuItem(label, act, **kw))
-            self.tray = pystray.Icon(APP, icon_image(64), "Mnema", pystray.Menu(*items))
+            self.tray = pystray.Icon(APP, icon_image(64), "Mnemai", pystray.Menu(*items))
             self.tray.run_detached()
         except Exception:
             self.tray = None
@@ -969,7 +969,7 @@ class App:
             menu.aboutToShow.connect(refresh)
             tray.setContextMenu(menu)
             tray.activated.connect(lambda r: self.show() if r == QSystemTrayIcon.ActivationReason.Trigger else None)
-            tray.setToolTip("Mnema")
+            tray.setToolTip("Mnemai")
             tray.show()
             self.tray = _QtTray(tray)
 
@@ -994,7 +994,7 @@ class App:
 
         def tray_note(text):  # meetings tell the owner where and how long, even when hidden
             try:
-                self.tray.notify(text, "Mnema")
+                self.tray.notify(text, "Mnemai")
             except Exception:
                 pass
 
@@ -1014,6 +1014,12 @@ class App:
         if cfg.get("vault") and upgrade.old_layout(Path(cfg["vault"])):  # the first build's settings: clean start
             upgrade.put_aside_old_settings(HOME)
             cfg = load_config()
+        try:  # подключения прежней Mnema в Claude и Cursor переходят на имя mnemai
+            from .cli import migrate_mcp
+
+            migrate_mcp()
+        except Exception:  # noqa: BLE001 — чужие файлы настроек не должны мешать запуску
+            pass
         vault = Vault(cfg["vault"]) if start_screen(cfg) == "vault" else None
         missing = start_screen(cfg) == "missing"
         if vault:
@@ -1085,7 +1091,7 @@ def webview2_installed() -> bool:
 
 
 def ensure_webview2() -> bool:
-    """Install WebView2 with Microsoft's own installer shipped inside Mnema (needs the internet once).
+    """Install WebView2 with Microsoft's own installer shipped inside Mnemai (needs the internet once).
     macOS and Linux draw the window with their own engine."""
     if not OS.IS_WIN or webview2_installed():
         return True
@@ -1099,7 +1105,7 @@ def ensure_webview2() -> bool:
     if not setup.exists():
         setup = Path(__file__).resolve().parents[1] / "vendor" / "webview2" / "MicrosoftEdgeWebview2Setup.exe"
     OS.message(
-        "Для окна Mnema нужен компонент Microsoft WebView2. Сейчас он установится — это один раз, "
+        "Для окна Mnemai нужен компонент Microsoft WebView2. Сейчас он установится — это один раз, "
         "около минуты, нужен интернет.\n\nMnema needs the Microsoft WebView2 component. "
         "It will be installed now, once."
     )
@@ -1166,7 +1172,7 @@ class _QtTray:
     def update_menu(self):
         pass  # refreshed every time the menu opens
 
-    def notify(self, text, title="Mnema"):
+    def notify(self, text, title="Mnemai"):
         self.icon.showMessage(title, text)
 
     def stop(self):
@@ -1176,7 +1182,7 @@ class _QtTray:
 def main(argv: list[str] | None = None) -> None:
     argv = sys.argv[1:] if argv is None else argv
     if argv and argv[0] not in ("--hidden",):
-        from .cli import main as cli_main  # Mnema.exe init/serve/... works like the CLI
+        from .cli import main as cli_main  # Mnemai.exe init/serve/... works like the CLI
 
         return cli_main(argv)
     if already_running():
@@ -1188,7 +1194,7 @@ def main(argv: list[str] | None = None) -> None:
         return
     if OS.IS_WIN:
         try:
-            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Mnema.Desktop")
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Mnemai.Desktop")
         except Exception:
             pass
     try:
@@ -1199,15 +1205,15 @@ def main(argv: list[str] | None = None) -> None:
         HOME.mkdir(parents=True, exist_ok=True)
         with (HOME / "app.log").open("a", encoding="utf-8") as f:
             f.write(traceback.format_exc() + "\n")
-        OS.message(f"Mnema не смогла запуститься. Подробности записаны в файл:\n{HOME / 'app.log'}", error=True)
+        OS.message(f"Mnemai не смогла запуститься. Подробности записаны в файл:\n{HOME / 'app.log'}", error=True)
     finally:
         _exit_now()
 
 
 def _exit_now() -> None:
-    """The window is gone: stop what Mnema started (the local model, the VPN engine) and leave. Python would otherwise
+    """The window is gone: stop what Mnemai started (the local model, the VPN engine) and leave. Python would otherwise
     wait for every helper thread — a library's or a request still running — and the program hangs without a window
-    (seen on macOS: Mnema stays in the Dock and «Завершить» does nothing)."""
+    (seen on macOS: Mnemai stays in the Dock and «Завершить» does nothing)."""
     import atexit
 
     try:

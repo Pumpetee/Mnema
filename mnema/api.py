@@ -90,7 +90,7 @@ def make_handler(vault: Vault, port: int):
                     503,
                     {
                         "error": f"Папка памяти пропала: {vault.root}. Верни её на место (или подключи диск) и "
-                        "перезапусти Mnema — или выбери другую папку при запуске."
+                        "перезапусти Mnemai — или выбери другую папку при запуске."
                     },
                 )
                 return False
@@ -105,7 +105,7 @@ def make_handler(vault: Vault, port: int):
                 ):
                     from . import crypt
 
-                    if crypt.locked(vault.root):  # encrypted by Mnema and the password not given yet
+                    if crypt.locked(vault.root):  # encrypted by Mnemai and the password not given yet
                         self.send(423, {"error": "Память зашифрована — введи пароль", "locked": True})
                         return False
             return True
@@ -262,7 +262,7 @@ def make_handler(vault: Vault, port: int):
                             return self.send(
                                 409,
                                 {
-                                    "error": "Файл изменился, пока ты его правил: Mnema дописала в него новое. "
+                                    "error": "Файл изменился, пока ты его правил: Mnemai дописала в него новое. "
                                     "Открой его заново и повтори правку."
                                 },
                             )
@@ -304,7 +304,7 @@ def serve(vault: Vault, port: int = 7461, learn: bool = True) -> None:
         from .sync import Syncer
 
         Syncer(vault).start()
-    print(f"Mnema: http://127.0.0.1:{port}  (хранилище {vault.root})", flush=True)
+    print(f"Mnemai: http://127.0.0.1:{port}  (хранилище {vault.root})", flush=True)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

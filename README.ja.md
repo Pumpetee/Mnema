@@ -1,24 +1,24 @@
 <div align="center">
 
-<img src="docs/img/brand/logo.svg" width="112" alt="Mnema">
+<img src="docs/img/brand/logo.svg" width="112" alt="Mnemai">
 
-# Mnema
+# Mnemai
 
 <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2600&pause=900&color=A78BFA&center=true&vCenter=true&width=720&height=46&lines=%E3%81%99%E3%81%B9%E3%81%A6%E3%81%AEAI%E3%81%AB%E3%80%81%E3%81%B2%E3%81%A8%E3%81%A4%E3%81%AE%E8%A8%98%E6%86%B6%E3%82%92;%E7%84%A1%E6%96%99%E3%80%81%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AEPC%E5%86%85%E3%80%81%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E4%B8%8D%E8%A6%81" alt="すべてのAIに、ひとつの記憶を">
 
-<a href="https://github.com/Pumpetee/Mnema/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnema?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnema/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnema/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnema?style=flat-square&color=ec4899" alt="last commit"></a>
+<a href="https://github.com/Pumpetee/Mnemai/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnemai?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnemai/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnemai/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnemai/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnemai?style=flat-square&color=ec4899" alt="last commit"></a>
 
 <img src="https://img.shields.io/badge/MCP-Claude%20%C2%B7%20Cursor-7c3aed?style=flat-square&logo=modelcontextprotocol&logoColor=white" alt="MCP: Claude · Cursor"> <img src="https://img.shields.io/badge/Obsidian-%E8%AA%AD%E3%81%BF%E5%8F%96%E3%82%8A%E5%B0%82%E7%94%A8-7c3aed?style=flat-square&logo=obsidian&logoColor=white" alt="Obsidian: 読み取り専用"> <img src="https://img.shields.io/badge/Telegram-%E8%AA%AD%E3%81%BF%E5%8F%96%E3%82%8A%E5%B0%82%E7%94%A8-229ED9?style=flat-square&logo=telegram&logoColor=white" alt="Telegram: 読み取り専用"> <img src="https://img.shields.io/badge/AES--256-%E6%9A%97%E5%8F%B7%E5%8C%96-15803d?style=flat-square" alt="AES-256: 暗号化"> <img src="https://img.shields.io/badge/Markdown-%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB-555555?style=flat-square&logo=markdown&logoColor=white" alt="Markdown: あなたのファイル"> <img src="https://img.shields.io/badge/Python-3.13-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python: 3.13">
 
-<a href="docs/guide/ja.md"><img src="https://img.shields.io/badge/Mnema%E3%82%AC%E3%82%A4%E3%83%89-%E3%81%99%E3%81%B9%E3%81%A6%E3%81%AE%E7%94%BB%E9%9D%A2%E3%81%A8%E8%A8%AD%E5%AE%9A-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnemaガイド"></a>
+<a href="docs/guide/ja.md"><img src="https://img.shields.io/badge/Mnemai%E3%82%AC%E3%82%A4%E3%83%89-%E3%81%99%E3%81%B9%E3%81%A6%E3%81%AE%E7%94%BB%E9%9D%A2%E3%81%A8%E8%A8%AD%E5%AE%9A-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnemaiガイド"></a>
 
-<a href="https://github.com/Pumpetee/Mnema"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnema"></a><br><sub>スキャンしてリポジトリを開く · github.com/Pumpetee/Mnema</sub>
+<a href="https://github.com/Pumpetee/Mnemai"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnemai"></a><br><sub>スキャンしてリポジトリを開く · github.com/Pumpetee/Mnemai</sub>
 
 </div>
 
 ## 言語
 
-Mnemaは9つの言語に対応しています。インターフェース、ヘルプ、AIの回答は、あなたが選んだ言語に合わせます。別の言語で書いても同じです。このREADMEとMnemaガイドは、どの言語でも用意されています。
+Mnemaiは9つの言語に対応しています。インターフェース、ヘルプ、AIの回答は、あなたが選んだ言語に合わせます。別の言語で書いても同じです。このREADMEとMnemaiガイドは、どの言語でも用意されています。
 
 <table>
 <tr><td align="center" width="10%"><img src="https://flagcdn.com/w80/gb.png" width="36" alt="English"><br><b>English</b><br><sub><a href="README.md">README</a> · <a href="docs/guide/en.md">Guide</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/ru.png" width="36" alt="Русский"><br><b>Русский</b><br><sub><a href="README.ru.md">README</a> · <a href="docs/guide/ru.md">Справочник</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/cn.png" width="36" alt="中文"><br><b>中文</b><br><sub><a href="README.zh.md">README</a> · <a href="docs/guide/zh.md">指南</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/es.png" width="36" alt="Español"><br><b>Español</b><br><sub><a href="README.es.md">README</a> · <a href="docs/guide/es.md">Guía</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/in.png" width="36" alt="हिन्दी"><br><b>हिन्दी</b><br><sub><a href="README.hi.md">README</a> · <a href="docs/guide/hi.md">गाइड</a></sub></td></tr>
@@ -27,11 +27,11 @@ Mnemaは9つの言語に対応しています。インターフェース、ヘ�
 
 <div align="center">
 
-Mnemaは、あなたが誰で、何に取り組んでいて、何を決めて、どんな答え方が好きかを覚えています。そして話しかけるすべてのAIに、その文脈を渡します。記憶は、あなたのコンピューター上にあるプレーンなMarkdownファイルのフォルダです。クラウドもアカウントも要りません。
+Mnemaiは、あなたが誰で、何に取り組んでいて、何を決めて、どんな答え方が好きかを覚えています。そして話しかけるすべてのAIに、その文脈を渡します。記憶は、あなたのコンピューター上にあるプレーンなMarkdownファイルのフォルダです。クラウドもアカウントも要りません。
 
-<a href="../../releases/latest/download/Mnema-Setup.exe"><img src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%3A-Windows-0078D4?style=for-the-badge" alt="Windows"></a> <a href="../../releases/latest/download/Mnema-macos-arm64.dmg"><img src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%3A-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a> <a href="../../releases/latest/download/Mnema-x86_64.AppImage"><img src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%3A-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Linux"></a>
+<a href="../../releases/latest/download/Mnemai-Setup.exe"><img src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%3A-Windows-0078D4?style=for-the-badge" alt="Windows"></a> <a href="../../releases/latest/download/Mnemai-macos-arm64.dmg"><img src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%3A-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a> <a href="../../releases/latest/download/Mnemai-x86_64.AppImage"><img src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%3A-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Linux"></a>
 
-<sub><a href="../../releases">すべてのファイル</a> · macOS Intel: <a href="../../releases/latest/download/Mnema-macos-x64.dmg">x64.dmg</a></sub>
+<sub><a href="../../releases">すべてのファイル</a> · macOS Intel: <a href="../../releases/latest/download/Mnemai-macos-x64.dmg">x64.dmg</a></sub>
 
 <img src="docs/img/ja/hero.gif" width="880" alt="質問すると、答えは記憶から返ってくる。今週の予定が表になり、すでに知っている価格と会議のルールも入っている">
 
@@ -56,11 +56,11 @@ Mnemaは、あなたが誰で、何に取り組んでいて、何を決めて、
 
 ## 🧠 あなたを知っている
 
-<p align="center"><img src="docs/img/ja/memory.gif" width="860" alt="プロフィールと記憶マップ:トピックが泡になり、大きさはMnemaがどれだけ知っているかを表します"></p>
+<p align="center"><img src="docs/img/ja/memory.gif" width="860" alt="プロフィールと記憶マップ:トピックが泡になり、大きさはMnemaiがどれだけ知っているかを表します"></p>
 
-- **どのAIも最初に読むプロフィール:** あなたが誰で、何を作っていて、どう仕事するのが好きか。Mnemaは学びながら書いていき、手で直すこともできます。
+- **どのAIも最初に読むプロフィール:** あなたが誰で、何を作っていて、どう仕事するのが好きか。Mnemaiは学びながら書いていき、手で直すこともできます。
 - **記憶マップ:** トピックはそれぞれ泡で、脈打っていれば最近変わったことを、鍵がついていれば一部のAIには見えないことを示します。
-- **古い情報を新しいものとして扱わない:** すべての事実に日付がつき、1か月以上前のステータスはMnemaが改めて確認します。
+- **古い情報を新しいものとして扱わない:** すべての事実に日付がつき、1か月以上前のステータスはMnemaiが改めて確認します。
 - **フォルダは複数つなげられます:** ObsidianのVaultやチームのフォルダを接続できます。読み取り専用で、書き込みはプログラム自体がブロックします。
 
 ## 🗣️ コンソーシアム:複数のAIでひとつの答え
@@ -82,7 +82,7 @@ Mnemaは、あなたが誰で、何に取り組んでいて、何を決めて、
 
 ## 🌱 自分で学ぶ
 
-<p align="center"><img src="docs/img/ja/learning.gif" width="860" alt="ちょっと口にしたことを、Mnemaが何を読み取り、どう理解し、何を書き留めたか、その理由とともにフィードで見せます"></p>
+<p align="center"><img src="docs/img/ja/learning.gif" width="860" alt="ちょっと口にしたことを、Mnemaiが何を読み取り、どう理解し、何を書き留めたか、その理由とともにフィードで見せます"></p>
 
 - **確かなら保存:** 確信度が80%以上の事実はすぐに書き込まれ、自信のないものは、もう一度出てくるまで待機します。
 - **個人的なことは別に:** お金、健康、プライベートな話題はタグつきのカードに入り、どのAIからも隠せます。
@@ -90,18 +90,18 @@ Mnemaは、あなたが誰で、何に取り組んでいて、何を決めて、
 
 ## ✈️ Telegramは読むだけ、書き込みはしない
 
-<p align="center"><img src="docs/img/ja/telegram.gif" width="860" alt="Telegramは読み取り専用で接続:チャットはあなたが選び、Mnemaはそこから学びます"></p>
+<p align="center"><img src="docs/img/ja/telegram.gif" width="860" alt="Telegramは読み取り専用で接続:チャットはあなたが選び、Mnemaiはそこから学びます"></p>
 
-- **チャットはあなたが選びます:** Mnemaがあなたや周りの人について学ぶのは、そのチャットからだけです。
-- **設計として読み取り専用:** Mnema内のTelegramクライアントは読むことしかできず、それ以外のコマンドは送信前に拒否されます。
-- **あなたのPCの中だけ:** ログイン情報はシステムのストアで暗号化され、Mnemaには専用のサーバーがありません。
+- **チャットはあなたが選びます:** Mnemaiがあなたや周りの人について学ぶのは、そのチャットからだけです。
+- **設計として読み取り専用:** Mnemai内のTelegramクライアントは読むことしかできず、それ以外のコマンドは送信前に拒否されます。
+- **あなたのPCの中だけ:** ログイン情報はシステムのストアで暗号化され、Mnemaiには専用のサーバーがありません。
 
 ## 📉 トークンを節約
 
-<p align="center"><img src="docs/img/ja/tokens.gif" width="560" alt="153,000文字の契約書についての質問:全文だと入力トークンは29,643、Mnemaを使うと6,159"></p>
+<p align="center"><img src="docs/img/ja/tokens.gif" width="560" alt="153,000文字の契約書についての質問:全文だと入力トークンは29,643、Mnemaiを使うと6,159"></p>
 
 - **必要な部分だけ送ります:** 記憶、ドキュメント、Webページはあなたのコンピューター上で読み込まれ、モデルには関連する部分だけが渡されます。
-- **実測しました:** 153,000文字の契約書についての質問では、全文だと入力トークンが29,643かかりましたが、Mnemaが送ったのは6,159で、正しく答えられたのもMnemaだけでした。
+- **実測しました:** 153,000文字の契約書についての質問では、全文だと入力トークンが29,643かかりましたが、Mnemaiが送ったのは6,159で、正しく答えられたのもMnemaiだけでした。
 - **毎回見えます:** 各回答の下に、節約したトークン数が表示されます。
 
 ## 🔐 設計から、プライベート
@@ -130,14 +130,14 @@ Mnemaは、あなたが誰で、何に取り組んでいて、何を決めて、
 
 | システム | ファイル | 方法 |
 |---|---|---|
-| Windows 10 および 11 | [`Mnema-Setup.exe`](../../releases/latest/download/Mnema-Setup.exe) | 実行してください。管理者権限は不要です。ポータブル版の `.zip` も用意されています。 |
-| macOS 11 以降 | Apple Silicon: [`Mnema-macos-arm64.dmg`](../../releases/latest/download/Mnema-macos-arm64.dmg)、Intel: [`Mnema-macos-x64.dmg`](../../releases/latest/download/Mnema-macos-x64.dmg) | 開いて、Mnema を Applications にドラッグしてください。 |
-| Linux x86-64（Ubuntu 22.04 以降、Fedora、Debian など） | [`Mnema-x86_64.AppImage`](../../releases/latest/download/Mnema-x86_64.AppImage) | `chmod +x Mnema-*.AppImage` を実行してから起動してください。同じプログラムをフォルダ形式にした `.tar.gz` もあり、中の `Mnema` を実行します。 |
+| Windows 10 および 11 | [`Mnemai-Setup.exe`](../../releases/latest/download/Mnemai-Setup.exe) | 実行してください。管理者権限は不要です。ポータブル版の `.zip` も用意されています。 |
+| macOS 11 以降 | Apple Silicon: [`Mnemai-macos-arm64.dmg`](../../releases/latest/download/Mnemai-macos-arm64.dmg)、Intel: [`Mnemai-macos-x64.dmg`](../../releases/latest/download/Mnemai-macos-x64.dmg) | 開いて、Mnemai を Applications にドラッグしてください。 |
+| Linux x86-64（Ubuntu 22.04 以降、Fedora、Debian など） | [`Mnemai-x86_64.AppImage`](../../releases/latest/download/Mnemai-x86_64.AppImage) | `chmod +x Mnemai-*.AppImage` を実行してから起動してください。同じプログラムをフォルダ形式にした `.tar.gz` もあり、中の `Mnemai` を実行します。 |
 
 パッケージにはまだコード署名がないため、各システムで初回に一度だけ警告が表示されます:
 
 - **Windows** SmartScreen に「Windows によって PC が保護されました」と表示されます。**詳細情報 → 実行** をクリックしてください。
-- **macOS** 開発元を確認できないと表示されます。Applications の Mnema を右クリックして **開く** を選ぶか、システム設定 → プライバシーとセキュリティ → **このまま開く** をクリックしてください。
+- **macOS** 開発元を確認できないと表示されます。Applications の Mnemai を右クリックして **開く** を選ぶか、システム設定 → プライバシーとセキュリティ → **このまま開く** をクリックしてください。
 - **Linux** AppImage には FUSE 2 が必要です: `sudo apt install libfuse2`（Ubuntu 24.04 では `libfuse2t64`）。または `.tar.gz` を使用してください。
 
 ファイルを検証するには、その sha256 を隣にある `.sha256` ファイルと比較してください: Windows では `certutil -hashfile <file> SHA256`、macOS では `shasum -a 256 <file>`、Linux では `sha256sum <file>`。
@@ -154,7 +154,7 @@ python -m venv .venv
 .venv\Scripts\pip install -r requirements-dev.txt
 .venv\Scripts\python tools\fetch_vendor.py      # llama.cpp, Xray, WebView2 を公式リリースから取得し、検証します
 .venv\Scripts\python -m mnema.desktop           # プログラムを実行
-.venv\Scripts\python tools\package.py           # dist\Mnema-Setup-<version>.exe とポータブル版 zip
+.venv\Scripts\python tools\package.py           # dist\Mnemai-Setup-<version>.exe とポータブル版 zip
 ```
 
 macOS と Linux:
@@ -164,8 +164,8 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python tools/fetch_vendor.py           # お使いのシステム向けの llama.cpp と Xray を取得し、sha256 で検証します
 .venv/bin/python -m mnema.desktop                # プログラムを実行
-.venv/bin/python tools/package.py                # macOS: dist/Mnema-<version>-macos-arm64.dmg
-                                                 # Linux: dist/Mnema-<version>-x86_64.AppImage と .tar.gz
+.venv/bin/python tools/package.py                # macOS: dist/Mnemai-<version>-macos-arm64.dmg
+                                                 # Linux: dist/Mnemai-<version>-x86_64.AppImage と .tar.gz
 ```
 
 プッシュのたびに Windows、macOS、Linux でテストが実行されます。3 つのパッケージがビルドされ、ウィンドウ付きで一度起動され、その実行結果のファイルとして保存されます (`.github/workflows`)。
@@ -216,7 +216,7 @@ AGPL-3.0。個人利用およびオープンソースプロジェクトでは無
 © 2026 Anton Sannikov
 
 <div align="center">
-<img src="docs/img/brand/logo.svg" width="40" alt="Mnema">
+<img src="docs/img/brand/logo.svg" width="40" alt="Mnemai">
 
-<sub>Mnemaがあなたの役に立つことを覚えていたら、⭐を付けてもらえると、ほかの人が見つけやすくなります。</sub>
+<sub>Mnemaiがあなたの役に立つことを覚えていたら、⭐を付けてもらえると、ほかの人が見つけやすくなります。</sub>
 </div>

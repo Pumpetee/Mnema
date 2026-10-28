@@ -1,4 +1,4 @@
-"""Sync of a memory encrypted by Mnema: the copy in the cloud folder (or on a station) is encrypted too, never the
+"""Sync of a memory encrypted by Mnemai: the copy in the cloud folder (or on a station) is encrypted too, never the
 plain text; repeated passes send nothing new; a change made on the other side comes back readable; a copy encrypted
 with another password is refused, not overwritten."""
 

@@ -126,7 +126,7 @@ def _digest(fs: list[str]) -> str:
 
 
 def is_manual(vault: Vault, intro: str) -> bool:
-    """The owner's own words: neither the template nor what Mnema wrote last time."""
+    """The owner's own words: neither the template nor what Mnemai wrote last time."""
     return bool(intro) and not intro.startswith(STUB) and intro != _state(vault).get("text", "")
 
 

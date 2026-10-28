@@ -1,13 +1,13 @@
-"""Mnema's own encryption of the memory folder, by password, on every system.
+"""Mnemai's own encryption of the memory folder, by password, on every system.
 
 What is encrypted: the notes (.md) and the service files that hold what the owner said or did — conversations and
 their attachments' text, the journal and its snapshots, learning traces, what went to the clouds, the portrait. Text
-files only: binary files (PDF, Word, pictures, recordings) stay as they are, other programs open them. Settings Mnema
+files only: binary files (PDF, Word, pictures, recordings) stay as they are, other programs open them. Settings Mnemai
 needs before the password (language, models, access rules) stay open too — see PLAIN.
 
 Keys: a random 256-bit memory key encrypts the files (AES-256-GCM). The password, stretched by scrypt, encrypts that
 key; both live in .mnema/crypto.json. «Remember on this computer» keeps the memory key in the system's secret store
-(DPAPI, Keychain, Secret Service), outside the memory folder: then Mnema opens without asking, like EFS. A new
+(DPAPI, Keychain, Secret Service), outside the memory folder: then Mnemai opens without asking, like EFS. A new
 password re-encrypts only the key.
 
 File format (text, so a line can be appended — the journal grows that way):
@@ -371,7 +371,7 @@ def attach(root: Path) -> str:
     import time
 
     last = _tried.get(kid, 0)
-    if time.monotonic() - last < 20:  # asked the secret store and the running Mnema a moment ago
+    if time.monotonic() - last < 20:  # asked the secret store and the running Mnemai a moment ago
         _register(root, kid, None)
         return "locked"
     _tried[kid] = time.monotonic()
@@ -389,7 +389,7 @@ def attach(root: Path) -> str:
 
 
 def _from_running_app(root: Path) -> bytes:
-    """The console helper (MCP for Claude Code and others) gets the key from the running Mnema, which has it."""
+    """The console helper (MCP for Claude Code and others) gets the key from the running Mnemai, which has it."""
     try:
         import urllib.request
 

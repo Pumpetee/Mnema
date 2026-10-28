@@ -39,7 +39,7 @@ class LearnNow(unittest.TestCase):
                 {"role": "assistant", "text": "Давай", "ts": "2026-10-21T10:00:05"},
                 {"role": "user", "text": "Запомни, что пилот стартует третьего ноября.", "ts": "2026-10-21T10:01:00"},
                 {"role": "assistant", "text": "Записала", "ts": "2026-10-21T10:01:05"},
-                {"role": "user", "text": "Пусть Mnema начнёт сама", "ts": "2026-10-21T10:02:00", "hidden": True},
+                {"role": "user", "text": "Пусть Mnemai начнёт сама", "ts": "2026-10-21T10:02:00", "hidden": True},
             ],
             **({"private": True} if private else {}),
         }

@@ -1,4 +1,4 @@
-"""Mnema QA harness: the real server on a throw-away memory, fake models, no web, dangerous endpoints stubbed."""
+"""Mnemai QA harness: the real server on a throw-away memory, fake models, no web, dangerous endpoints stubbed."""
 
 import json
 import os
@@ -52,7 +52,7 @@ def fake_stream(vault, pid, model, system, messages, stop=None, usage=None, meta
     if "вопрос кнопками" in last:
         yield 'Уточню.\n```ask\n{"question": "Какой вариант?", "options": ["Первый", "Второй"]}\n```'
         return
-    for w in ("Это ", "тестовый ", "ответ ", "**Mnema**. ", "\n\n- пункт один\n- пункт два"):
+    for w in ("Это ", "тестовый ", "ответ ", "**Mnemai**. ", "\n\n- пункт один\n- пункт два"):
         if stop and stop():
             return
         time.sleep(0.02)
@@ -74,9 +74,9 @@ def start(fill: bool = True):
 
     P.save(v, {"lang": "ru"})  # the flows click Russian labels; the interface itself starts in English since 23.10.2026
     if fill:
-        remember(v, "Иван — продакт, ведёт проект Mnema", "profile:Кто я")
+        remember(v, "Иван — продакт, ведёт проект Mnemai", "profile:Кто я")
         remember(v, "Решили запускать пилот в ноябре", "decisions")
-        remember(v, "Цель — пять компаний в пилоте (статус 01.08.2026)", "project:Mnema")
+        remember(v, "Цель — пять компаний в пилоте (статус 01.08.2026)", "project:Mnemai")
         remember(v, "Бюджет на месяц 100 тысяч", "card:Деньги #money")
         remember(v, "Отвечай коротко и по делу", "rules")
     srv = api.make_server(v, 0)
@@ -115,7 +115,7 @@ def guard(page, log):
         return route.continue_()
 
     page.route("**/api/**", handler)
-    # Mnema's own confirm / prompt: answered like the browser's were — yes, and a name for a prompt
+    # Mnemai's own confirm / prompt: answered like the browser's were — yes, and a name for a prompt
     page.add_init_script(
         """new MutationObserver(() => {
           const d = document.querySelector('.mdlg:not([data-qa])');

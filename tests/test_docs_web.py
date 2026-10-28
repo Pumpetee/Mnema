@@ -438,7 +438,7 @@ class TestWhenToSearch(unittest.TestCase):
             "Что ты обо мне знаешь?",
             "Напиши письмо клиенту о задержке",
             "Что ты умеешь делать с pdf?",
-            "Как в Mnema включить обучение?",
+            "Как в Mnemai включить обучение?",
             "Что такое GGUF в llama.cpp?",
             "Кто такой Илон Маск?",
         ):  # general knowledge: the model knows it, the web only checks fresh data

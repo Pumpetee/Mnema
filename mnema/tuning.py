@@ -1,4 +1,4 @@
-"""The engine: how much Mnema spends — tokens of the AIs and the power of this computer.
+"""The engine: how much Mnemai spends — tokens of the AIs and the power of this computer.
 
 Three modes (eco / balance / max) set everything at once; any slider moved by hand makes the mode "custom".
 - precise  — one step from 0 (cheapest) to 4 (most precise). It sets how much memory goes into a request to a cloud AI,

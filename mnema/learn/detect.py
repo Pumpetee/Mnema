@@ -1,12 +1,12 @@
-"""What can Mnema learn from on this computer — found by itself, switched on only by the owner.
-Mnema never reads folders on its own: the first launch asks whether it may look at other programs at all, then shows
+"""What can Mnemai learn from on this computer — found by itself, switched on only by the owner.
+Mnemai never reads folders on its own: the first launch asks whether it may look at other programs at all, then shows
 what was found, all unticked.
 
-On without asking: conversations in Mnema and the corrections in them. Everything else goes to settings["found"]
+On without asking: conversations in Mnemai and the corrections in them. Everything else goes to settings["found"]
 with its path filled in and waits for a tick.
 
 A source is switched on only when it really exists here and needs nothing from the owner:
-- always: conversations in Mnema, corrections in conversations with AI;
+- always: conversations in Mnemai, corrections in conversations with AI;
 - Claude Code — its conversation folder exists and is not empty;
 - notes — an Obsidian vault Obsidian itself lists (the one opened last);
 - documents — the Documents folder has documents in it;
@@ -117,7 +117,7 @@ def blocked() -> bool:
     return bool(os.environ.get("MNEMA_NO_DETECT")) or ("unittest" in sys.modules and not getattr(sys, "frozen", False))
 
 
-SILENT = ("mnema_chat", "corrections")  # inside Mnema itself: reads nothing else
+SILENT = ("mnema_chat", "corrections")  # inside Mnemai itself: reads nothing else
 
 
 def apply(settings: dict, found: dict[str, dict] | None = None) -> list[str]:

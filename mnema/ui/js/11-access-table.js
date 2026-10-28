@@ -1,12 +1,12 @@
 // ---------------------------------------------------------------- who sees what: one table, AIs across, memory parts down
 const ACC_COLS = {
   local: ["💻", "#10b981", "на компьютере", "Встроенная модель и Ollama. Ничего не уходит в интернет"],
-  claude: ["✳", "#d97757", "облако", "Чат Mnema с Claude (подписка или ключ) и Claude Code через MCP"],
-  chatgpt: ["◎", "#10a37f", "облако", "Чат Mnema с ключом OpenAI"],
-  gemini: ["✦", "#4f7cf7", "облако", "Чат Mnema с ключом Gemini"],
-  openrouter: ["⇄", "#7c5cf0", "облако", "Чат Mnema через OpenRouter — любые модели по одному ключу"],
-  deepseek: ["🐋", "#4d6bfe", "облако", "Чат Mnema с ключом DeepSeek"],
-  yandex: ["Я", "#fc3f1d", "облако", "Чат Mnema с YandexGPT через Yandex Cloud"],
+  claude: ["✳", "#d97757", "облако", "Чат Mnemai с Claude (подписка или ключ) и Claude Code через MCP"],
+  chatgpt: ["◎", "#10a37f", "облако", "Чат Mnemai с ключом OpenAI"],
+  gemini: ["✦", "#4f7cf7", "облако", "Чат Mnemai с ключом Gemini"],
+  openrouter: ["⇄", "#7c5cf0", "облако", "Чат Mnemai через OpenRouter — любые модели по одному ключу"],
+  deepseek: ["🐋", "#4d6bfe", "облако", "Чат Mnemai с ключом DeepSeek"],
+  yandex: ["Я", "#fc3f1d", "облако", "Чат Mnemai с YandexGPT через Yandex Cloud"],
   cursor: ["▲", "#334155", "облако", "Cursor через MCP"],
 };
 const ACC_ROWS = [

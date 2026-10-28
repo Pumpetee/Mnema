@@ -206,7 +206,7 @@ def read_notes(vault: Vault, opts: dict, cursor: dict, days: int | None, limit: 
     for f in sorted(root.rglob("*.md"), key=lambda f: f.stat().st_mtime):
         rp = f.resolve()
         if vroot == rp or vroot in rp.parents or any(part in excl for part in f.relative_to(root).parts):
-            continue  # never learn from Mnema's own memory
+            continue  # never learn from Mnemai's own memory
         st = f.stat()
         key = str(f.relative_to(root))
         prev = known.get(key)

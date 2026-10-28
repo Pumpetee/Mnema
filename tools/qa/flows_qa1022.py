@@ -122,10 +122,10 @@ with sync_playwright() as p:
     fresh(page)
     page.evaluate("mnemaAskClose()")
     page.wait_for_timeout(300)
-    check("«Закрыть Mnema?» с крестиком", page.locator(".closebox [data-x]").count() == 1)
+    check("«Закрыть Mnemai?» с крестиком", page.locator(".closebox [data-x]").count() == 1)
     page.keyboard.press("Escape")
     page.wait_for_timeout(300)
-    check("«Закрыть Mnema?» закрывается Escape", page.locator(".closebox").count() == 0)
+    check("«Закрыть Mnemai?» закрывается Escape", page.locator(".closebox").count() == 0)
 
     # QA 27: the side rail and titles in another language
     fresh(page, "chat", "en")

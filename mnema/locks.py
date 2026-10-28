@@ -1,6 +1,6 @@
 """One writer at a time per memory folder.
 
-The chat, the learner, the meeting scribe and an AI over MCP (a separate mnema-cli process) all write the same files.
+The chat, the learner, the meeting scribe and an AI over MCP (a separate mnemai-cli process) all write the same files.
 A change is read → changed → written; two at once lose one of them. vault_lock() makes that one step: a thread lock
 inside the process and a lock file (.mnema/write.lock) across processes. It is re-entrant within a thread, so a write
 that calls another write does not wait for itself.

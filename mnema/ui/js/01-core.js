@@ -14,7 +14,7 @@ async function api(path, opt = {}) {
   return d;
 }
 
-// the memory folder is encrypted by Mnema: the password before anything else
+// the memory folder is encrypted by Mnemai: the password before anything else
 function unlockScreen() {
   if ($(".unlock")) return;
   hideSplash();
@@ -128,12 +128,12 @@ function hideSplash() {
 }
 
 // ---------------------------------------------------------------- memory on / off
-// Off: the AIs get no memory and Mnema writes nothing — a plain chat; every other function stays. A new memory folder
+// Off: the AIs get no memory and Mnemai writes nothing — a plain chat; every other function stays. A new memory folder
 // starts off and the tour offers to turn it on.
 const MEM = { on: true, asked: true };
 // Turning the memory on is never one stray click: every switch and button asks first, with what it means.
 // quiet — the choice was already made in such a window (or in the first-run tour).
-// Mnema's own dialogs instead of the browser's confirm / prompt (those show «Сообщение с 127.0.0.1»):
+// Mnemai's own dialogs instead of the browser's confirm / prompt (those show «Сообщение с 127.0.0.1»):
 // ask(title, text, ok, danger) → true / false, askText(title, value, text) → the text or null
 function dlg({ title, text = "", ok = "OK", danger = false, input = null, placeholder = "", wait = 0 }) {
   return new Promise((done) => {
@@ -208,7 +208,7 @@ function memConfirm() {
     const pop = document.createElement("div");
     pop.className = "modal memask";
     pop.innerHTML = `<div class="card"><h2>${tr("Включить память?")}</h2>
-      <p class="hint">${tr("ИИ будут знать о тебе то, что разрешено в «Кто из ИИ что видит». Mnema начнёт учиться на разговорах и записывать факты в папку на этом компьютере.")}</p>
+      <p class="hint">${tr("ИИ будут знать о тебе то, что разрешено в «Кто из ИИ что видит». Mnemai начнёт учиться на разговорах и записывать факты в папку на этом компьютере.")}</p>
       <p class="hint">${tr("Выключить можно в любой момент тем же переключателем. Всё записанное видно в «Память» → «История», любую запись можно откатить.")}</p>
       <div class="row" style="justify-content:flex-end;margin-top:14px;gap:8px"><button class="btn g" data-no>${tr("Не включать")}</button><button class="btn" data-yes>${tr("Включить память")}</button></div></div>`;
     const close = (v) => {
@@ -229,7 +229,7 @@ async function memSet(on, quiet) {
   if (!quiet)
     toast(
       on
-        ? tr("Память включена: ИИ знают тебя, Mnema учится")
+        ? tr("Память включена: ИИ знают тебя, Mnemai учится")
         : tr("Память выключена: обычный чат, ничего не запоминается"),
     );
   document.body.classList.toggle("mem-off", !MEM.on);

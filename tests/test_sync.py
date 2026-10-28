@@ -34,7 +34,7 @@ class Base(unittest.TestCase):
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def link(self, v):
-        sync.add(v, "folder", path=str(self.cloud / "Mnema"))
+        sync.add(v, "folder", path=str(self.cloud / "Mnemai"))
         return sync.settings(v)["targets"][0]
 
     def go(self, v):
@@ -52,8 +52,8 @@ class TestFolder(Base):
         self.assertEqual(r["conflicts"], [])  # B's untouched templates simply take A's files
         self.assertIn("Любит чай", self.b.read_raw("70 Memory/Cards/Привычки.md"))
         self.assertIn("Отвечать коротко", self.b.read_raw("70 Memory/Rules.md"))
-        self.assertFalse((self.cloud / "Mnema" / "10 Now.md").exists())  # generated: each computer builds its own
-        self.assertFalse((self.cloud / "Mnema" / "95 Saves").exists())
+        self.assertFalse((self.cloud / "Mnemai" / "10 Now.md").exists())  # generated: each computer builds its own
+        self.assertFalse((self.cloud / "Mnemai" / "95 Saves").exists())
 
     def test_edit_and_delete_travel_both_ways(self):
         remember(self.a, "Любит чай", "card:Привычки", today=TODAY)
@@ -154,7 +154,7 @@ class TestStation(Base):
 
         self.assertEqual(
             rpc({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})["result"]["serverInfo"]["name"],
-            "mnema",
+            "mnemai",
         )
         out = rpc(
             {"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "memory_context", "arguments": {}}}

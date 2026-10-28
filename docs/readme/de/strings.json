@@ -1,6 +1,6 @@
 {
- "langs_intro": "Mnema spricht neun Sprachen. Oberfläche, Hilfe und die Antworten der KI richten sich nach der Sprache, die du auswählst – auch wenn du in einer anderen schreibst. Diese README und die Mnema-Anleitung gibt es in jeder davon.",
- "guide_btn": "Mnema-Anleitung",
+ "langs_intro": "Mnemai spricht neun Sprachen. Oberfläche, Hilfe und die Antworten der KI richten sich nach der Sprache, die du auswählst – auch wenn du in einer anderen schreibst. Diese README und die Mnemai-Anleitung gibt es in jeder davon.",
+ "guide_btn": "Mnemai-Anleitung",
  "guide_msg": "jeder Bildschirm und jede Einstellung",
  "badges": [
   "nur lesen",
@@ -12,15 +12,15 @@
   "Ein Gedächtnis für jede KI",
   "Kostenlos, auf deinem Rechner, ohne Konto"
  ],
- "lead": "Mnema merkt sich, wer du bist, woran du arbeitest, was du entschieden hast und wie du Antworten magst – und jede KI, mit der du sprichst, bekommt diesen Kontext. Das Gedächtnis ist ein Ordner mit einfachen Markdown-Dateien auf deinem Rechner. Keine Cloud, kein Konto.",
+ "lead": "Mnemai merkt sich, wer du bist, woran du arbeitest, was du entschieden hast und wie du Antworten magst – und jede KI, mit der du sprichst, bekommt diesen Kontext. Das Gedächtnis ist ein Ordner mit einfachen Markdown-Dateien auf deinem Rechner. Keine Cloud, kein Konto.",
  "dl": [
   "Herunterladen für",
   "alle Dateien"
  ],
- "hero_alt": "Eine Frage, und die Antwort kommt aus dem Gedächtnis: der Wochenplan als Tabelle, mit dem Preis und der Meeting-Regel, die Mnema schon kennt",
+ "hero_alt": "Eine Frage, und die Antwort kommt aus dem Gedächtnis: der Wochenplan als Tabelle, mit dem Preis und der Meeting-Regel, die Mnemai schon kennt",
  "hero_cap": "Du fragst «Was ist diese Woche wichtig?» – der Plan kommt als Tabelle, mit dem vereinbarten Preis und deiner Regel für Meetings. Du musstest sie nie erneut eintippen.",
  "langs": "Sprachen",
- "what": "Was Mnema kann",
+ "what": "Was Mnemai kann",
  "grid": [
   [
    "🧠",
@@ -57,11 +57,11 @@
   [
    "🧠 Es kennt dich",
    "memory",
-   "Porträt und Gedächtniskarte: Themen als Blasen, die Größe zeigt, wie viel Mnema weiß",
+   "Porträt und Gedächtniskarte: Themen als Blasen, die Größe zeigt, wie viel Mnemai weiß",
    [
-    "**Ein Porträt, das jede KI zuerst liest:** wer du bist, was du aufbaust, wie du gern arbeitest. Mnema schreibt es beim Lernen fort, du kannst es von Hand korrigieren.",
+    "**Ein Porträt, das jede KI zuerst liest:** wer du bist, was du aufbaust, wie du gern arbeitest. Mnemai schreibt es beim Lernen fort, du kannst es von Hand korrigieren.",
     "**Eine Gedächtniskarte:** Jedes Thema ist eine Blase, ein Pulsieren heißt, dass es sich kürzlich geändert hat, ein Schloss bedeutet, dass manche KIs es nicht sehen.",
-    "**Alte Fakten gelten nicht als neu:** Jeder Fakt trägt sein Datum, und bei einem Status, der älter als einen Monat ist, fragt Mnema noch einmal nach.",
+    "**Alte Fakten gelten nicht als neu:** Jeder Fakt trägt sein Datum, und bei einem Status, der älter als einen Monat ist, fragt Mnemai noch einmal nach.",
     "**Mehr als ein Ordner:** Verbinde einen Obsidian-Vault oder einen Team-Ordner – nur lesend, das Programm selbst verhindert dort jedes Schreiben."
    ]
   ],
@@ -89,7 +89,7 @@
   [
    "🌱 Es lernt von selbst",
    "learning",
-   "Du erwähnst etwas nebenbei, und der Feed zeigt, was Mnema gelesen, verstanden und notiert hat – und warum",
+   "Du erwähnst etwas nebenbei, und der Feed zeigt, was Mnemai gelesen, verstanden und notiert hat – und warum",
    [
     "**Sicher heißt gespeichert:** Ein Fakt, dessen es sich sicher ist (80 % oder mehr), wird sofort geschrieben, ein zweifelhafter wartet, bis er noch einmal auftaucht.",
     "**Persönliches kommt getrennt:** Geld, Gesundheit und Privates landen in markierten Karten, die du vor jeder KI verbergen kannst.",
@@ -99,20 +99,20 @@
   [
    "✈️ Liest Telegram, schreibt dort nie",
    "telegram",
-   "Telegram nur lesend verbunden: Du wählst die Chats, Mnema lernt aus ihnen",
+   "Telegram nur lesend verbunden: Du wählst die Chats, Mnemai lernt aus ihnen",
    [
-    "**Du wählst die Chats:** Mnema lernt nur aus diesen etwas über dich und die Menschen um dich herum.",
-    "**Nur lesend, by Design:** Der Telegram-Client in Mnema kann ausschließlich lesen; jeder andere Befehl wird abgelehnt, bevor er gesendet wird.",
-    "**Bleibt auf deinem Rechner:** Die Anmeldung wird im Speicher des Systems verschlüsselt abgelegt, und Mnema hat keine eigenen Server."
+    "**Du wählst die Chats:** Mnemai lernt nur aus diesen etwas über dich und die Menschen um dich herum.",
+    "**Nur lesend, by Design:** Der Telegram-Client in Mnemai kann ausschließlich lesen; jeder andere Befehl wird abgelehnt, bevor er gesendet wird.",
+    "**Bleibt auf deinem Rechner:** Die Anmeldung wird im Speicher des Systems verschlüsselt abgelegt, und Mnemai hat keine eigenen Server."
    ]
   ],
   [
    "📉 Spart Tokens",
    "tokens",
-   "Eine Frage zu einem Vertrag mit 153.000 Zeichen: 29.643 Eingabe-Tokens für den ganzen Text, 6.159 mit Mnema",
+   "Eine Frage zu einem Vertrag mit 153.000 Zeichen: 29.643 Eingabe-Tokens für den ganzen Text, 6.159 mit Mnemai",
    [
     "**Nur das Wichtige geht raus:** Gedächtnis, Dokumente und Webseiten werden auf deinem Rechner gelesen, und das Modell bekommt die relevanten Teile.",
-    "**Gemessen:** Bei einer Frage zu einem Vertrag mit 153.000 Zeichen brauchte der ganze Text 29.643 Eingabe-Tokens; Mnema schickte 6.159, und nur die Antwort mit Mnema war richtig.",
+    "**Gemessen:** Bei einer Frage zu einem Vertrag mit 153.000 Zeichen brauchte der ganze Text 29.643 Eingabe-Tokens; Mnemai schickte 6.159, und nur die Antwort mit Mnemai war richtig.",
     "**Jedes Mal sichtbar:** Unter jeder Antwort siehst du, wie viele Tokens gespart wurden."
    ],
    560
@@ -164,6 +164,6 @@
   "Sicherheit"
  ],
  "lic": "Lizenz",
- "foot": "Wenn Mnema sich etwas Nützliches für dich merkt, hilft ein ⭐ anderen, es zu finden.",
+ "foot": "Wenn Mnemai sich etwas Nützliches für dich merkt, hilft ein ⭐ anderen, es zu finden.",
  "qr": "Scannen, um das Repository zu öffnen"
 }

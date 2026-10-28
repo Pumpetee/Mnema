@@ -1,6 +1,6 @@
-"""Things to try and to show: «С памятью и без», «Насколько Mnema тебя знает», «Знакомство».
+"""Things to try and to show: «С памятью и без», «Насколько Mnemai тебя знает», «Знакомство».
 
-- compare — one question to the connected AIs twice: as a plain chat (no memory) and through Mnema (with memory),
+- compare — one question to the connected AIs twice: as a plain chat (no memory) and through Mnemai (with memory),
   so the difference is seen at once;
 - quiz — facts from the memory, one by one: true / no longer so / wrong. Every answer fixes the memory: a true status
   gets today's date, a changed one is rewritten, a wrong one goes to the fact archive. The score is what is shared;

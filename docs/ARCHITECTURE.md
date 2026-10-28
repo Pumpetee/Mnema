@@ -5,14 +5,14 @@
 ## Processes
 
 ```
-Mnema.exe (mnema/desktop.py)
+Mnemai.exe (mnema/desktop.py)
  ├─ window: pywebview on Microsoft WebView2 → http://127.0.0.1:<port>/
  ├─ tray icon (pystray): open, learn now, pause, proxy, autostart, exit
  ├─ local API (mnema/api.py, a thread): the interface and the window's hooks
  ├─ learner (mnema/learn/engine.py, a thread): reads the allowed sources on a timer
  └─ llama-server (vendor/llama, a child process, only while a local model is used)
 
-mnema-cli.exe / python -m mnema (mnema/cli.py)
+mnemai-cli.exe / python -m mnema (mnema/cli.py)
  └─ mcp — MCP server over stdio for Claude Code, Claude Desktop, Cursor
 ```
 
@@ -20,7 +20,7 @@ One copy per user (a named mutex); a second launch only shows the first window. 
 
 ## The memory folder
 
-Plain Markdown, readable without Mnema. Layout constants and access scopes are in `mnema/vault.py`.
+Plain Markdown, readable without Mnemai. Layout constants and access scopes are in `mnema/vault.py`.
 
 | Path | Scope | Content |
 |---|---|---|
@@ -48,7 +48,7 @@ A fact is one line with its date. A status line carries `(статус ДД.ММ
 interface (ui/js/19-chat.js) ──POST /api/chat/send──▶ chat/engine.send
   1. the message is saved; learning on it starts in the background (learn/engine.learn_episodes)
   2. system prompt = behaviour rules (agent/profile.py) + memory this model may see (context_for)
-                     + how Mnema works now (chat/selfknow.py) + knowledge-base sections if the question is about Mnema
+                     + how Mnemai works now (chat/selfknow.py) + knowledge-base sections if the question is about Mnemai
   3. attached files: text extracted on the computer (docs.py); scans and images go as files where supported
   4. web: only when the question needs fresh outside data (web.should_search), pages read locally
   5. cloud model: secrets replaced with labels (outgoing.py), the request logged; local model: as is
@@ -62,14 +62,14 @@ The consortium (`chat/consortium.py`) runs 2–4 models in turns with a format (
 
 ```
 sources (learn/sources.py, learn/sources_life.py)  → Episode(source, ref, ts, text)
-  only those switched on and allowed: settings.allowed() — "only Mnema" blocks everything outside it
+  only those switched on and allowed: settings.allowed() — "only Mnemai" blocks everything outside it
 brain (learn/brains.py): explicit signals, Claude Code, an API key, or a local model → candidate facts
 ledger (learn/ledger.py): repeats raise confidence; the day it was said (said_at) is kept
 decision (learn/engine.decide_why): write / ask / wait / skip, with the reason shown in the feed
 write: memory.remember(..., said=day) → journal, Now, Index regenerated
 ```
 
-There is no waiting queue. From a conversation in Mnema, a personal fact or a contradiction is asked once, right under that conversation (`chat["learn_ask"]`, answered through `/api/learn/review`); from anywhere else Mnema decides by itself: personal goes to a hidden part, the newer fact replaces the older one (the old one goes to the fact archive), a weak guess waits to be seen again. Undoing a learned write means "no" for good.
+There is no waiting queue. From a conversation in Mnemai, a personal fact or a contradiction is asked once, right under that conversation (`chat["learn_ask"]`, answered through `/api/learn/review`); from anywhere else Mnemai decides by itself: personal goes to a hidden part, the newer fact replaces the older one (the old one goes to the fact archive), a weak guess waits to be seen again. Undoing a learned write means "no" for good.
 
 ## What leaves the computer
 

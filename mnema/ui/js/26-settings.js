@@ -72,7 +72,7 @@ async function drawVaults() {
             !(await ask(
               open ? "Удалить открытую память?" : "Удалить эту память?",
               open
-                ? "Mnema закроет её и уберёт папку в корзину, вернуть можно оттуда."
+                ? "Mnemai закроет её и уберёт папку в корзину, вернуть можно оттуда."
                 : "Папка уйдёт в корзину, вернуть можно оттуда.",
             ))
           )
@@ -81,7 +81,7 @@ async function drawVaults() {
           if (
             !(await dlg({
               title: tr("Точно удалить") + " «" + v.name + "»?",
-              text: "Всё, что Mnema о тебе узнала в этой памяти, — портрет, факты, разговоры и история — уйдёт в корзину вместе с папкой.",
+              text: "Всё, что Mnemai о тебе узнала в этой памяти, — портрет, факты, разговоры и история — уйдёт в корзину вместе с папкой.",
               ok: "Удалить",
               danger: true,
               wait: 10,
@@ -109,7 +109,7 @@ async function drawVaults() {
       api("/api/app/switch");
   };
 }
-// Telegram: Mnema learns from the conversations in the chats the owner picked; read only — the client itself refuses anything but reading
+// Telegram: Mnemai learns from the conversations in the chats the owner picked; read only — the client itself refuses anything but reading
 const TG_LOGO = `<svg viewBox="0 0 24 24" class="tglogo"><circle cx="12" cy="12" r="12" fill="#229ED9"/><path d="M5.4 11.7l11.6-4.5c.5-.2 1 .1.8.9l-2 9.3c-.1.6-.5.8-1 .5l-2.9-2.2-1.4 1.4c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.3-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.1-.9z" fill="#fff"/></svg>`;
 async function drawTg() {
   const box = $("#c-tg");
@@ -155,12 +155,12 @@ async function drawTg() {
                 `<div class="tgci"><span class="tgava sm">${c.kind === "group" ? ic("users") : c.kind === "self" ? ic("pin") : esc((c.name || "?").slice(0, 1).toUpperCase())}</span><span data-noi18n>${esc(c.name)}</span><button class="kebab" data-tgdel="${k}" title="${tr("Убрать")}">${ic("x")}</button></div>`,
             )
             .join("")}</div>`
-        : `<p class="hint">${r.set ? tr("Пока ни одного чата — Mnema ничего не читает. Добавь чаты, по которым она будет тебя узнавать.") : tr("Чаты появятся здесь после входа: ты сам выберешь, какие Mnema читает.")}</p>`
+        : `<p class="hint">${r.set ? tr("Пока ни одного чата — Mnemai ничего не читает. Добавь чаты, по которым она будет тебя узнавать.") : tr("Чаты появятся здесь после входа: ты сам выберешь, какие Mnemai читает.")}</p>`
     }</div>`;
-  box.innerHTML = `<div class="tghead">${TG_LOGO}<div><h2>Telegram</h2><p>${tr("Mnema узнаёт тебя и людей вокруг по твоим перепискам в Telegram")}</p></div><span class="tgro">${ic("lock")}${tr("Только чтение")}</span></div>
+  box.innerHTML = `<div class="tghead">${TG_LOGO}<div><h2>Telegram</h2><p>${tr("Mnemai узнаёт тебя и людей вокруг по твоим перепискам в Telegram")}</p></div><span class="tgro">${ic("lock")}${tr("Только чтение")}</span></div>
     <div class="tgsafe"><span>${ic("check")}${tr("Читает переписку целиком — твои сообщения и собеседников, только в чатах, которые ты выбрал")}</span><span>${ic("check")}${tr("Ничего не отправляет, не удаляет и не отмечает прочитанным")}</span><span>${ic("check")}${tr("Каналы и ботов пропускает")}</span></div>
-    <p class="tgnote">${tr("Запрет заложен в саму программу: клиент Telegram внутри Mnema умеет только читать, любая другая команда отклоняется до отправки.")}</p>
-    <div class="tglocal">${ic("shield")}<div><b>${tr("Всё хранится только на этом компьютере")}</b><p>${tr("Вход в Telegram зашифрован в защищённом хранилище системы, список чатов и то, что Mnema из них поняла, лежат в папке памяти. Своих серверов у Mnema нет, переписка никуда не копируется. ИИ получает только нужные места, когда ты задаёшь вопрос.")}</p></div></div>
+    <p class="tgnote">${tr("Запрет заложен в саму программу: клиент Telegram внутри Mnemai умеет только читать, любая другая команда отклоняется до отправки.")}</p>
+    <div class="tglocal">${ic("shield")}<div><b>${tr("Всё хранится только на этом компьютере")}</b><p>${tr("Вход в Telegram зашифрован в защищённом хранилище системы, список чатов и то, что Mnemai из них поняла, лежат в папке памяти. Своих серверов у Mnemai нет, переписка никуда не копируется. ИИ получает только нужные места, когда ты задаёшь вопрос.")}</p></div></div>
     ${body}${chatList}`;
   const rdp = (b) =>
     post("/api/telegram", b)
@@ -187,13 +187,13 @@ async function drawTg() {
   on(
     "tgrforget",
     async () =>
-      (await ask("Отключить Telegram?", "Mnema забудет вход и перестанет читать переписку.", "Отключить")) &&
+      (await ask("Отключить Telegram?", "Mnemai забудет вход и перестанет читать переписку.", "Отключить")) &&
       rdp({ forget: true }),
   );
 }
-// the owner's chats to pick from: Mnema reads only the picked ones
+// the owner's chats to pick from: Mnemai reads only the picked ones
 async function tgPick(cur) {
-  const head = `<div class="obshead">${TG_LOGO}<div><h2>${tr("Чаты для чтения")}</h2><p class="hint">${tr("Mnema будет читать переписку целиком — твои сообщения и собеседников — только в отмеченных чатах. Каналы и боты в список не попадают.")}</p></div></div>`;
+  const head = `<div class="obshead">${TG_LOGO}<div><h2>${tr("Чаты для чтения")}</h2><p class="hint">${tr("Mnemai будет читать переписку целиком — твои сообщения и собеседников — только в отмеченных чатах. Каналы и боты в список не попадают.")}</p></div></div>`;
   const pop = document.createElement("div");
   pop.className = "modal obspick tgpick";
   pop.innerHTML = `<div class="card">${head}<p class="hint">${tr("загружаю…")}</p></div>`;
@@ -245,8 +245,8 @@ async function tgPick(cur) {
       pop.remove();
       toast(
         chosen.size
-          ? tr("Чаты сохранены: Mnema прочитает их в ближайшем цикле обучения")
-          : tr("Чаты убраны: Mnema ничего не читает"),
+          ? tr("Чаты сохранены: Mnemai прочитает их в ближайшем цикле обучения")
+          : tr("Чаты убраны: Mnemai ничего не читает"),
       );
       drawTg();
     };
@@ -266,7 +266,7 @@ async function obsidianPick(prof) {
   pop.className = "modal obspick";
   const chosen = new Set(d.vaults.filter((v) => v.added).map((v) => v.path));
   const draw = () => {
-    pop.innerHTML = `<div class="card"><div class="obshead">${OBS_LOGO}<div><h2>${tr("Подключить Obsidian")}</h2><p class="hint">${tr("Mnema будет видеть заметки хранилища вместе со своей памятью: при каждом вопросе найдёт нужные места и отдаст их ИИ. Заметки только читаются, в них ничего не пишется.")}</p></div></div>
+    pop.innerHTML = `<div class="card"><div class="obshead">${OBS_LOGO}<div><h2>${tr("Подключить Obsidian")}</h2><p class="hint">${tr("Mnemai будет видеть заметки хранилища вместе со своей памятью: при каждом вопросе найдёт нужные места и отдаст их ИИ. Заметки только читаются, в них ничего не пишется.")}</p></div></div>
       ${
         d.vaults.length
           ? `<div class="obslist">${d.vaults
@@ -466,7 +466,7 @@ function bindProxyForm(box, onSave) {
         [
           ...(d.tunnels || []).map(
             (t) =>
-              `<div class="vrow sys"><i></i><div><b>${esc(t)}</b> <span class="hint">${tr("запущен. Если он подключён, Mnema пойдёт через него сама — поля можно не заполнять")}</span></div></div>`,
+              `<div class="vrow sys"><i></i><div><b>${esc(t)}</b> <span class="hint">${tr("запущен. Если он подключён, Mnemai пойдёт через него сама — поля можно не заполнять")}</span></div></div>`,
           ),
           ...(d.proxies || []).map(
             (p) =>
@@ -552,7 +552,7 @@ async function viewSettings(arg) {
   {
     $("#st").innerHTML = `
     ${modelHero(ms, allModels, prof.default_model || ms.default_model)}
-    <div class="card" data-sec="ai" id="c-prov"><h2>${tr("Модели")}<span class="hint">${tr("с какими ИИ говорить в Mnema")}</span></h2><div class="aigrp aipaid">${tr("Платные")}<span class="hint">${tr("работают через интернет: платишь компании, чей это ИИ")}</span></div><div class="aisub">${tr("По подписке")}<span class="hint">${tr("та, что уже оплачена у компании")}</span></div><div class="aigrid">${ms.providers
+    <div class="card" data-sec="ai" id="c-prov"><h2>${tr("Модели")}<span class="hint">${tr("с какими ИИ говорить в Mnemai")}</span></h2><div class="aigrp aipaid">${tr("Платные")}<span class="hint">${tr("работают через интернет: платишь компании, чей это ИИ")}</span></div><div class="aisub">${tr("По подписке")}<span class="hint">${tr("та, что уже оплачена у компании")}</span></div><div class="aigrid">${ms.providers
       .filter((x) => x.id === "claude_code")
       .map((x, n) => provTile(x, n))
       .join(
@@ -571,16 +571,16 @@ async function viewSettings(arg) {
     ${((SCR_X = { ...SCR_X, models: allModels, summary: prof.scribe_summary_model || "", keep: !!prof.scribe_keep_audio }), (bindScribeCard.last = scr), scribeCard(scr))}
     <div class="card" data-sec="security" id="seccard"><h2>${tr("Защита данных")}</h2>
      <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.redact !== false ? "on" : ""}" id="secred"></button><div><b>${tr("Скрывать секреты от облачных ИИ")}</b><p>${tr("Номера карт, пароли, ключи, телефоны, паспорта и СНИЛС заменяются метками до отправки, в ответ настоящие значения подставляются на компьютере.")}</p></div></div>
-     ${efs ? `<div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${efs.on ? "on" : ""}" id="secefs" ${efs.supported ? "" : "disabled"}></button><div><b>${tr("Шифровать папку памяти")}</b><p>${efs.supported ? tr("Средствами Windows: файлы на диске зашифрованы ключом твоей учётной записи, без входа в неё их не прочитать, даже вынув диск. Для тебя и Mnema всё работает как раньше.") : esc(tr(efs.reason))}</p>${efs.on ? `<button class="btn g sm" id="secbk" style="margin-top:6px">${tr("Сохранить ключ восстановления")}</button>` : ""}</div></div>` : ""}
-     ${cry ? `<div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${cry.on ? "on" : ""}" id="seccry"></button><div><b>${tr("Шифровать память паролем")}</b><p>${tr("Mnema сама шифрует заметки, разговоры и журнал, на любой системе. Без пароля их не прочитать, даже скопировав папку. Obsidian и другие редакторы эти файлы не откроют. Забудешь пароль — память не вернуть.")}</p>${cry.on ? `<p class="hint">${tr("Зашифровано файлов")}: ${cry.files}</p><div class="tg" style="padding:6px 0 0;border:0"><button class="sw sm ${cry.remembered ? "on" : ""}" id="seccrem"></button><div><b>${tr("Помнить пароль на этом компьютере")}</b><p>${tr("Mnema открывается без вопроса, ключ хранится в защищённом хранилище системы. Выключи, чтобы пароль спрашивался при каждом запуске.")}</p></div></div><button class="btn g sm" id="seccpw" style="margin-top:6px">${tr("Сменить пароль")}</button>` : ""}</div></div>` : ""}
+     ${efs ? `<div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${efs.on ? "on" : ""}" id="secefs" ${efs.supported ? "" : "disabled"}></button><div><b>${tr("Шифровать папку памяти")}</b><p>${efs.supported ? tr("Средствами Windows: файлы на диске зашифрованы ключом твоей учётной записи, без входа в неё их не прочитать, даже вынув диск. Для тебя и Mnemai всё работает как раньше.") : esc(tr(efs.reason))}</p>${efs.on ? `<button class="btn g sm" id="secbk" style="margin-top:6px">${tr("Сохранить ключ восстановления")}</button>` : ""}</div></div>` : ""}
+     ${cry ? `<div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${cry.on ? "on" : ""}" id="seccry"></button><div><b>${tr("Шифровать память паролем")}</b><p>${tr("Mnemai сама шифрует заметки, разговоры и журнал, на любой системе. Без пароля их не прочитать, даже скопировав папку. Obsidian и другие редакторы эти файлы не откроют. Забудешь пароль — память не вернуть.")}</p>${cry.on ? `<p class="hint">${tr("Зашифровано файлов")}: ${cry.files}</p><div class="tg" style="padding:6px 0 0;border:0"><button class="sw sm ${cry.remembered ? "on" : ""}" id="seccrem"></button><div><b>${tr("Помнить пароль на этом компьютере")}</b><p>${tr("Mnemai открывается без вопроса, ключ хранится в защищённом хранилище системы. Выключи, чтобы пароль спрашивался при каждом запуске.")}</p></div></div><button class="btn g sm" id="seccpw" style="margin-top:6px">${tr("Сменить пароль")}</button>` : ""}</div></div>` : ""}
      <div class="row"><button class="btn l" id="secout">${ic("eye")}${tr("Что ушло наружу")}</button><button class="btn g" id="secacc">${ic("lock")}${tr("Кто из ИИ что видит")}</button></div></div>
     ${themeCard()}
     ${compCard()}
     ${youCard(prof, ag)}
-    <div class="card" data-sec="learn" id="c-mem"><div class="tg" style="padding:0;border:0"><button class="sw ${MEM.on ? "on" : ""}" id="memsw2"></button><div><b>${tr("Память")}</b><p>${tr(MEM.on ? "Включена: ИИ знают, кто ты и над чем работаешь, Mnema учится по ходу разговора. Claude Code, Claude Desktop и Cursor получают ту же память." : "Выключена: обычный чат. ИИ ничего о тебе не знают, Mnema ничего не запоминает, Claude Code, Claude Desktop и Cursor память не получают. Всё остальное работает.")}</p></div></div></div>
+    <div class="card" data-sec="learn" id="c-mem"><div class="tg" style="padding:0;border:0"><button class="sw ${MEM.on ? "on" : ""}" id="memsw2"></button><div><b>${tr("Память")}</b><p>${tr(MEM.on ? "Включена: ИИ знают, кто ты и над чем работаешь, Mnemai учится по ходу разговора. Claude Code, Claude Desktop и Cursor получают ту же память." : "Выключена: обычный чат. ИИ ничего о тебе не знают, Mnemai ничего не запоминает, Claude Code, Claude Desktop и Cursor память не получают. Всё остальное работает.")}</p></div></div></div>
     <div class="card ${MEM.on ? "" : "dimmed"}" data-sec="learn" id="c-learn">${MEM.on ? "" : memOffNote("обучение не идёт")}<div class="set"><b>Насколько сама учится${hq("learn")}</b><div>${seg("autonomy", ag.simple.autonomy.choices, simple.autonomy)}${autoScene(simple.autonomy)}<div class="hint" style="margin-top:6px">${esc(AUTO_HINT[simple.autonomy])}</div></div></div>
     <div class="set"><b>${tr("Вопросы от себя")}</b><div class="tg" style="padding:0;border:0"><button class="sw ${prof.self_ask !== false ? "on" : ""}" id="selfasksw"></button><div><b>${tr("Иногда спрашивать о проекте")}</b><p>${tr("Когда разговор про проект — один вопрос карточкой: устаревший статус или нет цели. Не чаще раза в 40–120 минут.")}</p></div></div></div>
-    <div class="set"><b>${tr("Что Mnema можно смотреть")}${hq("outside")}</b><div class="tg" style="padding:0;border:0"><button class="sw ${s.outside !== false ? "on" : ""}" id="outsw"></button><div><b>${tr("Другие программы и браузер")}</b><p>${s.outside === false ? tr("Выключено: учусь только на разговорах в Mnema. Чаты Claude Code, заметки, документы, Telegram и историю браузера не читаю.") : tr("Можно: читаю только то, что включено ниже. Всё читается на компьютере.")}</p></div></div></div>
+    <div class="set"><b>${tr("Что Mnemai можно смотреть")}${hq("outside")}</b><div class="tg" style="padding:0;border:0"><button class="sw ${s.outside !== false ? "on" : ""}" id="outsw"></button><div><b>${tr("Другие программы и браузер")}</b><p>${s.outside === false ? tr("Выключено: учусь только на разговорах в Mnemai. Чаты Claude Code, заметки, документы, Telegram и историю браузера не читаю.") : tr("Можно: читаю только то, что включено ниже. Всё читается на компьютере.")}</p></div></div></div>
     <div class="set srcset"><b>Где учиться<span class="hint">${tr("Нажми на карточку, чтобы включить или выключить")}</span></b><div class="srcgrid ${s.outside === false ? "outoff" : ""}">${Object.entries(
       groups,
     )
@@ -739,7 +739,7 @@ async function viewSettings(arg) {
       $("#outsw").onclick = async () => {
         await saveL(
           { outside: s.outside === false, found_asked: true },
-          s.outside === false ? tr("Можно смотреть то, что включено") : tr("Только разговоры в Mnema"),
+          s.outside === false ? tr("Можно смотреть то, что включено") : tr("Только разговоры в Mnemai"),
         );
         again();
       };
@@ -841,12 +841,12 @@ async function viewSettings(arg) {
     <div class="card ${MEM.on ? "" : "dimmed"}" data-sec="security" id="c-access">${MEM.on ? "" : memOffNote("ИИ сейчас ничего не получают")}<h2>Кто из ИИ что видит${hq("access")}<span class="accsaved" id="accsaved">${ic("check")}${tr("Сохранено")}</span></h2>
       <p class="hint" style="margin:-4px 0 12px">${tr("Галочка — эта часть памяти уходит этому ИИ вместе с вопросом. Замок — тема вырезается даже из разрешённых частей. Меняется сразу.")}</p>
       <div class="accwrap" id="accm">${accMatrix(clients)}</div></div>
-    <div class="card" data-sec="style" id="promptcard"><h2>${tr("Повторяющиеся задачи")}${hq("prompts")}</h2><p class="hint" style="margin:-4px 0 10px">${tr("Делаешь что-то не в первый раз — отчёт по встрече, пост по заметкам, письмо клиенту? Mnema запишет рецепт: как именно ты это делаешь. Дальше просишь коротко — и она делает так же, без уточнений.")}</p>
+    <div class="card" data-sec="style" id="promptcard"><h2>${tr("Повторяющиеся задачи")}${hq("prompts")}</h2><p class="hint" style="margin:-4px 0 10px">${tr("Делаешь что-то не в первый раз — отчёт по встрече, пост по заметкам, письмо клиенту? Mnemai запишет рецепт: как именно ты это делаешь. Дальше просишь коротко — и она делает так же, без уточнений.")}</p>
       <div class="set"><b>${tr("Предлагать записать рецепт")}</b><div>${seg("pmode", { off: "никогда", second: "когда задача повторилась", every: "на каждую задачу" }, PRM_ST.mode)}</div></div>
-      <div class="tg" style="padding:12px 0"><button class="sw ${PRM_ST.auto ? "on" : ""}" id="pauto"></button><div><b>${tr("Узнавать задачу и готовить по рецепту")}</b><p>${tr("Попросил знакомое — Mnema сама берёт рецепт, в ответе пометка «по рецепту». Выключено — рецепты лежат, но сама их не берёт.")}</p></div></div>
-      <div class="set"><b>${tr("Мои рецепты")}</b><div>${PRM_ST.prompts.length ? `<div class="plist">${PRM_ST.prompts.map((x) => `<div class="pi"><div><b>${esc(x.name)}</b><span>${esc(x.when || "")} · использован ${x.uses} раз</span></div><button class="btn g sm" data-popen="${esc(x.file)}">Открыть</button><button class="btn g sm" data-pdel="${esc(x.file)}">Удалить</button></div>`).join("")}</div>` : '<span class="hint">пока нет — Mnema предложит первый, когда задача повторится</span>'}</div></div></div>
+      <div class="tg" style="padding:12px 0"><button class="sw ${PRM_ST.auto ? "on" : ""}" id="pauto"></button><div><b>${tr("Узнавать задачу и готовить по рецепту")}</b><p>${tr("Попросил знакомое — Mnemai сама берёт рецепт, в ответе пометка «по рецепту». Выключено — рецепты лежат, но сама их не берёт.")}</p></div></div>
+      <div class="set"><b>${tr("Мои рецепты")}</b><div>${PRM_ST.prompts.length ? `<div class="plist">${PRM_ST.prompts.map((x) => `<div class="pi"><div><b>${esc(x.name)}</b><span>${esc(x.when || "")} · использован ${x.uses} раз</span></div><button class="btn g sm" data-popen="${esc(x.file)}">Открыть</button><button class="btn g sm" data-pdel="${esc(x.file)}">Удалить</button></div>`).join("")}</div>` : '<span class="hint">пока нет — Mnemai предложит первый, когда задача повторится</span>'}</div></div></div>
     <div class="card" data-sec="app" id="netcard"><h2>${tr("VPN и прокси")}</h2>
-      <p class="hint" style="margin:-4px 0 12px">${tr("Когда ИИ недоступны напрямую. По ключу Mnema подключается сама, держать приложение VPN открытым не нужно. Через VPN идут только запросы Mnema, остальной компьютер работает как раньше.")}</p>
+      <p class="hint" style="margin:-4px 0 12px">${tr("Когда ИИ недоступны напрямую. По ключу Mnemai подключается сама, держать приложение VPN открытым не нужно. Через VPN идут только запросы Mnemai, остальной компьютер работает как раньше.")}</p>
       <div class="vksvcs">${VK_SVCS.map((x, n) => {
         const [mk, c1, c2] = VK_LOOK[x] || ["•", "#64748b", "#94a3b8"];
         return `<button class="vksv ${x === (prof.vpn_service || "Hiddify") ? "on" : ""}" data-vks="${esc(x)}" style="--c1:${c1};--c2:${c2};--d:${n * 0.04}s"><span class="medal2"><span>${mk}</span></span><b ${x === "Другой сервис" ? "" : "data-noi18n"}>${esc(tr(x))}</b></button>`;
@@ -860,7 +860,7 @@ async function viewSettings(arg) {
       <div class="hint" style="margin-top:10px">${tr("Сейчас запросы идут")}: <b>${esc(ag.proxy_used || tr("напрямую"))}</b></div></div>
     <div class="card" data-sec="app" id="c-acts"><h2>${tr("Действия с файлами")}</h2>
       <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.tools !== false ? "on" : ""}" id="actsw"></button><div><b>${tr("Модель может читать и создавать файлы")}</b><p>${tr("Читать, искать, создавать и править файлы, делать PDF, Word и Excel, записывать в память. Программы не запускаются, в интернет ничего не уходит. Любую запись можно откатить: «Память» → «История».")}</p></div></div>
-      <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.tools_ask ? "on" : ""}" id="actask-sw"></button><div><b>${tr("Спрашивать разрешение на каждое действие")}</b><p>${tr("Выключено: Mnema делает сразу. Каждая запись всё равно в журнале и откатывается в «Память» → «История».")}</p></div></div>
+      <div class="tg" style="padding:0 0 10px;border:0"><button class="sw ${prof.tools_ask ? "on" : ""}" id="actask-sw"></button><div><b>${tr("Спрашивать разрешение на каждое действие")}</b><p>${tr("Выключено: Mnemai делает сразу. Каждая запись всё равно в журнале и откатывается в «Память» → «История».")}</p></div></div>
       <div class="set"><b>${tr("Где можно")}</b><div><div class="actfolders"><div class="actf"><span>${tr("Папка памяти")}</span><code data-noi18n>${esc(ACH.folder || "")}</code></div>${(prof.tool_folders || []).map((f, k) => `<div class="actf"><span>${tr("Рабочая папка")}</span><code data-noi18n>${esc(f)}</code><button class="btn g sm" data-actdel="${k}">${tr("Убрать")}</button></div>`).join("")}</div>
       <div class="row" style="margin-top:8px"><input id="actnew" class="inp" style="min-width:320px" placeholder="${tr("папка, где можно работать")}">${window.pywebview ? `<button class="btn l" id="actpick">${tr("Выбрать…")}</button>` : ""}<button class="btn g" id="actadd">${tr("Добавить")}</button></div></div></div></div>
     <div class="card" data-sec="app" id="c-team"><h2>${tr("Дополнительные папки памяти")}${hq("team")}</h2>
@@ -1044,7 +1044,9 @@ async function viewSettings(arg) {
     $$("[data-pdel]").forEach(
       (b) =>
         (b.onclick = async () => {
-          if (!(await ask("Удалить повторяющуюся задачу?", "Mnema забудет рецепт и перестанет делать задачу по нему.")))
+          if (
+            !(await ask("Удалить повторяющуюся задачу?", "Mnemai забудет рецепт и перестанет делать задачу по нему."))
+          )
             return;
           await post("/api/prompts/delete", { file: b.dataset.pdel });
           again();
@@ -1915,7 +1917,7 @@ function modelMenu(anchor) {
 }
 const PROV_HOW = {
   claude_code: {
-    t: "Нужны подписка Claude и Claude Code от Anthropic — отдельная программа или та, что идёт внутри приложения Claude Desktop. Mnema находит её сама. Если Claude Code найден, но не подключён, — нажми «Войти» на плитке и войди своей подпиской.",
+    t: "Нужны подписка Claude и Claude Code от Anthropic — отдельная программа или та, что идёт внутри приложения Claude Desktop. Mnemai находит её сама. Если Claude Code найден, но не подключён, — нажми «Войти» на плитке и войди своей подпиской.",
     u: "https://code.claude.com/docs/en/setup",
   },
   anthropic: {
@@ -2145,7 +2147,7 @@ function youCard(prof, ag) {
   </div>`;
 }
 
-// Mnema's own encryption: turn on (a new password twice), turn off (the password), change the password
+// Mnemai's own encryption: turn on (a new password twice), turn off (the password), change the password
 function cryptoModal(mode, done) {
   const pop = document.createElement("div");
   pop.className = "modal cryptm";

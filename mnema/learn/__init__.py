@@ -1,4 +1,4 @@
-"""Learning: Mnema watches where the owner already lives (AI chats, notes, mail, Telegram) and learns about him.
+"""Learning: Mnemai watches where the owner already lives (AI chats, notes, mail, Telegram) and learns about him.
 
 The owner owes it nothing: no forms, no interviews. He chooses only *how* it learns:
 

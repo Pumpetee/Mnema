@@ -1,7 +1,7 @@
 """What leaves the computer, and what never does.
 
 Redactor — before a request goes to a cloud AI, card numbers, passwords, keys and tokens, phone numbers, passport and
-SNILS numbers are swapped for labels like [ТЕЛЕФОН-1]. The AI answers with the labels, Mnema puts the real values
+SNILS numbers are swapped for labels like [ТЕЛЕФОН-1]. The AI answers with the labels, Mnemai puts the real values
 back on the computer. The values themselves never leave and are never written to the log.
 
 log()   — one line per cloud request in .mnema/outgoing.jsonl: when, to whom, why, how many characters, how much
@@ -66,7 +66,7 @@ ACCOUNT_RE = re.compile(r"(?i)(?<!\w)((?:р/?с|к/?с|сч[её]т\w*|account)\
 IBAN_RE = re.compile(r"\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){2,7}(?:\s?[A-Z0-9]{1,4})?\b")
 LABEL_RE = re.compile(r"\[(?:" + "|".join(LABELS.values()) + r")-\d+\]")
 NOTE = (
-    "Значения вида [ТЕЛЕФОН-1], [КАРТА-1], [ПАРОЛЬ-1], [КЛЮЧ-1], [СЧЁТ-1] — скрытые данные владельца: Mnema не "
+    "Значения вида [ТЕЛЕФОН-1], [КАРТА-1], [ПАРОЛЬ-1], [КЛЮЧ-1], [СЧЁТ-1] — скрытые данные владельца: Mnemai не "
     "отправляет их наружу и сама подставит в ответ. Если нужно сослаться на такое значение — пиши метку как есть, "
     "не выдумывай его."
 )

@@ -1,7 +1,7 @@
 """Preparing a small model on this computer (1–4B) before it answers — instead of training it.
 
 Why not fine-tuning: on a CPU it takes hours per memory update and barely helps a 1B model. What
-helps is what it reads: the full prompt (how Mnema is built, folder layout, markup rules, the ask format — ~5 000 chars)
+helps is what it reads: the full prompt (how Mnemai is built, folder layout, markup rules, the ask format — ~5 000 chars)
 is noise for a small model, it loses the facts in it, answers on behalf of the owner and agrees with things his
 memory contradicts. So a small model gets a short brief instead:
 - who it talks to (and that it is not that person);

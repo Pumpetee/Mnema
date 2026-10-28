@@ -16,7 +16,7 @@ The owner runs it like a round table:
 Where the discussion stands is kept in chat["consortium"]["state"]: status running / paused / waiting / done,
 round and the index of the next speaker.
 
-Every participant gets Mnema's memory under its own access rules (system_prompt by provider), so a model that may
+Every participant gets Mnemai's memory under its own access rules (system_prompt by provider), so a model that may
 not see money doesn't see it here either.
 """
 
@@ -127,7 +127,7 @@ RULES = """=== Консорциум ===
 SEARCH_RULE = """
 - Можешь проверить себя в интернете. Если опираешься на факт, цифру, дату или свежие сведения, в которых не уверен,
   или споришь с чужим утверждением о фактах — напиши ТОЛЬКО строку [поиск: короткий запрос] (не больше двух таких строк)
-  и больше ничего. Mnema найдёт и пришлёт выдержки, тогда ответишь, ставя номера источников [1], [2].
+  и больше ничего. Mnemai найдёт и пришлёт выдержки, тогда ответишь, ставя номера источников [1], [2].
   На мнения, советы и рассуждения не ищи."""
 
 SEARCH_DONE = """

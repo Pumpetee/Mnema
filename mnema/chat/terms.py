@@ -1,7 +1,7 @@
 """Pop-up hints for terms in answers.
 
 When hints are on, the model adds a short glossary after its answer: words and abbreviations the owner may not know,
-each explained in one plain sentence. Mnema cuts the glossary off the answer, keeps it next to the message, and the
+each explained in one plain sentence. Mnemai cuts the glossary off the answer, keeps it next to the message, and the
 chat underlines those words — hovering shows the explanation. Switched off in the chat itself ("Подсказки").
 """
 

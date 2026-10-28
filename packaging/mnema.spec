@@ -1,7 +1,7 @@
 # PyInstaller: one folder, two programs sharing it, on Windows, macOS and Linux.
-#   Mnema (.exe)      — the program (window + tray), no console
-#   mnema-cli (.exe)  — console helper: MCP server for Claude, hook, CLI commands
-# macOS: the folder is wrapped into Mnema.app.
+#   Mnemai (.exe)      — the program (window + tray), no console
+#   mnemai-cli (.exe)  — console helper: MCP server for Claude, hook, CLI commands
+# macOS: the folder is wrapped into Mnemai.app.
 # Build: python tools/package.py (it runs this spec)
 import os
 import sys
@@ -63,7 +63,7 @@ app_pyz = PYZ(app.pure)
 cli_pyz = PYZ(cli.pure)
 
 def win_version(file_name, description):
-    """Version resources of a Windows program: product name Mnema and the version, the same in every build."""
+    """Version resources of a Windows program: product name Mnemai and the version, the same in every build."""
     if sys.platform != "win32":
         return None
     from PyInstaller.utils.win32.versioninfo import (
@@ -76,7 +76,7 @@ def win_version(file_name, description):
         ffi=FixedFileInfo(filevers=nums, prodvers=nums),
         kids=[
             StringFileInfo([StringTable("040904B0", [
-                StringStruct("ProductName", "Mnema"),
+                StringStruct("ProductName", "Mnemai"),
                 StringStruct("FileDescription", description),
                 StringStruct("FileVersion", __version__),
                 StringStruct("ProductVersion", __version__),
@@ -88,29 +88,29 @@ def win_version(file_name, description):
     )
 
 
-app_exe = EXE(app_pyz, app.scripts, [], exclude_binaries=True, name="Mnema", icon=icon, console=False,
-              version=win_version("Mnema.exe", "Mnema"), upx=False)
-cli_exe = EXE(cli_pyz, cli.scripts, [], exclude_binaries=True, name="mnema-cli", icon=icon, console=True,
-              version=win_version("mnema-cli.exe", "Mnema command line"), upx=False)
+app_exe = EXE(app_pyz, app.scripts, [], exclude_binaries=True, name="Mnemai", icon=icon, console=False,
+              version=win_version("Mnemai.exe", "Mnemai"), upx=False)
+cli_exe = EXE(cli_pyz, cli.scripts, [], exclude_binaries=True, name="mnemai-cli", icon=icon, console=True,
+              version=win_version("mnemai-cli.exe", "Mnemai command line"), upx=False)
 
-coll = COLLECT(app_exe, app.binaries, app.datas, cli_exe, cli.binaries, cli.datas, name="Mnema", upx=False)
+coll = COLLECT(app_exe, app.binaries, app.datas, cli_exe, cli.binaries, cli.datas, name="Mnemai", upx=False)
 
 if MAC:
     from mnema import __version__
 
     app_bundle = BUNDLE(
         coll,
-        name="Mnema.app",
+        name="Mnemai.app",
         icon=icon,
         bundle_identifier="app.mnema.desktop",
         version=__version__,
         info_plist={
-            "CFBundleName": "Mnema",
-            "CFBundleDisplayName": "Mnema",
+            "CFBundleName": "Mnemai",
+            "CFBundleDisplayName": "Mnemai",
             "CFBundleShortVersionString": __version__,
             "NSHighResolutionCapable": True,
             "LSMinimumSystemVersion": "11.0",
-            "NSMicrophoneUsageDescription": "Mnema records meetings and voice commands when you press the microphone.",
-            "NSAppleEventsUsageDescription": "Mnema opens files and folders in Finder when you ask.",
+            "NSMicrophoneUsageDescription": "Mnemai records meetings and voice commands when you press the microphone.",
+            "NSAppleEventsUsageDescription": "Mnemai opens files and folders in Finder when you ask.",
         },
     )

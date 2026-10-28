@@ -98,7 +98,7 @@ function clipUrl() {
   pop.onclick = (e) => {
     if (e.target === pop) pop.remove();
   };
-  pop.innerHTML = `<div class="card"><div class="cmhead"><div class="cmic">${ic("globe")}</div><div><h2>${tr("Приложить страницу по ссылке")}</h2><p>${tr("Mnema прочитает страницу у себя и приложит её текст к вопросу.")}</p></div><button class="lmx" data-x>×</button></div>
+  pop.innerHTML = `<div class="card"><div class="cmhead"><div class="cmic">${ic("globe")}</div><div><h2>${tr("Приложить страницу по ссылке")}</h2><p>${tr("Mnemai прочитает страницу у себя и приложит её текст к вопросу.")}</p></div><button class="lmx" data-x>×</button></div>
     <div class="row" style="gap:8px"><input class="inp" id="cuq" placeholder="https://…" style="flex:1"><button class="btn" id="cugo">${tr("Приложить")}</button></div><div class="hint" id="cum" style="margin-top:8px"></div></div>`;
   const go = async () => {
     const u = $("#cuq", pop).value.trim();

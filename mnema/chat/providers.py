@@ -387,7 +387,7 @@ _strata_looked: set[str] = set()
 
 
 def find_strata(vault: Vault) -> None:
-    """Strata, once per start of Mnema: if it runs on its usual address and isn't connected yet, take its models.
+    """Strata, once per start of Mnemai: if it runs on its usual address and isn't connected yet, take its models.
     A quiet, quick look on this computer only; nothing happens if it isn't there."""
     import os
 

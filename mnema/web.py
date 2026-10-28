@@ -52,7 +52,7 @@ def public_url(url: str) -> bool:
 
 def _open(url: str, direct: bool, timeout: int, data: bytes | None = None, headers: dict | None = None):
     if not public_url(url):
-        raise ValueError("этот адрес внутри компьютера или локальной сети — такие Mnema не открывает")
+        raise ValueError("этот адрес внутри компьютера или локальной сети — такие Mnemai не открывает")
     req = urllib.request.Request(url, data=data, headers={**UA, **(headers or {})})
     if direct:
         return urllib.request.build_opener(urllib.request.ProxyHandler({})).open(req, timeout=timeout)
@@ -225,7 +225,7 @@ NEEDS_FRESH = re.compile(
 
 def needs_web(text: str) -> bool:
     """With «Интернет» off: does this question really need fresh data from the web (prices, news, versions, events)?
-    Then Mnema answers what it knows and offers to switch the search on."""
+    Then Mnemai answers what it knows and offers to switch the search on."""
     t = (text or "").strip()
     if not should_search(t):
         return False
@@ -235,7 +235,7 @@ def needs_web(text: str) -> bool:
 def should_search(text: str) -> bool:
     """«Интернет» allows searching; this decides whether this message needs it at all. The web is only for data that
     must be exact and current, never "just because". Small talk, questions about the owner or about
-    Mnema itself, general knowledge and tasks on given text don't; fresh outside facts (prices, rates, news, versions,
+    Mnemai itself, general knowledge and tasks on given text don't; fresh outside facts (prices, rates, news, versions,
     schedules, "сейчас / последний") and an explicit "найди" do."""
     t = (text or "").strip()
     if not t or URL_IN_TEXT.search(t):
@@ -247,7 +247,7 @@ def should_search(text: str) -> bool:
     if len(keywords(t).split()) < 2:
         return False
     if ABOUT_YOU.search(t) and not NEEDS_FRESH.search(t):
-        return False  # about Mnema itself: it answers from its own knowledge
+        return False  # about Mnemai itself: it answers from its own knowledge
     if ABOUT_ME.search(t) and not FRESH.search(t):
         return False  # about the owner: memory knows better than the web
     return bool(NEEDS_FRESH.search(t) or (FRESH.search(t) and FACTUAL.search(t)))

@@ -331,7 +331,7 @@ class TestV31(Base):
         init_vault(empty)
         t = self_knowledge(empty)
         self.assertIn("ничего не нужно заполнять", t.replace("не нужно ничего заполнять", "ничего не нужно заполнять"))
-        self.assertIn("Разговоры в Mnema", t)
+        self.assertIn("Разговоры в Mnemai", t)
         self.assertIn("Память почти пустая", t)
         self.assertIn("Мозг обучения выключен", t)
         s = S.load(empty)

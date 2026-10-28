@@ -1,4 +1,4 @@
-"""Questions from Mnema herself. When the conversation is about one of the owner's projects, now and then one short
+"""Questions from Mnemai herself. When the conversation is about one of the owner's projects, now and then one short
 question about it, shown as a card under the answer (like «Записать рецепт»): a status that is over a month old, or a
 project without a goal. Not more often than once in 40–120 minutes — after each question the pause is drawn anew —
 never in a conversation without learning, never with the memory off. The answer goes straight into the memory.

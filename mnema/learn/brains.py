@@ -507,7 +507,7 @@ class ApiBrain(_LLMBrain):
 
 
 class LocalBrain(_LLMBrain):
-    """The model built into Mnema (llama.cpp on this computer)."""
+    """The model built into Mnemai (llama.cpp on this computer)."""
 
     name = "local"
 

@@ -43,7 +43,7 @@ async function welcomeFlow() {
     }
   };
   const vs = (a, b) =>
-    `<div class="wvs"><div class="wcol bad"><span class="wlab">${tr("Обычный ИИ")}</span>${a}</div><div class="wcol good"><span class="wlab">Mnema</span>${b}</div></div>`;
+    `<div class="wvs"><div class="wcol bad"><span class="wlab">${tr("Обычный ИИ")}</span>${a}</div><div class="wcol good"><span class="wlab">Mnemai</span>${b}</div></div>`;
   const S = [
     {
       case: 1,
@@ -52,7 +52,7 @@ async function welcomeFlow() {
         `<div class="cb me">${tr("Продолжим пилот?")}</div><div class="cb ai ok">${tr("Да! 3 ноября, Казань.")}</div>`,
       ),
       t: tr("Не нужно объяснять заново"),
-      p: tr("Mnema помнит, кто ты, твои проекты и как с тобой говорить. Сразу к делу."),
+      p: tr("Mnemai помнит, кто ты, твои проекты и как с тобой говорить. Сразу к делу."),
     },
     {
       case: 2,
@@ -65,11 +65,11 @@ async function welcomeFlow() {
       // the measured case from the knowledge base: a 153 000-character contract, input tokens without and with the economy
       art: `<div class="wtok"><div class="wtokh">${ic("file")}<span>${tr("Вопрос по договору на 153 000 знаков")}</span><small>${tr("входные токены")}</small></div>
         <div class="wtrow raw"><span>${tr("Весь текст")}</span><i style="--w:100%"></i><b data-noi18n>29 643</b></div>
-        <div class="wtrow mn"><span>Mnema</span><i style="--w:21%"></i><b data-noi18n>6 159</b></div>
+        <div class="wtrow mn"><span>Mnemai</span><i style="--w:21%"></i><b data-noi18n>6 159</b></div>
         <div class="wtais">${["Claude", "ChatGPT", "Gemini", tr("на компьютере")].map((n, k) => `<em style="--k:${k}">${ic("check")}${esc(n)}</em>`).join("")}</div></div>`,
       t: tr("Меньше токенов в любом ИИ"),
       p: tr(
-        "Mnema отправляет только нужное: из памяти — то, что относится к вопросу, документ — подходящими кусками, старые сообщения — короче. На этом договоре входных токенов в 4,8 раза меньше.",
+        "Mnemai отправляет только нужное: из памяти — то, что относится к вопросу, документ — подходящими кусками, старые сообщения — короче. На этом договоре входных токенов в 4,8 раза меньше.",
       ),
     },
     {
@@ -85,7 +85,7 @@ async function welcomeFlow() {
         `<div class="cb me">${tr("Что решили по цене?")}</div><div class="cb ai ok">${tr("4 900 ₽, решено 20.10")}<em class="wpill">${tr("решение")}</em></div>`,
       ),
       t: tr("Помнит решения и сроки"),
-      p: tr("Договорённости, статусы, даты. Устаревшее Mnema переспросит, а не выдумает."),
+      p: tr("Договорённости, статусы, даты. Устаревшее Mnemai переспросит, а не выдумает."),
     },
     {
       case: 6,
@@ -97,7 +97,7 @@ async function welcomeFlow() {
       mem: true,
       t: tr("Включить память?"),
       p: tr(
-        "С памятью ИИ знают, кто ты и над чем работаешь, а Mnema учится по ходу разговора. Без неё — обычный чат: ничего не запоминается, всё остальное работает. Поменять можно в любой момент.",
+        "С памятью ИИ знают, кто ты и над чем работаешь, а Mnemai учится по ходу разговора. Без неё — обычный чат: ничего не запоминается, всё остальное работает. Поменять можно в любой момент.",
       ),
     },
     ...(cry && !cry.on
@@ -106,7 +106,7 @@ async function welcomeFlow() {
             lock: true,
             t: tr("Защитить память паролем?"),
             p: tr(
-              "Как в KeePass: заметки и разговоры шифруются на диске по AES-256, ключ получается из твоего пароля. Без пароля их не прочитать, даже скопировав папку. Шифрование открытое и проверенное, код Mnema открыт.",
+              "Как в KeePass: заметки и разговоры шифруются на диске по AES-256, ключ получается из твоего пароля. Без пароля их не прочитать, даже скопировав папку. Шифрование открытое и проверенное, код Mnemai открыт.",
             ),
           },
         ]
@@ -128,7 +128,7 @@ async function welcomeFlow() {
       ${s.case ? `<div class="wcase">${tr("Кейс")} ${s.case} ${tr("из")} ${S.filter((x) => x.case).length}</div>` : ""}<h2>${s.case === 1 && name ? esc(name) + ", " + s.t.charAt(0).toLowerCase() + s.t.slice(1) : s.t}</h2><p>${s.p}</p>
       ${
         s.mem
-          ? `<div class="wpick"><div class="wopt ${memChoice ? "on" : ""}" data-mem="1"><span class="wic ${memChoice ? "ok" : ""}">${ic(memChoice ? "check" : "user")}</span><div><b>${tr("Включить память")}</b><small>${tr("ИИ знают тебя, Mnema учится и запоминает")}</small></div></div><div class="wopt ${memChoice ? "" : "on"}" data-mem="0"><span class="wic ${memChoice ? "" : "ok"}">${ic(memChoice ? "eyeoff" : "check")}</span><div><b>${tr("Без памяти")}</b><small>${tr("обычный чат, ничего не запоминается")}</small></div></div></div>`
+          ? `<div class="wpick"><div class="wopt ${memChoice ? "on" : ""}" data-mem="1"><span class="wic ${memChoice ? "ok" : ""}">${ic(memChoice ? "check" : "user")}</span><div><b>${tr("Включить память")}</b><small>${tr("ИИ знают тебя, Mnemai учится и запоминает")}</small></div></div><div class="wopt ${memChoice ? "" : "on"}" data-mem="0"><span class="wic ${memChoice ? "" : "ok"}">${ic(memChoice ? "eyeoff" : "check")}</span><div><b>${tr("Без памяти")}</b><small>${tr("обычный чат, ничего не запоминается")}</small></div></div></div>`
           : ""
       }
       ${s.lock ? lockStep(lock) : ""}
@@ -256,7 +256,7 @@ async function welcomeFlow() {
   };
   draw();
 }
-// «Защитить память паролем?» on the first start: no password (default) or Mnema's own encryption, set right here
+// «Защитить память паролем?» on the first start: no password (default) or Mnemai's own encryption, set right here
 function pwScore(pw) {
   let s = 0;
   if (pw.length >= 8) s++;
@@ -326,7 +326,7 @@ function bindLockStep(pop, L, draw) {
       draw();
     };
 }
-// ---------------------------------------------------------------- may Mnema look outside itself; then what exactly
+// ---------------------------------------------------------------- may Mnemai look outside itself; then what exactly
 async function sourcesAsk() {
   if (APP.demo || $(".srcask")) return;
   if ($(".wlc")) {
@@ -349,15 +349,15 @@ async function sourcesAsk() {
   const sub = (k) => f[k].path || d.sources[k].note || "";
   const ask = () => {
     pop.innerHTML = `<div class="card"><div class="saart">${["💬", "📝", "📄", "✈️", "🌐"].map((e, k) => `<span style="--k:${k}">${e}</span>`).join("")}<i class="sahub">${ic("mem")}</i></div>
-    <h2>${tr("Можно Mnema смотреть другие программы?")}</h2>
-    <p>${tr("Так Mnema узнает тебя быстрее — по тому, что ты уже пишешь в других местах: чаты с ИИ, заметки, документы, Telegram, браузер. Всё читается здесь, на компьютере, и только то, что ты выберешь.")}</p>
-    <p class="hint">${tr("Если нет — Mnema учится только на разговорах с ней. Передумать можно в Настройки → Обучение.")}</p>
-    <div class="safoot"><button class="btn g" data-no>${tr("Нет, только Mnema")}</button><button class="btn" data-yes>${tr("Да, выберу что")}</button></div></div>`;
+    <h2>${tr("Можно Mnemai смотреть другие программы?")}</h2>
+    <p>${tr("Так Mnemai узнает тебя быстрее — по тому, что ты уже пишешь в других местах: чаты с ИИ, заметки, документы, Telegram, браузер. Всё читается здесь, на компьютере, и только то, что ты выберешь.")}</p>
+    <p class="hint">${tr("Если нет — Mnemai учится только на разговорах с ней. Передумать можно в Настройки → Обучение.")}</p>
+    <div class="safoot"><button class="btn g" data-no>${tr("Нет, только Mnemai")}</button><button class="btn" data-yes>${tr("Да, выберу что")}</button></div></div>`;
     $("[data-no]", pop).onclick = () => done(false, []);
     $("[data-yes]", pop).onclick = pick;
   };
   const pick = () => {
-    pop.innerHTML = `<div class="card"><h2>${tr("Что Mnema можно смотреть?")}</h2><p>${tr("Нашла это на твоём компьютере. Читаю только то, что отметишь.")}</p>
+    pop.innerHTML = `<div class="card"><h2>${tr("Что Mnemai можно смотреть?")}</h2><p>${tr("Нашла это на твоём компьютере. Читаю только то, что отметишь.")}</p>
     <div class="salist">${ids.map((k) => `<label class="sarow"><input type="checkbox" data-sid="${k}"><span><b>${esc(tr(d.sources[k].name))}</b><small data-noi18n>${esc(sub(k))}</small></span></label>`).join("")}</div>
     <div class="safoot"><button class="btn g" data-back>${tr("Назад")}</button><button class="btn" data-ok disabled>${tr("Включить отмеченное")}</button></div></div>`;
     const ok = $("[data-ok]", pop),
@@ -398,8 +398,8 @@ function memAsk() {
   pop.className = "modal memask";
   let on = false;
   const draw = () => {
-    pop.innerHTML = `<div class="card"><h2>${tr("Включить память?")}</h2><p class="hint">${tr("С памятью ИИ знают, кто ты и над чем работаешь, а Mnema учится по ходу разговора. Без неё — обычный чат: ничего не запоминается, всё остальное работает. Поменять можно в любой момент.")}</p>
-      <div class="wpick"><div class="wopt ${on ? "on" : ""}" data-m="1"><span class="wic ${on ? "ok" : ""}">${ic(on ? "check" : "user")}</span><div><b>${tr("Включить память")}</b><small>${tr("ИИ знают тебя, Mnema учится и запоминает")}</small></div></div><div class="wopt ${on ? "" : "on"}" data-m="0"><span class="wic ${on ? "" : "ok"}">${ic(on ? "eyeoff" : "check")}</span><div><b>${tr("Без памяти")}</b><small>${tr("обычный чат, ничего не запоминается")}</small></div></div></div>
+    pop.innerHTML = `<div class="card"><h2>${tr("Включить память?")}</h2><p class="hint">${tr("С памятью ИИ знают, кто ты и над чем работаешь, а Mnemai учится по ходу разговора. Без неё — обычный чат: ничего не запоминается, всё остальное работает. Поменять можно в любой момент.")}</p>
+      <div class="wpick"><div class="wopt ${on ? "on" : ""}" data-m="1"><span class="wic ${on ? "ok" : ""}">${ic(on ? "check" : "user")}</span><div><b>${tr("Включить память")}</b><small>${tr("ИИ знают тебя, Mnemai учится и запоминает")}</small></div></div><div class="wopt ${on ? "" : "on"}" data-m="0"><span class="wic ${on ? "" : "ok"}">${ic(on ? "eyeoff" : "check")}</span><div><b>${tr("Без памяти")}</b><small>${tr("обычный чат, ничего не запоминается")}</small></div></div></div>
       <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-ok>${tr("Готово")}</button></div></div>`;
     $$("[data-m]", pop).forEach((x) => (x.onclick = () => ((on = x.dataset.m === "1"), draw())));
     $("[data-ok]", pop).onclick = async () => {

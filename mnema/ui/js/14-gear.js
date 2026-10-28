@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------- the gear: learning, theme, language, tutorial, achievements
 function statusText() {
   if ((CHAT.chat && CHAT.chat.private) || (!CHAT.id && CHAT.newPrivate))
-    return tr("Без обучения — этот разговор Mnema не запоминает");
+    return tr("Без обучения — этот разговор Mnemai не запоминает");
   if (!STATUS.label) return tr("Напиши что угодно — я помню тебя и учусь по ходу");
   return STATUS.label + (STATUS.when ? " · " + STATUS.when : "");
 }
@@ -29,7 +29,7 @@ function drawGear() {
   // a conversation without learning: the dot turns orange while it is open
   const priv = !!$("#msgs") && typeof isPrivate === "function" && isPrivate();
   $(".gdot", b).className = "gdot " + (priv ? "priv" : STATUS.dot || "");
-  b.title = priv ? tr("Без обучения — этот разговор Mnema не запоминает") : tr("Обучение, тема, язык, туториал");
+  b.title = priv ? tr("Без обучения — этот разговор Mnemai не запоминает") : tr("Обучение, тема, язык, туториал");
   const q = $(".gq", b);
   q.hidden = true;
   if ($(".gearm")) gearFill($(".gearm"));
@@ -57,7 +57,7 @@ function gearFill(m) {
     th = themeCfg().mode,
     lg = LANGS.find((x) => x[0] === I18N.lang) || LANGS[0];
   // the memory itself is switched in one place, the memory block on the left; here only learning can pause
-  m.innerHTML = `<div class="ghead"><span class="ld ${STATUS.dot || ""}"></span><div><b>${esc(STATUS.label || tr("Mnema учится"))}</b><small>${esc(STATUS.when || "")}</small></div>${MEM.on ? `<button class="sw ${s.paused ? "" : "on"}" id="glon" title="${tr(s.paused ? "Продолжить обучение" : "Поставить обучение на паузу")}"></button>` : ""}</div>
+  m.innerHTML = `<div class="ghead"><span class="ld ${STATUS.dot || ""}"></span><div><b>${esc(STATUS.label || tr("Mnemai учится"))}</b><small>${esc(STATUS.when || "")}</small></div>${MEM.on ? `<button class="sw ${s.paused ? "" : "on"}" id="glon" title="${tr(s.paused ? "Продолжить обучение" : "Поставить обучение на паузу")}"></button>` : ""}</div>
     <div class="gmodes ${MEM.on ? "" : "dimmed"}">${QUICK.filter((q) => q[0] !== "pause")
       .map(
         ([k, t, d]) =>
@@ -77,9 +77,9 @@ function gearFill(m) {
     <div class="gline"><span>${tr("Язык")}</span><button class="glang" data-g="lang" data-noi18n>${flagSvg(lg[0])}<span>${lg[1]}</span>${ic("chev")}</button></div>
     <div class="gline"><span>${tr("Достижения")}</span><button class="sw ${achOn() ? "on" : ""}" id="gach"></button></div>
     ${LS.get("costtip", true) === false ? `<div class="gline"><span>${tr("Совет о дорогом разговоре")}</span><button class="sw" id="gcost"></button></div>` : ""}
-    ${LS.get("tour", true) ? "" : `<div class="gline"><span>${tr("Туториал в новых разговорах")}</span><button class="sw" id="gtour"></button></div><button class="gbig" data-g="tour">${ic("book")}<span>${tr("Как устроена Mnema")}</span><small>${tr("6 шагов, минута")}</small></button>`}
+    ${LS.get("tour", true) ? "" : `<div class="gline"><span>${tr("Туториал в новых разговорах")}</span><button class="sw" id="gtour"></button></div><button class="gbig" data-g="tour">${ic("book")}<span>${tr("Как устроена Mnemai")}</span><small>${tr("6 шагов, минута")}</small></button>`}
     <button class="gbig" data-g="memtour">${ic("lock")}<span>${tr("Как работает память")}</span><small>${tr(`${MEMTOUR.length} шагов`)}</small></button>
-    <button class="gbig" data-g="kb">${ic("book")}<span>${tr("Справочник Mnema")}</span><small>${tr("как всё устроено")}</small></button>
+    <button class="gbig" data-g="kb">${ic("book")}<span>${tr("Справочник Mnemai")}</span><small>${tr("как всё устроено")}</small></button>
     <button class="gbig" data-g="settings">${ic("set")}<span>${tr("Все настройки")}</span></button>`;
   if ($("#glon", m))
     $("#glon", m).onclick = async (e) => {
@@ -203,7 +203,7 @@ function tourSteps() {
   ];
   t[2] = [
     "Учится сама, когда память включена",
-    "Тогда Mnema замечает факты о тебе, уверенное записывает сама, спорное спрашивает. Сейчас память выключена — ничего не записывается.",
+    "Тогда Mnemai замечает факты о тебе, уверенное записывает сама, спорное спрашивает. Сейчас память выключена — ничего не записывается.",
     "feed",
     "Показать ленту",
   ];
@@ -216,7 +216,7 @@ function tourModal() {
   pop.onclick = (e) => {
     if (e.target === pop) pop.remove();
   };
-  pop.innerHTML = `<div class="tour"><div class="tc"><button class="lmx" data-x>×</button><h3>${tr("Как устроена Mnema")}</h3><div class="sub">${tr("6 шагов, минута чтения")}</div>${tourSteps()
+  pop.innerHTML = `<div class="tour"><div class="tc"><button class="lmx" data-x>×</button><h3>${tr("Как устроена Mnemai")}</h3><div class="sub">${tr("6 шагов, минута чтения")}</div>${tourSteps()
     .map(
       ([b, t, a, l], i) =>
         `<div class="st"><span class="n">${i + 1}</span><div><b>${esc(tr(b))}</b><p>${esc(tr(t))}</p></div><button data-tour="${a}">${esc(tr(l))}</button></div>`,
@@ -247,7 +247,7 @@ function tourModal() {
   );
 }
 
-// «Справочник Mnema»: the knowledge base Mnema answers from about itself, sections on the left, search on top
+// «Справочник Mnemai»: the knowledge base Mnemai answers from about itself, sections on the left, search on top
 async function kbModal(q0) {
   let secs = [];
   try {
@@ -259,7 +259,7 @@ async function kbModal(q0) {
   if (!secs.length) return toast(tr("Справочник не найден"));
   const pop = document.createElement("div");
   pop.className = "modal kbm";
-  pop.innerHTML = `<div class="card kbc"><div class="kbh"><span class="kbic">${ic("book")}</span><div><h2>${tr("Справочник Mnema")}</h2><small>${tr("Как устроена и работает Mnema. По нему она отвечает на вопросы о себе.")}</small></div><button class="lmx" data-x>×</button></div>
+  pop.innerHTML = `<div class="card kbc"><div class="kbh"><span class="kbic">${ic("book")}</span><div><h2>${tr("Справочник Mnemai")}</h2><small>${tr("Как устроена и работает Mnemai. По нему она отвечает на вопросы о себе.")}</small></div><button class="lmx" data-x>×</button></div>
     <div class="kbs">${ic("search")}<input id="kbq" placeholder="${tr("Поиск по справочнику")}" value="${esc(q0 || "")}"></div>
     <div class="kbb"><nav class="kbn" id="kbn"></nav><article class="kbt" id="kbt"></article></div></div>`;
   document.body.appendChild(pop);

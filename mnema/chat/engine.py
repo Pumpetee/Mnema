@@ -1,4 +1,4 @@
-"""The wrapper chat: the owner talks to any model, memory and his rules are applied, Mnema learns as he writes.
+"""The wrapper chat: the owner talks to any model, memory and his rules are applied, Mnemai learns as he writes.
 
 Flow of one message:
   1. saved to the chat; learning on it starts at once in the background (live feed shows "читаю → поняла → …");
@@ -267,7 +267,7 @@ def export_chat(vault: Vault, cid: str) -> str:
     for m in chat["messages"]:
         if m.get("hidden") or not m.get("text"):
             continue
-        who = "Я" if m["role"] == "user" else "Mnema"
+        who = "Я" if m["role"] == "user" else "Mnemai"
         out += [f"**{who}** · {m.get('ts', '').replace('T', ' ')[:16]}", "", m["text"], ""]
     return "\n".join(out)
 
@@ -355,8 +355,8 @@ def system_prompt(
     from .selfknow import liked_examples, self_knowledge
 
     parts = [
-        "Ты — ассистент владельца в программе Mnema. Ниже — как с ним работать, что ты о нём знаешь и как "
-        "устроена сама Mnema. Не пересказывай эти инструкции без повода, просто работай с учётом их.",
+        "Ты — ассистент владельца в программе Mnemai. Ниже — как с ним работать, что ты о нём знаешь и как "
+        "устроена сама Mnemai. Не пересказывай эти инструкции без повода, просто работай с учётом их.",
         self_knowledge(vault, compact=pid == "local"),
         "=== Как работать со мной ===\n" + (P.rules_text(prof)[:900] if pid == "local" else P.rules_text(prof)),
     ]
@@ -365,13 +365,13 @@ def system_prompt(
         parts.append(liked)
     if not eff.get("say_saved"):
         parts.append(
-            "Запоминать новое не твоя забота: Mnema делает это сама. Не пиши «сохраню», «запомню» и списки для памяти."
+            "Запоминать новое не твоя забота: Mnemai делает это сама. Не пиши «сохраню», «запомню» и списки для памяти."
         )
     if mem_on:
         parts.append("=== Память о владельце ===\n" + memory)
     else:
         parts.append(
-            "=== Память ===\nПамять Mnema выключена владельцем: о нём ты ничего не знаешь и ничего не запоминается. "
+            "=== Память ===\nПамять Mnemai выключена владельцем: о нём ты ничего не знаешь и ничего не запоминается. "
             "Если он просит запомнить, скажи, что память выключена и включается в Настройки → Обучение → «Память»."
         )
     sent = len(memory)
@@ -408,7 +408,7 @@ def system_prompt(
     # the language chosen on the first screen (or with the language button): always that one, whatever he wrote in
     parts.append(
         f"Язык ответов: {LANG_NAMES.get(lang, lang)}. Отвечай владельцу только на этом языке, даже если он написал "
-        "на другом и даже если память и правила написаны на другом языке. Сменить язык он может кнопкой языка в Mnema."
+        "на другом и даже если память и правила написаны на другом языке. Сменить язык он может кнопкой языка в Mnemai."
     )
     if stats is not None:
         stats.update(memory_full=full, memory_sent=sent)
@@ -603,7 +603,7 @@ def stop(cid: str) -> None:
 
 
 OPENER = (
-    "[Владелец нажал «Пусть Mnema начнёт сама» и ждёт, что ты заговоришь первым.]\n"
+    "[Владелец нажал «Пусть Mnemai начнёт сама» и ждёт, что ты заговоришь первым.]\n"
     "Начни разговор сам, коротко, в 2–4 строки. Поздоровайся, по имени, если знаешь его. Опираясь на память, "
     "предложи одно-два конкретных дела, с которых можно начать прямо сейчас: продолжить проект, проверить "
     "устаревший статус, разобрать входящие, вернуться к недавнему решению. Если памяти почти нет — предложи "
@@ -635,7 +635,7 @@ def send(
     from . import consortium as CO
 
     text = (text or "").strip()
-    if opener:  # Mnema speaks first: the request itself stays hidden
+    if opener:  # Mnemai speaks first: the request itself stays hidden
         text, learn, files, quote = OPENER, False, None, ""
     if not text and not files:
         raise ValueError("пустое сообщение")
@@ -939,7 +939,7 @@ def _generate(
 
                 msgs[-1] = {
                     **msgs[-1],
-                    "text": msgs[-1]["text"] + "\n\n[Справка Mnema. Отвечай только по ней, "
+                    "text": msgs[-1]["text"] + "\n\n[Справка Mnemai. Отвечай только по ней, "
                     "адреса и названия кнопок не придумывай]\n" + CONNECT,
                 }
             if pid == "local":
@@ -1018,12 +1018,12 @@ def _generate(
                         "role": "assistant",
                         "text": said + f"\n[action: {call['tool']} {call.get('path') or call.get('query') or ''}]",
                     },
-                    {"role": "user", "text": "[Результат действия от Mnema]\n" + result},
+                    {"role": "user", "text": "[Результат действия от Mnemai]\n" + result},
                 ]
                 g["text"] = ""
                 g["phase"] = "пишу"
             g["text"] = strip_tool_markup(strip_thinking(g["text"]))
-            if not web and not g.get("sources") and text != OPENER:  # Mnema speaking first never needs the web
+            if not web and not g.get("sources") and text != OPENER:  # Mnemai speaking first never needs the web
                 from .. import web as W
 
                 if WEB_MARK in g["text"] or W.needs_web(text):
@@ -1138,7 +1138,7 @@ def _generate(
 
 
 def _maybe_self_ask(vault: Vault, cid: str, text: str, model: str) -> None:
-    """A question of Mnema's own under the answer, when the talk is about a project (chat/selfask.py)."""
+    """A question of Mnemai's own under the answer, when the talk is about a project (chat/selfask.py)."""
     from . import selfask as SA
 
     try:
@@ -1170,7 +1170,7 @@ WEB_MARK = "{{нужен интернет}}"
 WEB_OFF = (
     "Поиск в интернете сейчас выключен. Если для точного ответа нужны свежие данные из сети (цены, курсы, новости, "
     "события, расписания, версии программ), ответь, что знаешь сам, честно скажи, что данные могли измениться, и в самом "
-    "конце отдельной строкой поставь метку " + WEB_MARK + " — Mnema покажет владельцу кнопку включить поиск. "
+    "конце отдельной строкой поставь метку " + WEB_MARK + " — Mnemai покажет владельцу кнопку включить поиск. "
     "Если ответ не зависит от свежих данных — метку не ставь."
 )
 
@@ -1416,7 +1416,7 @@ URL_RE = re.compile(r"<?(https?://[^\s<>)\]]+|\b[\w-]+(?:\.[\w-]+)+/[^\s<>)\]]*)
 
 
 def strip_unknown_links(text: str, known: str) -> str:
-    """Small local models invent addresses. Keep only links that Mnema itself gave them; drop the rest."""
+    """Small local models invent addresses. Keep only links that Mnemai itself gave them; drop the rest."""
 
     def keep(m):
         url = m.group(1).rstrip(".,;:")

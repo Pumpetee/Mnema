@@ -335,15 +335,15 @@ class NothingIsLost(unittest.TestCase):
         from mnema import upgrade
 
         home = Path(tempfile.mkdtemp())
-        app = home / "Mnema"
+        app = home / "Mnemai"
         (app / "_internal").mkdir(parents=True)
-        (app / "Mnema.exe").write_bytes(b"MZ")
-        (app / "mnema-cli.exe").write_bytes(b"MZ")
-        mem = Vault(app / "Mnema")
+        (app / "Mnemai.exe").write_bytes(b"MZ")
+        (app / "mnemai-cli.exe").write_bytes(b"MZ")
+        mem = Vault(app / "Mnemai")
         init_vault(mem)
         remember(mem, "Важный факт владельца", "profile:Кто я")
         self.assertTrue(upgrade.remove_dir(app))
-        self.assertFalse((app / "Mnema.exe").exists())
+        self.assertFalse((app / "Mnemai.exe").exists())
         self.assertFalse((app / "_internal").exists())
         self.assertIn("Важный факт владельца", (mem.root / "70 Memory/Profile.md").read_text(encoding="utf-8"))
 
@@ -351,14 +351,14 @@ class NothingIsLost(unittest.TestCase):
         from mnema import upgrade
 
         home = Path(tempfile.mkdtemp())
-        (home / "Mnema" / "_internal").mkdir(parents=True)
-        (home / "Mnema" / "Mnema.exe").write_bytes(b"MZ")
+        (home / "Mnemai" / "_internal").mkdir(parents=True)
+        (home / "Mnemai" / "Mnemai.exe").write_bytes(b"MZ")
         from unittest import mock
 
         with mock.patch.dict(os.environ, {"USERPROFILE": str(home), "HOME": str(home)}):
             p = upgrade.free_memory_path()
         self.assertFalse(upgrade.is_app_dir(p))
-        self.assertNotIn(home / "Mnema", [p, *p.parents])
+        self.assertNotIn(home / "Mnemai", [p, *p.parents])
 
     def test_a_file_saved_by_notepad_does_not_break_memory(self):  # QA 11
         v = _vault()
@@ -453,7 +453,7 @@ class NothingIsLost(unittest.TestCase):
 
 
 class MissingMemoryAtStart(unittest.TestCase):
-    """QA 28: the memory folder of the last run is gone — Mnema says so instead of starting over."""
+    """QA 28: the memory folder of the last run is gone — Mnemai says so instead of starting over."""
 
     def test_start_screen(self):
         from mnema import desktop
@@ -925,9 +925,9 @@ class FirstRun(unittest.TestCase):
         api = desktop.App.Api.__new__(desktop.App.Api)
         api._app = App()
         base = tempfile.mkdtemp()
-        cases = {"": "Укажи папку", "   ": "Укажи папку", "Mnema": "полный путь"}
+        cases = {"": "Укажи папку", "   ": "Укажи папку", "Mnemai": "полный путь"}
         if sys.platform == "win32":  # names and drives Windows forbids; macOS and Linux allow them
-            cases.update({base + "\\a<b": "не разрешает", "Q:\\Mnema": "Диска", base + "\\CON": "не разрешает"})
+            cases.update({base + "\\a<b": "не разрешает", "Q:\\Mnemai": "Диска", base + "\\CON": "не разрешает"})
         for path, word in cases.items():
             r = api.create(path, "", "", {"lang": "ru"})
             self.assertIsInstance(r, str, path)
@@ -1075,22 +1075,22 @@ class UpdateKeepsConnections(unittest.TestCase):
         from mnema import upgrade
 
         d = Path(tempfile.mkdtemp())
-        old, new = d / "Old" / "Mnema", d / "Programs" / "Mnema"
+        old, new = d / "Old" / "Mnemai", d / "Programs" / "Mnemai"
         for x in (old, new):
             (x / "_internal").mkdir(parents=True)
-            (x / "Mnema.exe").write_bytes(b"MZ")
-            (x / "mnema-cli.exe").write_bytes(b"MZ")
+            (x / "Mnemai.exe").write_bytes(b"MZ")
+            (x / "mnemai-cli.exe").write_bytes(b"MZ")
         cfg = d / "claude_desktop_config.json"
         other = {"command": "C:\\other\\tool.exe", "args": []}
         cfg.write_text(
             json.dumps(
-                {"mcpServers": {"mnema": {"command": str(old / "mnema-cli.exe"), "args": ["mcp"]}, "other": other}}
+                {"mcpServers": {"mnema": {"command": str(old / "mnemai-cli.exe"), "args": ["mcp"]}, "other": other}}
             ),
             encoding="utf-8",
         )
         moved = upgrade.move_mcp([old], new, {"claude-desktop": cfg})
         data = json.loads(cfg.read_text(encoding="utf-8"))
-        self.assertEqual(data["mcpServers"]["mnema"]["command"], str(new / "mnema-cli.exe"))
+        self.assertEqual(data["mcpServers"]["mnema"]["command"], str(new / "mnemai-cli.exe"))
         self.assertEqual(data["mcpServers"]["other"], other)
         self.assertEqual(moved, ["claude-desktop"])
 

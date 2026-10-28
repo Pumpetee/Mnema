@@ -75,7 +75,7 @@ class Server:
             from . import crypt
 
             if crypt.attach(self.vault.root) == "locked":
-                return "Память зашифрована: открой Mnema и введи пароль — тогда память снова доступна."
+                return "Память зашифрована: открой Mnemai и введи пароль — тогда память снова доступна."
         c = get_client(self.vault, self.client_id)
         if not c.enabled:
             return "Доступ к памяти для этого ассистента выключен владельцем."
@@ -153,7 +153,7 @@ class Server:
                 result = {
                     "protocolVersion": asked if asked in PROTOCOLS else PROTOCOLS[0],
                     "capabilities": {"tools": {"listChanged": False}},
-                    "serverInfo": {"name": "mnema", "version": __version__},
+                    "serverInfo": {"name": "mnemai", "version": __version__},
                     "instructions": INSTRUCTIONS,
                 }
             elif method == "ping":

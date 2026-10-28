@@ -1,4 +1,4 @@
-"""Mnema's own encryption of the memory folder: notes and personal service files encrypted on disk, readable by Mnema
+"""Mnemai's own encryption of the memory folder: notes and personal service files encrypted on disk, readable by Mnemai
 with the key, never written plain while the folder is locked; password change, removal, an interrupted pass."""
 
 import json
@@ -25,7 +25,7 @@ def raw(p: Path) -> bytes:
 
 
 def forget_keys():
-    """As if Mnema started again: no key in memory."""
+    """As if Mnemai started again: no key in memory."""
     crypt._keys.clear()
     crypt._tried.clear()
 
@@ -64,7 +64,7 @@ class Crypt(unittest.TestCase):
         self.assertEqual(
             raw(self.v.service / "chats" / "scan.pdf"), b"%PDF-1.4 binary", "binary files stay as they are"
         )
-        # Mnema reads them as before
+        # Mnemai reads them as before
         self.assertIn("тайна", (self.v.service / "chats" / "c1.json").read_text(encoding="utf-8"))
         self.assertTrue(any("Пилот" in n.body for n in self.v.notes()))
 
@@ -90,7 +90,7 @@ class Crypt(unittest.TestCase):
     def test_locked_reads_fail_and_nothing_is_written_plain(self):
         self.enable()
         forget_keys()
-        v = Vault(self.v.root)  # a fresh start: no saved key, no running Mnema
+        v = Vault(self.v.root)  # a fresh start: no saved key, no running Mnemai
         self.assertTrue(crypt.locked(v.root))
         with self.assertRaises(crypt.Locked):
             self.note.read_text(encoding="utf-8")
@@ -197,7 +197,7 @@ class Crypt(unittest.TestCase):
         srv = Server(self.v, "claude")  # started before the folder was encrypted
         self.enable()
         self.assertIn("Пилот", srv.call("memory_search", {"query": "Пилот"}))
-        forget_keys()  # no saved key, no running Mnema
+        forget_keys()  # no saved key, no running Mnemai
         self.assertIn("зашифрована", srv.call("memory_search", {"query": "Пилот"}))
 
     def test_selftest_of_the_built_program(self):

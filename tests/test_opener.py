@@ -1,4 +1,4 @@
-""" "Let Mnema start": the AI speaks first, the request behind it stays hidden. Fake data only."""
+""" "Let Mnemai start": the AI speaks first, the request behind it stays hidden. Fake data only."""
 
 import os
 import shutil
@@ -49,9 +49,9 @@ class TestOpener(unittest.TestCase):
         self.assertTrue(user.get("hidden"))
         self.assertEqual(ai["text"], "Привет! Продолжим пилот CRM? С чего начнём?")
         system, msgs = self.calls[0]
-        self.assertIn("Пусть Mnema начнёт сама", msgs[-1]["text"])
+        self.assertIn("Пусть Mnemai начнёт сама", msgs[-1]["text"])
         self.assertIn("три автосервиса", system)  # it starts from the memory
-        self.assertNotIn("Пусть Mnema начнёт сама", CH.export_chat(self.v, r["chat"]))
+        self.assertNotIn("Пусть Mnemai начнёт сама", CH.export_chat(self.v, r["chat"]))
         self.assertNotEqual(chat["title"][:20], CH.OPENER[:20])
         self.assertFalse(ai.get("needs_web"))  # speaking first never asks for the internet
         self.assertNotIn("Поиск в интернете сейчас выключен", system)

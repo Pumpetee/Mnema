@@ -109,10 +109,12 @@ def run_interview(vault: Vault, answers: dict | None = None) -> None:
 
 def mcp_command(vault: Vault, client: str = "claude") -> tuple[str, list[str], dict]:
     args = ["mcp", "--client", client, "--vault", str(vault.root)]
-    if getattr(sys, "frozen", False):  # installed program: the console helper next to Mnema.exe (Mnema on macOS/Linux)
+    if getattr(
+        sys, "frozen", False
+    ):  # installed program: the console helper next to Mnemai.exe (Mnemai on macOS/Linux)
         from . import osapi
 
-        return str(Path(sys.executable).with_name(osapi.exe("mnema-cli"))), args, {}
+        return str(Path(sys.executable).with_name(osapi.exe("mnemai-cli"))), args, {}
     return sys.executable, ["-m", "mnema", *args], {"PYTHONPATH": str(REPO)}
 
 
@@ -135,8 +137,37 @@ def mcp_configs() -> dict[str, Path]:
 
 
 def connected() -> dict[str, bool]:
-    """Which AIs already have Mnema as an MCP server."""
-    return {k: "mnema" in _json_servers(p) for k, p in mcp_configs().items()}
+    """Which AIs already have Mnemai as an MCP server."""
+    return {k: bool({"mnemai", "mnema"} & set(_json_servers(p))) for k, p in mcp_configs().items()}
+
+
+def migrate_mcp(configs: dict | None = None) -> list[str]:
+    """Прежняя Mnema записывала себя в Claude и Cursor под именем mnema. Запись переименовывается в mnemai,
+    а установленная программа подставляет путь к своему mnemai-cli. Остальные серверы не трогаются."""
+    moved = []
+    for name, cfg in (configs if configs is not None else mcp_configs()).items():
+        try:
+            data = json.loads(Path(cfg).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        servers = data.get("mcpServers")
+        if not isinstance(servers, dict) or "mnema" not in servers:
+            continue
+        srv = servers.pop("mnema")
+        if getattr(sys, "frozen", False) and str(srv.get("command", "")).lower().endswith(
+            ("mnema-cli.exe", "mnema-cli")
+        ):
+            from . import osapi
+
+            srv["command"] = str(Path(sys.executable).with_name(osapi.exe("mnemai-cli")))
+        servers.setdefault("mnemai", srv)
+        try:
+            shutil.copy(cfg, str(cfg) + ".bak")
+            Path(cfg).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+            moved.append(name)
+        except OSError:
+            continue
+    return moved
 
 
 def install(target: str, vault: Vault, apply: bool, config: str | None) -> None:
@@ -144,11 +175,12 @@ def install(target: str, vault: Vault, apply: bool, config: str | None) -> None:
     if target in ("claude-desktop", "cursor"):  # both keep MCP servers in a JSON file of the same shape
         cfg = Path(config) if config else mcp_configs()[target]
         data = json.loads(cfg.read_text(encoding="utf-8")) if cfg.exists() else {}
-        data.setdefault("mcpServers", {})["mnema"] = {"command": cmd, "args": args, "env": env}
+        data.setdefault("mcpServers", {}).pop("mnema", None)
+        data["mcpServers"]["mnemai"] = {"command": cmd, "args": args, "env": env}
         if not apply:
             out(
                 f"Запишу в {cfg}:\n"
-                + json.dumps(data["mcpServers"]["mnema"], ensure_ascii=False, indent=2)
+                + json.dumps(data["mcpServers"]["mnemai"], ensure_ascii=False, indent=2)
                 + "\nДобавь --apply."
             )
             return
@@ -160,7 +192,7 @@ def install(target: str, vault: Vault, apply: bool, config: str | None) -> None:
     elif target == "claude-code":
         claude = shutil.which("claude")
         envs = [x for k, val in env.items() for x in ("-e", f"{k}={val}")]
-        line = ["claude", "mcp", "add", "--scope", "user", *envs, "mnema", "--", cmd, *args]
+        line = ["claude", "mcp", "add", "--scope", "user", *envs, "mnemai", "--", cmd, *args]
         if not apply or not claude:
             out(
                 "Выполню:\n"
@@ -182,7 +214,7 @@ def main(argv: list[str] | None = None) -> None:
     # --vault is accepted both before and after the command: "mnema --vault X mcp" and "mnema mcp --vault X".
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--vault", default=argparse.SUPPRESS)
-    ap = argparse.ArgumentParser(prog="mnema", description="Mnema — память для любого ИИ", parents=[common])
+    ap = argparse.ArgumentParser(prog="mnemai", description="Mnemai — память для любого ИИ", parents=[common])
     sub = ap.add_subparsers(dest="cmd", required=True)
     sp = lambda name: sub.add_parser(name, parents=[common])  # noqa: E731
     p = sp("init")

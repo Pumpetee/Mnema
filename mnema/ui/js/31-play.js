@@ -1,6 +1,6 @@
-// Things to try and to show: «Поделиться карточкой», «С памятью и без», «Насколько Mnema тебя знает», «Знакомство»,
-// «Прожарка». A card is a picture with the result, Mnema's mark and the link — no memory goes into it by itself.
-const SHARE_URL = "github.com/Pumpetee/Mnema";
+// Things to try and to show: «Поделиться карточкой», «С памятью и без», «Насколько Mnemai тебя знает», «Знакомство»,
+// «Прожарка». A card is a picture with the result, Mnemai's mark and the link — no memory goes into it by itself.
+const SHARE_URL = "github.com/Pumpetee/Mnemai";
 
 function cardWrap(x, text, maxW, maxLines) {
   const words = String(text || "")
@@ -60,7 +60,7 @@ function cardCanvas({ kind = "", title = "", big = "", sub = "", lines = [] }) {
   x.textAlign = "left";
   x.textBaseline = "alphabetic";
   x.font = `800 30px ${font}`;
-  x.fillText("Mnema", 136, 96);
+  x.fillText("Mnemai", 136, 96);
   if (kind) {
     x.font = `700 20px ${font}`;
     x.fillStyle = "#c4b5fd";
@@ -144,7 +144,7 @@ function shareCard(spec, postText) {
   };
   $("[data-a='save']", pop).onclick = async () => {
     try {
-      const r = await post("/api/share/save", { png: url, name: "Mnema " + (spec.kind || "") });
+      const r = await post("/api/share/save", { png: url, name: "Mnemai " + (spec.kind || "") });
       toast(tr("Сохранила") + ": " + r.path);
     } catch (e) {
       toast(e.message);
@@ -166,7 +166,7 @@ async function compareView(question) {
   const pop = document.createElement("div");
   pop.className = "modal plpop cmppop";
   const q0 = question || tr("Что ты знаешь обо мне? И что мне важнее всего сделать на этой неделе?");
-  pop.innerHTML = `<div class="card"><button class="lmx" data-x>×</button><div class="plhead"><span class="plic">${ic("eye")}</span><div><h2>${tr("С памятью и без")}</h2><p class="hint">${tr("Один вопрос — подключённые ИИ отвечают дважды: как обычный чат, ничего о тебе не зная, и через Mnema, с твоей памятью.")}</p></div></div>
+  pop.innerHTML = `<div class="card"><button class="lmx" data-x>×</button><div class="plhead"><span class="plic">${ic("eye")}</span><div><h2>${tr("С памятью и без")}</h2><p class="hint">${tr("Один вопрос — подключённые ИИ отвечают дважды: как обычный чат, ничего о тебе не зная, и через Mnemai, с твоей памятью.")}</p></div></div>
     <div class="cmpq"><input class="inp" id="cmpq" value="${esc(q0)}"><button class="btn" id="cmpgo">${tr("Сравнить")}</button></div>
     <div id="cmpres"></div></div>`;
   const close = () => pop.remove();
@@ -193,7 +193,7 @@ async function compareView(question) {
           `<div class="cmpcol"><div class="cmpname"><i style="background:${spkColor(r.ref)}"></i><b data-noi18n>${esc(r.name)}</b></div>${
             r.error
               ? `<p class="err">${linkSettings(esc(r.error))}</p>`
-              : `<div class="cmpa plain"><small>${tr("Без памяти")}</small><div class="md">${md(r.plain || "—")}</div></div><div class="cmpa mine"><small>${ic("check")}${tr("С Mnema")}</small><div class="md">${md(r.mine || "—")}</div></div>`
+              : `<div class="cmpa plain"><small>${tr("Без памяти")}</small><div class="md">${md(r.plain || "—")}</div></div><div class="cmpa mine"><small>${ic("check")}${tr("С Mnemai")}</small><div class="md">${md(r.mine || "—")}</div></div>`
           }</div>`,
       )
       .join("")}</div>
@@ -207,11 +207,11 @@ async function compareView(question) {
               title: d.question,
               lines: [
                 tr("Без памяти") + ": " + ok.plain.replace(/[#*_`>]/g, ""),
-                tr("С Mnema") + ": " + ok.mine.replace(/[#*_`>]/g, ""),
+                tr("С Mnemai") + ": " + ok.mine.replace(/[#*_`>]/g, ""),
               ],
               sub: ok.name,
             },
-            tr("Спросил ИИ одно и то же дважды: как обычный чат и через Mnema, с моей памятью. Разница видна сразу."),
+            tr("Спросил ИИ одно и то же дважды: как обычный чат и через Mnemai, с моей памятью. Разница видна сразу."),
           )
         : toast(tr("Нечем делиться: ни один ИИ не ответил"));
   };
@@ -219,7 +219,7 @@ async function compareView(question) {
   $("#cmpq", pop).onkeydown = (e) => e.key === "Enter" && go();
 }
 
-// ---------------------------------------------------------------- «Насколько Mnema тебя знает»
+// ---------------------------------------------------------------- «Насколько Mnemai тебя знает»
 async function quizView() {
   let d;
   try {
@@ -234,7 +234,7 @@ async function quizView() {
   document.body.appendChild(pop);
   const items = d.items || [];
   if (items.length < 3) {
-    pop.innerHTML = `<div class="card"><button class="lmx" data-x>×</button><div class="plhead"><span class="plic">${ic("hint")}</span><div><h2>${tr("Насколько Mnema тебя знает")}</h2><p class="hint">${tr("Пока Mnema знает о тебе слишком мало для квиза. Пройди знакомство — пара минут, и будет что проверять.")}</p></div></div>
+    pop.innerHTML = `<div class="card"><button class="lmx" data-x>×</button><div class="plhead"><span class="plic">${ic("hint")}</span><div><h2>${tr("Насколько Mnemai тебя знает")}</h2><p class="hint">${tr("Пока Mnemai знает о тебе слишком мало для квиза. Пройди знакомство — пара минут, и будет что проверять.")}</p></div></div>
       <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="qzint">${tr("Познакомиться")}</button></div></div>`;
     $("[data-x]", pop).onclick = close;
     $("#qzint", pop).onclick = () => (close(), interviewView());
@@ -284,7 +284,7 @@ async function quizView() {
       pct = Math.round((yes / n) * 100);
     pop.innerHTML = `<div class="card qzdone"><button class="lmx" data-x>×</button>
       <div class="qzscore">${yes}<small>/${n}</small></div>
-      <h2>${tr("Насколько Mnema тебя знает")}: ${pct}%</h2>
+      <h2>${tr("Насколько Mnemai тебя знает")}: ${pct}%</h2>
       <p class="hint">${fixed ? tr("Поправлено фактов") + ": " + fixed + ". " + tr("Память теперь точнее — каждый ИИ получит уже исправленное.") : tr("Всё верно — память в порядке.")}</p>
       <div class="row" style="justify-content:center;gap:8px;margin-top:16px"><button class="btn" id="qzsh">${tr("Поделиться")}</button><button class="btn l" id="qzagain">${tr("Ещё раз")}</button><button class="btn g" data-x2>${tr("Закрыть")}</button></div></div>`;
     $("[data-x]", pop).onclick = close;
@@ -295,13 +295,13 @@ async function quizView() {
         {
           kind: tr("Квиз"),
           big: `${yes}/${n}`,
-          title: `${tr("Насколько Mnema меня знает")}: ${pct}%`,
+          title: `${tr("Насколько Mnemai меня знает")}: ${pct}%`,
           lines: [
             tr("Проверил") + " " + n + " " + tr("фактов из своей памяти"),
             fixed ? tr("Поправил") + " " + fixed + " — " + tr("память стала точнее") : tr("Ни одного промаха"),
           ],
         },
-        `${tr("Проверил, насколько Mnema меня знает")}: ${yes} ${tr("из")} ${n}. ${tr("Одна память для Claude, ChatGPT, Gemini и локальных моделей — и всё на моём компьютере.")}`,
+        `${tr("Проверил, насколько Mnemai меня знает")}: ${yes} ${tr("из")} ${n}. ${tr("Одна память для Claude, ChatGPT, Gemini и локальных моделей — и всё на моём компьютере.")}`,
       );
   };
   draw();
@@ -371,7 +371,7 @@ async function interviewView() {
     pop.innerHTML = `<div class="card qzdone"><button class="lmx" data-x>×</button>
       <div class="qzscore">${r.facts}</div>
       <h2>${tr("фактов о тебе в памяти")}</h2>
-      <p class="hint">${tr("Теперь любой ИИ, с которым ты говоришь через Mnema, знает, кто ты, что сейчас главное и как с тобой говорить. Дальше память пополняется сама.")}</p>
+      <p class="hint">${tr("Теперь любой ИИ, с которым ты говоришь через Mnemai, знает, кто ты, что сейчас главное и как с тобой говорить. Дальше память пополняется сама.")}</p>
       <div class="row" style="justify-content:center;gap:8px;margin-top:16px;flex-wrap:wrap"><button class="btn" id="intport">${tr("Мой портрет")}</button><button class="btn l" id="intcmp">${tr("С памятью и без")}</button><button class="btn g" id="intsh">${tr("Поделиться")}</button></div></div>`;
     $("[data-x]", pop).onclick = close;
     $("#intport", pop).onclick = () => (close(), go("memory", "portrait"));
@@ -381,11 +381,11 @@ async function interviewView() {
         {
           kind: tr("Знакомство"),
           big: String(r.facts),
-          title: tr("фактов обо мне Mnema узнала за") + " " + mins + " " + tr("мин"),
+          title: tr("фактов обо мне Mnemai узнала за") + " " + mins + " " + tr("мин"),
           lines: [tr("Теперь Claude, ChatGPT и Gemini знают, кто я и как со мной говорить")],
         },
         tr(
-          "Познакомился с Mnema за пару минут — теперь все мои ИИ знают меня одинаково, а память лежит у меня на компьютере.",
+          "Познакомился с Mnemai за пару минут — теперь все мои ИИ знают меня одинаково, а память лежит у меня на компьютере.",
         ),
       );
     if (typeof refreshStatus === "function") refreshStatus();

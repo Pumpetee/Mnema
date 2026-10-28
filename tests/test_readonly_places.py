@@ -1,4 +1,4 @@
-"""Mnema writes only into its own memory: an Obsidian vault and the extra memory folders are read, never changed;
+"""Mnemai writes only into its own memory: an Obsidian vault and the extra memory folders are read, never changed;
 Telegram is read only in the chats the owner picked."""
 
 import datetime as dt
@@ -44,7 +44,7 @@ class ObsidianStaysUntouched(unittest.TestCase):
         (self.obs / "Проекты").mkdir()
         (self.obs / "Проекты" / "Склад.md").write_text("# Склад\n\nАренда склада в Кольцово.\n", encoding="utf-8")
         (self.obs / "Дом.md").write_text("# Дом\n\nРемонт кухни.\n", encoding="utf-8")
-        self.v = Vault(base / "Mnema")
+        self.v = Vault(base / "Mnemai")
         init_vault(self.v)
         P.save(self.v, {"extra_folders": [str(self.obs)], "tool_folders": [str(self.obs)], "memory_on": True})
         extra._idx.clear()

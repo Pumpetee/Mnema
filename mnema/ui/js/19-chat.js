@@ -291,11 +291,11 @@ async function refreshStatus() {
         ? "Память выключена"
         : lon
           ? br.ok
-            ? "Mnema учится"
-            : "Mnema запоминает только сказанное прямо"
+            ? "Mnemai учится"
+            : "Mnemai запоминает только сказанное прямо"
           : s.paused
-            ? "Mnema на паузе"
-            : "Mnema не учится",
+            ? "Mnemai на паузе"
+            : "Mnemai не учится",
     );
     STATUS.when = !MEM.on
       ? tr("обычный чат, ничего не запоминается")
@@ -346,7 +346,7 @@ function quickModes(anchor) {
   const cur = s.paused ? "pause" : (Object.values(s.sources).find((x) => x.enabled) || {}).mode || "mixed";
   const m = document.createElement("div");
   m.className = "menu qmodes";
-  m.innerHTML = `<div class="qh"><b>Как Mnema учится</b>${hq("learn")}<button class="sw ${s.paused ? "" : "on"}" id="qlon" title="${tr(s.paused ? "Включить обучение" : "Поставить на паузу")}" style="margin-left:auto"></button></div>${QUICK.map(([k, t, d]) => `<button data-q="${k}" class="${k === cur ? "cur" : ""}"><span><b>${t}</b><small>${d}</small></span>${k === cur ? ic("check") : ""}</button>`).join("")}
+  m.innerHTML = `<div class="qh"><b>Как Mnemai учится</b>${hq("learn")}<button class="sw ${s.paused ? "" : "on"}" id="qlon" title="${tr(s.paused ? "Включить обучение" : "Поставить на паузу")}" style="margin-left:auto"></button></div>${QUICK.map(([k, t, d]) => `<button data-q="${k}" class="${k === cur ? "cur" : ""}"><span><b>${t}</b><small>${d}</small></span>${k === cur ? ic("check") : ""}</button>`).join("")}
     <hr><button data-q="feed">${ic("eye")}<span>Что поняла и почему</span></button><button data-q="tune">${ic("gear")}<span>Настроить</span></button>`;
   document.body.appendChild(m);
   const r = anchor.getBoundingClientRect();
@@ -401,7 +401,7 @@ function learnPop(anchor) {
   const auto = (Object.values(s.sources).find((x) => x.enabled) || {}).mode || "mixed";
   const p = document.createElement("div");
   p.className = "pop";
-  p.innerHTML = `<div class="row" style="margin:0;justify-content:space-between"><h4>Как Mnema учится</h4><button class="sw ${s.paused ? "" : "on"}" id="pp" title="Учиться"></button></div>
+  p.innerHTML = `<div class="row" style="margin:0;justify-content:space-between"><h4>Как Mnemai учится</h4><button class="sw ${s.paused ? "" : "on"}" id="pp" title="Учиться"></button></div>
    <div class="hint">${s.paused ? "Обучение на паузе" : "Учусь, пока ты пишешь, и проверяю подключённые источники"}</div>
    <div class="lab">Чем понимает речь</div>${seg("brain", BRAINS, s.brain.kind)}${br.level !== "ok" ? `<div class="hint" style="margin-top:6px;color:${br.level === "bad" ? "var(--bad)" : "var(--ink3)"}">${esc(br.message)}</div>` : ""}
    <div class="lab">Насколько сама учится</div>${seg("autonomy", { observe: "смотрит", approve: "спрашивает", mixed: "уверенное сама", quiet: "всё сама" }, auto)}
@@ -909,7 +909,7 @@ function plusMenu(anchor) {
     <div class="sep"></div><div class="mhead">${tr("Попробовать")}</div>
     <button data-p="roast">${ic("fire")}<span>${tr("Прожарка")}<small>${tr("несколько ИИ жёстко и по делу разбирают идею, резюме или текст")}</small></span></button>
     <button data-p="compare">${ic("eye")}<span>${tr("С памятью и без")}<small>${tr("один вопрос — два ответа рядом")}</small></span></button>
-    <button data-p="quiz">${ic("check")}<span>${tr("Насколько Mnema тебя знает")}<small>${tr("квиз по твоей памяти")}</small></span></button>
+    <button data-p="quiz">${ic("check")}<span>${tr("Насколько Mnemai тебя знает")}<small>${tr("квиз по твоей памяти")}</small></span></button>
     <button data-p="interview">${ic("user")}<span>${tr("Знакомство")}<small>${tr("пара минут вопросов — и память не пустая")}</small></span></button>
 `;
   document.body.appendChild(m);
@@ -1058,7 +1058,7 @@ async function renderEmpty() {
 
   const TOUR = tourSteps();
   const tour = LS.get("tour", true)
-    ? `<div class="tour"><div class="tc"><h3>Как устроена Mnema</h3><div class="sub">6 шагов, минута чтения</div>${TOUR.map(([b, t, a, l], i) => `<div class="st"><span class="n">${i + 1}</span><div><b>${esc(b)}</b><p>${esc(t)}</p></div><button data-tour="${a}">${esc(l)}</button></div>`).join("")}<div class="foot">${tr("Показывается в каждом новом разговоре.")} <a href="#" id="tourx">${tr("Больше не показывать")}</a> · ${tr("вернуть — в шестерёнке справа вверху")}</div></div></div>`
+    ? `<div class="tour"><div class="tc"><h3>Как устроена Mnemai</h3><div class="sub">6 шагов, минута чтения</div>${TOUR.map(([b, t, a, l], i) => `<div class="st"><span class="n">${i + 1}</span><div><b>${esc(b)}</b><p>${esc(t)}</p></div><button data-tour="${a}">${esc(l)}</button></div>`).join("")}<div class="foot">${tr("Показывается в каждом новом разговоре.")} <a href="#" id="tourx">${tr("Больше не показывать")}</a> · ${tr("вернуть — в шестерёнке справа вверху")}</div></div></div>`
     : "";
   if (CHAT.cons) {
     $("#msgs").innerHTML =
@@ -1066,7 +1066,7 @@ async function renderEmpty() {
     return;
   }
   $("#msgs").innerHTML =
-    `<div class="emptyw">${tour}<div class="esp"></div><div class="ebot"><div class="startline">${tr("Начни диалог")}</div>${CHAT.model ? `<div class="opener"><button class="btn l" id="opener">${ic("chat")}${tr("Пусть Mnema начнёт сама")}</button></div>` : ""}</div></div>`;
+    `<div class="emptyw">${tour}<div class="esp"></div><div class="ebot"><div class="startline">${tr("Начни диалог")}</div>${CHAT.model ? `<div class="opener"><button class="btn l" id="opener">${ic("chat")}${tr("Пусть Mnemai начнёт сама")}</button></div>` : ""}</div></div>`;
   statusLine();
   const TA = {
     memory: () => go("memory"),
@@ -1237,7 +1237,7 @@ function actionAsk(cid, p) {
   if (!live) return;
   live.insertAdjacentHTML(
     "afterend",
-    `<div class="actask" id="actask" data-id="${esc(p.id)}"><div class="actaskh">${ic(p.write ? "edit" : "file")}<b>${tr("Mnema хочет")}</b></div>
+    `<div class="actask" id="actask" data-id="${esc(p.id)}"><div class="actaskh">${ic(p.write ? "edit" : "file")}<b>${tr("Mnemai хочет")}</b></div>
      <div class="actwhat" data-noi18n>${esc(p.what)}</div>
      <div class="row"><button class="btn sm" data-act="yes">${tr("Да")}</button><button class="btn g sm" data-act="always">${tr("Да для этого разговора")}</button><button class="btn g sm" data-act="no">${tr("Нет")}</button></div>
      <p class="hint">${tr("Программы не запускаются, в интернет ничего не уходит. Запись можно откатить в «Память» → «История».")}</p></div>`,
@@ -1394,7 +1394,7 @@ function costTipHtml(c) {
     <div class="askh"><span class="aski">${ic("coin")}</span><span class="askl">${tr("Совет")}</span><button class="ctx" data-ct="hide" title="${tr("Скрыть в этом разговоре")}">${ic("x")}</button></div>
     <div class="askq">${tr("Разговор стал дорогим")}</div>
     <div class="ctbars"><div class="ctrow"><span>${tr("Первый ответ")}</span><i style="--w:${w}%"></i><b>${esc(fmtTok(t.first, true))}</b></div><div class="ctrow hot"><span>${tr("Последний")}</span><i style="--w:100%"></i><b>${esc(fmtTok(t.last, true))}</b></div></div>
-    <div class="askw">${tr("Последний ответ обошёлся")} <b>${tr("в")} ${k} ${tr("раза дороже первого")}</b>: ${tr("каждый ответ заново перечитывает весь разговор.")} ${c.private ? tr("Новая сессия начнётся с чистого листа, память и правила останутся.") : tr("Mnema сначала выучит этот разговор, потом начнёт новую сессию с чистого листа — память и правила останутся.")}</div>
+    <div class="askw">${tr("Последний ответ обошёлся")} <b>${tr("в")} ${k} ${tr("раза дороже первого")}</b>: ${tr("каждый ответ заново перечитывает весь разговор.")} ${c.private ? tr("Новая сессия начнётся с чистого листа, память и правила останутся.") : tr("Mnemai сначала выучит этот разговор, потом начнёт новую сессию с чистого листа — память и правила останутся.")}</div>
     <div class="laskacts"><button class="btn sm" data-ct="go">${go}</button><button class="btn g sm" data-ct="off">${tr("Больше не показывать")}</button></div></div>`;
 }
 function bindCostTip() {
@@ -1548,7 +1548,7 @@ function renderChat(c) {
   drawModelLabel();
   $("#ctitle").textContent = c.title || tr("Разговор");
   const ms = c.messages || [];
-  // a question card of Mnema's own under the answer doesn't take «the last answer» away from it
+  // a question card of Mnemai's own under the answer doesn't take «the last answer» away from it
   const tail = ms.length - 1 - (ms.length && ms[ms.length - 1].kind === "self_ask" ? 1 : 0);
   const lastAi = ms
     .slice(0, tail + 1)
@@ -2020,7 +2020,7 @@ function sessExplain() {
       <div class="sxpt"><span class="sxic">${ic("plus")}</span><div><b>${tr("Новый разговор")}</b><p>${tr("Новая тема в той же сессии. Модель начинает с чистого листа: знает тебя по памяти, но не тащит переписку других разговоров.")}</p></div></div>
       <div class="sxpt"><span class="sxic">${ic("session")}</span><div><b>${tr("Новая сессия")}</b><p>${tr("Новая группа разговоров в списке: новый день или новая задача. Контекст тоже начинается с чистого листа.")}</p></div></div>
     </div>
-    <p class="sxtip">${ic("hint")}<span>${tr("Сменилась тема — начни новый разговор. Нужное из прошлого Mnema уже записала в память.")}</span></p>
+    <p class="sxtip">${ic("hint")}<span>${tr("Сменилась тема — начни новый разговор. Нужное из прошлого Mnemai уже записала в память.")}</span></p>
     <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-x>${tr("Понятно")}</button></div></div>`;
   document.body.appendChild(pop);
   const close = () => pop.remove();

@@ -79,7 +79,7 @@ class ActionsTest(unittest.TestCase):
         self.assertTrue(target.exists())
         self.assertIn("шаг один", target.read_text(encoding="utf-8"))
         self.assertIn("создать файл", owner.asked[0])
-        self.assertIn("[Результат действия от Mnema]", s.seen[1][1][-1]["text"])
+        self.assertIn("[Результат действия от Mnemai]", s.seen[1][1][-1]["text"])
         msgs = CH.load_chat(v, r["chat"])["messages"]
         self.assertTrue(any(m.get("kind") == "action" and "Создала файл" in m["text"] for m in msgs))
         self.assertEqual(msgs[-1]["text"], "Создала план.")

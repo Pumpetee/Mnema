@@ -37,7 +37,7 @@ class MemorySwitch(unittest.TestCase):
         self.assertIn("SECRETFACT", CH.system_prompt(on, "anthropic", log=False))
         prompt = CH.system_prompt(off, "anthropic", log=False)
         self.assertNotIn("SECRETFACT", prompt)
-        self.assertIn("Память Mnema выключена", prompt)
+        self.assertIn("Память Mnemai выключена", prompt)
 
     def test_off_mcp_gives_nothing_and_writes_nothing(self):
         v = _vault(False)

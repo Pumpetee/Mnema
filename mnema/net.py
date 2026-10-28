@@ -1,10 +1,10 @@
 """Network: every request to an AI, search engine or model download goes through the owner's proxy.
 
-Sources, in order: the proxy set in Mnema (first screen, tray, settings) → the variables the app already has →
+Sources, in order: the proxy set in Mnemai (first screen, tray, settings) → the variables the app already has →
 the Windows system proxy that VPN clients (Hiddify, v2rayN, Clash…) set. "off" means a direct connection.
 
 HTTP and SOCKS5 proxies are supported, with a login and password. The password is kept in the Windows secret store,
-never in the memory folder. Claude Code and some libraries only speak HTTP proxies, so for SOCKS5 Mnema runs a tiny
+never in the memory folder. Claude Code and some libraries only speak HTTP proxies, so for SOCKS5 Mnemai runs a tiny
 bridge on 127.0.0.1: an HTTP proxy that forwards every connection through the SOCKS5 server. Local servers
 (the built-in model) are never sent through the proxy.
 """
@@ -182,7 +182,7 @@ def check(setting: str, password: str = "", timeout: int = 15) -> dict:
     t = time.time()
     try:
         urlopen(
-            urllib.request.Request("https://api.anthropic.com/", headers={"User-Agent": "Mnema"}),
+            urllib.request.Request("https://api.anthropic.com/", headers={"User-Agent": "Mnemai"}),
             timeout=timeout,
             setting=s or "off",
         )

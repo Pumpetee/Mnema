@@ -61,7 +61,7 @@ function engineCard(e) {
     </div></details></div>
    <div class="card" data-sec="engine" id="engbg"><h2>${tr("В фоне")}</h2>
     <div class="tg"><button class="sw ${e.low ? "on" : ""}" id="englow"></button><div><b>${tr("Не мешать работе")}</b><p>${tr("Локальная модель работает с низким приоритетом: окна и браузер не тормозят.")}</p></div></div>
-    <div class="engcol1">${sl("learn", tr("Обучение в фоне"), 0, LEARN_STEPS.length - 1, 1, li, learnL(e.learn), tr("Как часто Mnema проверяет источники обучения."))}</div>
+    <div class="engcol1">${sl("learn", tr("Обучение в фоне"), 0, LEARN_STEPS.length - 1, 1, li, learnL(e.learn), tr("Как часто Mnemai проверяет источники обучения."))}</div>
    </div></div>`;
 }
 function bindEngine() {
@@ -176,7 +176,7 @@ async function outgoingModal(days) {
   pop.innerHTML = `<div class="card"><h2>${tr("Что ушло наружу")}<span class="hint">${tr("за")} ${days} ${tr("дн.")}</span><button class="mx" id="outx">×</button></h2>
    <div class="outsum"><div><b>${d.requests}</b><span>${tr("запросов к облачным ИИ")}</span></div><div><b>${fmtN(d.memory_kept)}</b><span>${tr("знаков памяти остались на компьютере")}</span></div><div><b>${fmtN(Object.values(d.redacted).reduce((a, b) => a + b, 0))}</b><span>${tr("секретов скрыто")}</span></div></div>
    ${by ? `<p class="hint">${tr("Кому")}: ${by}${Object.keys(d.redacted).length ? ` · ${tr("скрыто")}: ${redLine(d.redacted)}` : ""}</p>` : ""}
-   <div class="tg" style="padding:6px 0 10px;border:0"><button class="sw ${d.redact ? "on" : ""}" id="outred"></button><div><b>${tr("Скрывать секреты от облачных ИИ")}</b><p>${tr("Номера карт, пароли, ПИН-коды, ключи, телефоны, паспорта, СНИЛС, ИНН и счета заменяются метками до отправки, в том числе в поиске. Настоящие значения Mnema возвращает в ответ уже на компьютере. В этот отчёт они тоже не попадают.")}</p></div></div>
+   <div class="tg" style="padding:6px 0 10px;border:0"><button class="sw ${d.redact ? "on" : ""}" id="outred"></button><div><b>${tr("Скрывать секреты от облачных ИИ")}</b><p>${tr("Номера карт, пароли, ПИН-коды, ключи, телефоны, паспорта, СНИЛС, ИНН и счета заменяются метками до отправки, в том числе в поиске. Настоящие значения Mnemai возвращает в ответ уже на компьютере. В этот отчёт они тоже не попадают.")}</p></div></div>
    ${rows ? `<div class="outtbl"><table><tr><th>${tr("Когда")}</th><th>${tr("Кому")}</th><th>${tr("Зачем")}</th><th>${tr("Знаков")}</th><th>${tr("Память")}</th><th>${tr("Не видел")}</th><th>${tr("Скрыто")}</th></tr>${rows}</table></div>` : `<p class="hint">${tr("За эти дни ничего не уходило: работала только локальная модель или ты не писал.")}</p>`}
    <p class="hint">${tr("Локальная модель в отчёт не попадает: она на этом компьютере и ничего не отправляет.")}</p></div>`;
   $("#outx", pop).onclick = () => pop.remove();
@@ -279,17 +279,17 @@ ${tr("час записи ≈")} ${hour} ${tr("мин")}`
 function scribeStep(c) {
   const s = SCR_X.step;
   if (s === "rec")
-    return `<p class="mfd">${tr("Mnema пишет микрофон и звук компьютера двумя дорожками: в расшифровке сразу видно, где ты, а где собеседник, без угадывания по голосу. Можно не записывать, а загрузить готовый файл: mp3, m4a, wav, видео. Всё ложится в папку памяти «80 Meetings», в папку с датой и названием встречи.")}</p>
+    return `<p class="mfd">${tr("Mnemai пишет микрофон и звук компьютера двумя дорожками: в расшифровке сразу видно, где ты, а где собеседник, без угадывания по голосу. Можно не записывать, а загрузить готовый файл: mp3, m4a, wav, видео. Всё ложится в папку памяти «80 Meetings», в папку с датой и названием встречи.")}</p>
    <div class="tg" style="padding:6px 0 0;border:0"><button class="sw ${SCR_X.keep ? "on" : ""}" id="scrkeep"></button><div><b>${tr("Хранить аудио")}</b><p>${tr("Выключено: остаётся только текст, запись удаляется. Включено: файл встречи лежит рядом с расшифровкой.")}</p></div></div>`;
   if (s === "text")
-    return `<p class="mfd">${tr("Речь превращается в текст. На компьютере работает Whisper: бесплатно, запись никуда не уходит. Облачный Whisper быстрее и не грузит компьютер, но платный и получает запись. Тишину, выдуманные фразы и эхо из колонок Mnema вырезает сама.")}</p>
+    return `<p class="mfd">${tr("Речь превращается в текст. На компьютере работает Whisper: бесплатно, запись никуда не уходит. Облачный Whisper быстрее и не грузит компьютер, но платный и получает запись. Тишину, выдуманные фразы и эхо из колонок Mnemai вырезает сама.")}</p>
    <div class="shd"><b>${tr("Где")}</b><span class="hint">${tr("где расшифровывать")}</span></div>${scribePlans(c, c.mode, false, true)}
    ${c.mode !== "cloud" ? `<div class="shd"><b>${tr("Точность")}</b><span class="hint">${tr("на компьютере")}</span></div>${scribeQuality(c.quality)}` : ""}
    <details class="scrown"><summary>${tr("Облачный Whisper: свой адрес и ключ")}${c.cloud_ready ? ` · ✓ ${tr("готов")}: ${tr(c.cloud_from)}` : ""}</summary><div class="row" style="margin-top:6px"><input class="inp" id="scrbase" placeholder="https://…/v1" value="${esc(c.base || "")}" style="min-width:260px"><input class="inp" id="scrmodel" placeholder="whisper-1" value="${esc(c.model || "")}" style="width:150px"><input class="inp" id="scrkey" type="password" placeholder="${tr("ключ")}" style="width:200px"><button class="btn g sm" id="scrsave">${tr("Сохранить")}</button></div></details>`;
   if (s === "sum")
     return `<p class="mfd">${tr("Готовая расшифровка уходит одним сообщением выбранной модели: о чём встреча, что решили, какие задачи и за кем. Итоги приходят новым разговором в чате — там же можно попросить письмо участникам или план. Локальная модель — бесплатно и без интернета.")}</p>
    <div class="shd"><b>${tr("Кто подводит")}</b><span class="hint">${tr("итоги встречи")}</span></div><select class="inp" id="scrsum" style="max-width:420px"><option value="">${tr("модель текущего чата")}</option>${SCR_X.models.map((m) => `<option value="${esc(m.v)}" ${m.v === SCR_X.summary ? "selected" : ""}>${esc(m.l)}</option>`).join("")}</select>`;
-  return `<p class="mfd">${tr("Из встречи Mnema учится на твоих словах: решения, сроки, договорённости. Слова собеседника — только контекст, за тебя они не записываются. Насколько смело записывать — как в остальном обучении.")}</p>
+  return `<p class="mfd">${tr("Из встречи Mnemai учится на твоих словах: решения, сроки, договорённости. Слова собеседника — только контекст, за тебя они не записываются. Насколько смело записывать — как в остальном обучении.")}</p>
    <button class="btn g sm" id="scrlearn">${ic("book")}${tr("Настройки обучения")}</button>`;
 }
 function scribeCard(c) {
@@ -387,7 +387,7 @@ function syncCard(d) {
   const cloud = (k, name) => {
     const t = on(k),
       path = d.detected[k];
-    return `<div class="syncrow"><div><b>${name}</b><span class="hint" data-noi18n>${esc(t ? t.where : path ? path + "\\Mnema" : "")}</span>${t ? `<span class="hint">${esc(syncLast(t.last))}</span>` : path ? "" : `<span class="hint">${tr("Приложение не найдено на компьютере. Установи его и войди — папка появится сама.")}</span>`}</div>${t ? `<button class="btn g sm" data-sdel="${t.id}">${tr("Отключить")}</button>` : path ? `<button class="btn l sm" data-sadd="${k}">${tr("Включить")}</button>` : `<a class="btn g sm" href="${k === "gdrive" ? "https://www.google.com/drive/download/" : "https://www.dropbox.com/install"}" target="_blank">${tr("Скачать")}</a>`}</div>`;
+    return `<div class="syncrow"><div><b>${name}</b><span class="hint" data-noi18n>${esc(t ? t.where : path ? path + "\\Mnemai" : "")}</span>${t ? `<span class="hint">${esc(syncLast(t.last))}</span>` : path ? "" : `<span class="hint">${tr("Приложение не найдено на компьютере. Установи его и войди — папка появится сама.")}</span>`}</div>${t ? `<button class="btn g sm" data-sdel="${t.id}">${tr("Отключить")}</button>` : path ? `<button class="btn l sm" data-sadd="${k}">${tr("Включить")}</button>` : `<a class="btn g sm" href="${k === "gdrive" ? "https://www.google.com/drive/download/" : "https://www.dropbox.com/install"}" target="_blank">${tr("Скачать")}</a>`}</div>`;
   };
   const others = d.targets.filter((t) => t.kind === "folder" || t.kind === "station");
   return `<div class="card" data-sec="sync" id="synccard"><h2>${tr("Синхронизация")}${hq("sync")}<span class="hint">${tr("бесплатно")}</span></h2>
@@ -395,7 +395,7 @@ function syncCard(d) {
    ${cloud("gdrive", "Google Drive")}${cloud("dropbox", "Dropbox")}
    ${others.map((t) => `<div class="syncrow"><div><b>${esc(tr(t.name))}</b><span class="hint" data-noi18n>${esc(t.where)}</span><span class="hint">${esc(syncLast(t.last))}</span></div><button class="btn g sm" data-sdel="${t.id}">${tr("Отключить")}</button></div>`).join("")}
    <details style="margin-top:10px"><summary class="hint" style="cursor:pointer">${tr("Своя папка или MCP-станция")}</summary>
-    <div class="row" style="margin-top:8px"><input class="inp" id="sfold" placeholder="D:\\Облако\\Mnema" style="min-width:300px"><button class="btn l sm" id="sfadd">${tr("Добавить папку")}</button></div>
+    <div class="row" style="margin-top:8px"><input class="inp" id="sfold" placeholder="D:\\Облако\\Mnemai" style="min-width:300px"><button class="btn l sm" id="sfadd">${tr("Добавить папку")}</button></div>
     <div class="row" style="margin-top:8px"><input class="inp" id="surl" placeholder="https://mnema.example.com" style="min-width:300px"><input class="inp" id="stok" type="password" placeholder="${tr("ключ синхронизации")}" style="width:220px"><button class="btn l sm" id="ssadd">${tr("Подключить станцию")}</button></div>
     <div class="hint" style="margin-top:6px">${tr("Станция — твой сервер с копией памяти: компьютеры синхронизируются через неё, а любой агент подключается к памяти по MCP со своим ключом. Запуск на сервере")}: <code data-noi18n>mnema station --host 0.0.0.0</code></div></details>
    <div class="row" style="margin-top:12px"><button class="btn sm" id="snow" ${d.targets.length ? "" : "disabled"}>${tr("Синхронизировать сейчас")}</button><span class="hint">${tr("Сама — каждые")}</span><select class="inp" id="smin" style="width:auto">${[5, 10, 15, 30, 60].map((m) => `<option value="${m}" ${m === d.minutes ? "selected" : ""}>${m} ${tr("мин")}</option>`).join("")}</select></div></div>`;

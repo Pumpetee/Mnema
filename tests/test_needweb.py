@@ -1,4 +1,4 @@
-"""Internet off: Mnema notices when a question needs fresh data and offers the search; it knows its own map. Fake data."""
+"""Internet off: Mnemai notices when a question needs fresh data and offers the search; it knows its own map. Fake data."""
 
 import os
 import shutil
@@ -78,9 +78,9 @@ class TestNeedsWeb(unittest.TestCase):
 
     def test_questions_about_mnema_get_its_map(self):
         CH.send(self.v, "Как включить синхронизацию?", model="openai:gpt-4o", sync=True, web=False)
-        self.assertIn("Устройство Mnema", self.calls[-1])
+        self.assertIn("Устройство Mnemai", self.calls[-1])
         CH.send(self.v, "Напиши план пилота", model="openai:gpt-4o", sync=True, web=False)
-        self.assertNotIn("Устройство Mnema", self.calls[-1])
+        self.assertNotIn("Устройство Mnemai", self.calls[-1])
 
 
 if __name__ == "__main__":

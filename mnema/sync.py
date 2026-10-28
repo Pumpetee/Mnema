@@ -1,10 +1,10 @@
 """Free sync of the memory between computers, as open files (the owner's choice).
 
 Targets:
-- gdrive  — the folder of Google Drive for desktop («Мой диск» / «My Drive»), subfolder Mnema;
-- dropbox — the Dropbox folder (from Dropbox's own info.json), subfolder Mnema;
+- gdrive  — the folder of Google Drive for desktop («Мой диск» / «My Drive»), subfolder Mnemai;
+- dropbox — the Dropbox folder (from Dropbox's own info.json), subfolder Mnemai;
 - folder  — any folder (a NAS, a USB disk, another cloud client);
-- station — the owner's own Mnema station on a server (mnema station): the same memory over HTTP, plus MCP for any agent.
+- station — the owner's own Mnemai station on a server (mnema station): the same memory over HTTP, plus MCP for any agent.
 
 What travels: the memory notes (*.md) except the generated «10 Now» and «Index» and the per-computer «95 Saves»;
 conversations (.mnema/chats/*.json) and access rules (.mnema/clients.json). Never: keys (they live in Windows),
@@ -32,7 +32,7 @@ from .vault import GENERATED, SAVES, Vault
 
 KINDS = ("gdrive", "dropbox", "folder", "station")
 NAMES = {"gdrive": "Google Drive", "dropbox": "Dropbox", "folder": "Своя папка", "station": "MCP-станция"}
-SUB = "Mnema"
+SUB = "Mnemai"
 _lock = threading.Lock()
 _last: dict[str, dict] = {}
 
@@ -213,11 +213,11 @@ def target_of(vault: Vault, t: dict):
 
 
 class Sealed:
-    """A target for a memory encrypted by Mnema: what leaves this computer is the encrypted file, never the plain text.
+    """A target for a memory encrypted by Mnemai: what leaves this computer is the encrypted file, never the plain text.
 
-    Mnema reads its encrypted files as plain text (crypt hooks Path.read_bytes), so without this a synced copy of an
+    Mnemai reads its encrypted files as plain text (crypt hooks Path.read_bytes), so without this a synced copy of an
     encrypted memory would land in Google Drive or on a station as plain text. Files the encryption leaves open (pictures,
-    PDF, the settings Mnema needs before the password) go as they are. A station lists hashes of what it stores — the
+    PDF, the settings Mnemai needs before the password) go as they are. A station lists hashes of what it stores — the
     encrypted bytes — so the hash of the plain text each one stands for is kept here, next to the sync state."""
 
     def __init__(self, tgt, vault: Vault, tid: str):
@@ -467,7 +467,9 @@ def run(vault: Vault, only: str = "") -> list[dict]:
         if any(r.get("conflicts") for r in out):
             from . import scribe_cloud
 
-            scribe_cloud.notify("Mnema: при синхронизации заметка поменялась на двух устройствах — сохранил обе версии")
+            scribe_cloud.notify(
+                "Mnemai: при синхронизации заметка поменялась на двух устройствах — сохранил обе версии"
+            )
         return out
     finally:
         _lock.release()

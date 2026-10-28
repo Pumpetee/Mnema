@@ -1,4 +1,4 @@
-"""A demo memory to look around before trusting Mnema with your own life. Fictional person, no learning sources."""
+"""A demo memory to look around before trusting Mnemai with your own life. Fictional person, no learning sources."""
 
 from __future__ import annotations
 

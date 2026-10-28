@@ -28,7 +28,7 @@ MODES_RU = {
 
 SOURCES = {
     "mnema_chat": {
-        "name": "Разговоры в Mnema",
+        "name": "Разговоры в Mnemai",
         "group": "Разговоры с ИИ",
         "options": {},
         "note": "Твои сообщения и ответы ИИ прямо здесь, в чате. Учится сразу, пока ты пишешь.",
@@ -95,7 +95,7 @@ BRAINS = {
     "claude_code": "Claude Code, который уже стоит на компьютере",
     "api": "Свой ключ API (Anthropic или совместимый с OpenAI)",
     "ollama": "Локальная модель Ollama — ничего не уходит с компьютера",
-    "local": "Встроенная модель Mnema — ничего не уходит с компьютера",
+    "local": "Встроенная модель Mnemai — ничего не уходит с компьютера",
 }
 
 DEFAULT = {
@@ -113,8 +113,8 @@ DEFAULT = {
     "interval_minutes": 15,
     "max_episodes_per_run": 200,
     "initial": {"done": False, "days": 90},
-    # May Mnema look outside its own chat and memory folder (other programs, the browser, the web)? None — not asked
-    # yet, False — "только Mnema" (nothing else is read, whatever is switched on), True — what is ticked.
+    # May Mnemai look outside its own chat and memory folder (other programs, the browser, the web)? None — not asked
+    # yet, False — "только Mnemai" (nothing else is read, whatever is switched on), True — what is ticked.
     "outside": None,
     "found": {},  # found on this computer, off until the owner ticks it (learn/detect.py)
     "found_asked": True,  # false: the first launch still has to show the list
@@ -133,11 +133,11 @@ def _merge(base: dict, over: dict) -> dict:
     return out
 
 
-LOCAL_ONLY = ("mnema_chat", "corrections")  # learn inside Mnema itself, never outside it
+LOCAL_ONLY = ("mnema_chat", "corrections")  # learn inside Mnemai itself, never outside it
 
 
 def allowed(s: dict, sid: str) -> bool:
-    """A source really runs: switched on, and inside Mnema or the owner didn't say "только Mnema". Before the question
+    """A source really runs: switched on, and inside Mnemai or the owner didn't say "только Mnemai". Before the question
     nothing outside is on anyway: only the owner's own tick switches a source on."""
     src = s["sources"].get(sid) or {}
     return bool(

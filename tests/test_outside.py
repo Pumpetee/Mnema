@@ -1,4 +1,4 @@
-""" "Можно мне смотреть другие программы?": "нет" — only Mnema's own chat and corrections,
+""" "Можно мне смотреть другие программы?": "нет" — only Mnemai's own chat and corrections,
 whatever else is switched on; not asked yet — only what the owner ticked himself."""
 
 import tempfile

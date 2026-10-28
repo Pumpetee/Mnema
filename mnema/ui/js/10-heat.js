@@ -45,7 +45,7 @@ function heatPopFill(m, d) {
   m.innerHTML = `<div class="hhead lv-${d.level}"><span class="hic">${ic("thermo")}</span><div><b>${tr(HEAT_RU[d.level])}</b><small>${esc(tr(d.why))}</small></div></div>
    ${bar(d.cpu, tr("Процессор"))}${bar(d.model_cpu, tr("Из них модель"))}${bar(d.ram, tr("Память"))}
    <div class="hrow"><span>${tr("Температура")}</span><em class="wide">${d.temp != null ? d.temp + " °C" : tr("Windows не сообщает")}</em></div>
-   ${d.auto_cooled ? `<div class="hnote">${tr("Перегрев держался минуту — Mnema сама снизила приоритет модели, окна не тормозят.")}</div>` : ""}
+   ${d.auto_cooled ? `<div class="hnote">${tr("Перегрев держался минуту — Mnemai сама снизила приоритет модели, окна не тормозят.")}</div>` : ""}
    <div class="hacts"><button class="btn l sm" data-hc="cool" ${d.running ? "" : "disabled"}>${tr("Снизить нагрузку")}</button><button class="btn g sm" data-hc="stop" ${d.running ? "" : "disabled"}>${tr("Остановить модель")}</button></div>`;
   $$("[data-hc]", m).forEach(
     (x) =>

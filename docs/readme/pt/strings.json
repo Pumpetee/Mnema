@@ -1,6 +1,6 @@
 {
- "langs_intro": "O Mnema fala nove idiomas. A interface, a ajuda e as respostas da IA seguem o idioma que você escolher, mesmo quando você escreve em outro. Este README e o guia do Mnema existem em cada um deles.",
- "guide_btn": "Guia do Mnema",
+ "langs_intro": "O Mnemai fala nove idiomas. A interface, a ajuda e as respostas da IA seguem o idioma que você escolher, mesmo quando você escreve em outro. Este README e o guia do Mnemai existem em cada um deles.",
+ "guide_btn": "Guia do Mnemai",
  "guide_msg": "todas as telas e configurações",
  "badges": [
   "somente leitura",
@@ -12,7 +12,7 @@
   "Uma memória para todas as IAs",
   "Grátis, no seu computador, sem conta"
  ],
- "lead": "O Mnema lembra quem você é, no que está trabalhando, o que decidiu e como você gosta das respostas — e toda IA com quem você conversa recebe esse contexto. A memória é uma pasta de arquivos Markdown simples no seu computador. Sem nuvem, sem conta.",
+ "lead": "O Mnemai lembra quem você é, no que está trabalhando, o que decidiu e como você gosta das respostas — e toda IA com quem você conversa recebe esse contexto. A memória é uma pasta de arquivos Markdown simples no seu computador. Sem nuvem, sem conta.",
  "dl": [
   "Baixar para",
   "todos os arquivos"
@@ -57,11 +57,11 @@
   [
    "🧠 Ele conhece você",
    "memory",
-   "Retrato e mapa da memória: os tópicos são bolhas, e o tamanho mostra o quanto o Mnema sabe",
+   "Retrato e mapa da memória: os tópicos são bolhas, e o tamanho mostra o quanto o Mnemai sabe",
    [
-    "**Um retrato que toda IA lê primeiro:** quem você é, o que está construindo, como gosta de trabalhar. O Mnema escreve o retrato conforme aprende, e você pode corrigi-lo à mão.",
+    "**Um retrato que toda IA lê primeiro:** quem você é, o que está construindo, como gosta de trabalhar. O Mnemai escreve o retrato conforme aprende, e você pode corrigi-lo à mão.",
     "**Um mapa da memória:** cada tópico é uma bolha, uma pulsação indica que mudou recentemente, um cadeado indica que algumas IAs não o enxergam.",
-    "**Fatos antigos não se passam por novos:** cada fato leva a sua data, e o Mnema pergunta de novo sobre qualquer status com mais de um mês.",
+    "**Fatos antigos não se passam por novos:** cada fato leva a sua data, e o Mnemai pergunta de novo sobre qualquer status com mais de um mês.",
     "**Mais de uma pasta:** conecte um cofre do Obsidian ou uma pasta de equipe — somente leitura, o próprio programa bloqueia a escrita ali."
    ]
   ],
@@ -89,7 +89,7 @@
   [
    "🌱 Ele aprende sozinho",
    "learning",
-   "Você menciona algo de passagem, e o feed mostra o que o Mnema leu, entendeu e anotou, e por quê",
+   "Você menciona algo de passagem, e o feed mostra o que o Mnemai leu, entendeu e anotou, e por quê",
    [
     "**Certeza significa salvar:** um fato de que ele tem certeza (80% ou mais) é gravado na hora, e um duvidoso espera ser ouvido de novo.",
     "**O pessoal fica à parte:** dinheiro, saúde e assuntos privados vão para cartões com etiqueta que você pode esconder de qualquer IA.",
@@ -99,20 +99,20 @@
   [
    "✈️ Lê o Telegram, nunca escreve nele",
    "telegram",
-   "Telegram conectado somente para leitura: você escolhe os chats, e o Mnema aprende com eles",
+   "Telegram conectado somente para leitura: você escolhe os chats, e o Mnemai aprende com eles",
    [
-    "**Você escolhe os chats:** o Mnema aprende sobre você e as pessoas ao seu redor apenas com eles.",
-    "**Somente leitura, por design:** o cliente do Telegram dentro do Mnema só consegue ler; qualquer outro comando é recusado antes de ser enviado.",
-    "**Fica no seu computador:** o login é criptografado no armazenamento do sistema, e o Mnema não tem servidores próprios."
+    "**Você escolhe os chats:** o Mnemai aprende sobre você e as pessoas ao seu redor apenas com eles.",
+    "**Somente leitura, por design:** o cliente do Telegram dentro do Mnemai só consegue ler; qualquer outro comando é recusado antes de ser enviado.",
+    "**Fica no seu computador:** o login é criptografado no armazenamento do sistema, e o Mnemai não tem servidores próprios."
    ]
   ],
   [
    "📉 Economiza tokens",
    "tokens",
-   "Uma pergunta sobre um contrato de 153.000 caracteres: 29.643 tokens de entrada com o texto inteiro, 6.159 com o Mnema",
+   "Uma pergunta sobre um contrato de 153.000 caracteres: 29.643 tokens de entrada com o texto inteiro, 6.159 com o Mnemai",
    [
     "**Só o que importa sai daqui:** memória, documentos e páginas da web são lidos no seu computador, e o modelo recebe apenas as partes relevantes.",
-    "**Medido:** em uma pergunta sobre um contrato de 153.000 caracteres, o texto inteiro custou 29.643 tokens de entrada; o Mnema enviou 6.159, e só a resposta do Mnema estava certa.",
+    "**Medido:** em uma pergunta sobre um contrato de 153.000 caracteres, o texto inteiro custou 29.643 tokens de entrada; o Mnemai enviou 6.159, e só a resposta do Mnemai estava certa.",
     "**Visível sempre:** embaixo de cada resposta você vê quantos tokens foram economizados."
    ],
    560
@@ -164,6 +164,6 @@
   "Segurança"
  ],
  "lic": "Licença",
- "foot": "Se o Mnema lembra de algo útil para você, uma ⭐ ajuda outras pessoas a encontrá-lo.",
+ "foot": "Se o Mnemai lembra de algo útil para você, uma ⭐ ajuda outras pessoas a encontrá-lo.",
  "qr": "Escaneie para abrir o repositório"
 }

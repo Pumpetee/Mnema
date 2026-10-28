@@ -1,24 +1,24 @@
 <div align="center">
 
-<img src="docs/img/brand/logo.svg" width="112" alt="Mnema">
+<img src="docs/img/brand/logo.svg" width="112" alt="Mnemai">
 
-# Mnema
+# Mnemai
 
 <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2600&pause=900&color=A78BFA&center=true&vCenter=true&width=720&height=46&lines=One%20memory%20for%20every%20AI;Free%2C%20on%20your%20computer%2C%20no%20account" alt="One memory for every AI">
 
-<a href="https://github.com/Pumpetee/Mnema/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnema?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnema/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnema/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnema?style=flat-square&color=ec4899" alt="last commit"></a>
+<a href="https://github.com/Pumpetee/Mnemai/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnemai?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnemai/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnemai/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnemai/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnemai?style=flat-square&color=ec4899" alt="last commit"></a>
 
 <img src="https://img.shields.io/badge/MCP-Claude%20%C2%B7%20Cursor-7c3aed?style=flat-square&logo=modelcontextprotocol&logoColor=white" alt="MCP: Claude · Cursor"> <img src="https://img.shields.io/badge/Obsidian-read%20only-7c3aed?style=flat-square&logo=obsidian&logoColor=white" alt="Obsidian: read only"> <img src="https://img.shields.io/badge/Telegram-read%20only-229ED9?style=flat-square&logo=telegram&logoColor=white" alt="Telegram: read only"> <img src="https://img.shields.io/badge/AES--256-encryption-15803d?style=flat-square" alt="AES-256: encryption"> <img src="https://img.shields.io/badge/Markdown-your%20files-555555?style=flat-square&logo=markdown&logoColor=white" alt="Markdown: your files"> <img src="https://img.shields.io/badge/Python-3.13-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python: 3.13">
 
-<a href="docs/guide/en.md"><img src="https://img.shields.io/badge/Mnema%20guide-every%20screen%20and%20setting-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnema guide"></a>
+<a href="docs/guide/en.md"><img src="https://img.shields.io/badge/Mnemai%20guide-every%20screen%20and%20setting-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnemai guide"></a>
 
-<a href="https://github.com/Pumpetee/Mnema"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnema"></a><br><sub>Scan to open the repository · github.com/Pumpetee/Mnema</sub>
+<a href="https://github.com/Pumpetee/Mnemai"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnemai"></a><br><sub>Scan to open the repository · github.com/Pumpetee/Mnemai</sub>
 
 </div>
 
 ## Languages
 
-Mnema speaks nine languages. The interface, the help and the AI's answers follow the one you pick, even when you write in another. This README and the Mnema guide exist in each of them.
+Mnemai speaks nine languages. The interface, the help and the AI's answers follow the one you pick, even when you write in another. This README and the Mnemai guide exist in each of them.
 
 <table>
 <tr><td align="center" width="10%"><img src="https://flagcdn.com/w80/gb.png" width="36" alt="English"><br><b>✓ English</b><br><sub><a href="README.md">README</a> · <a href="docs/guide/en.md">Guide</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/ru.png" width="36" alt="Русский"><br><b>Русский</b><br><sub><a href="README.ru.md">README</a> · <a href="docs/guide/ru.md">Справочник</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/cn.png" width="36" alt="中文"><br><b>中文</b><br><sub><a href="README.zh.md">README</a> · <a href="docs/guide/zh.md">指南</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/es.png" width="36" alt="Español"><br><b>Español</b><br><sub><a href="README.es.md">README</a> · <a href="docs/guide/es.md">Guía</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/in.png" width="36" alt="हिन्दी"><br><b>हिन्दी</b><br><sub><a href="README.hi.md">README</a> · <a href="docs/guide/hi.md">गाइड</a></sub></td></tr>
@@ -27,11 +27,11 @@ Mnema speaks nine languages. The interface, the help and the AI's answers follow
 
 <div align="center">
 
-Mnema remembers who you are, what you are working on, what you decided and how you like answers — and every AI you talk to gets that context. The memory is a folder of plain Markdown files on your computer. No cloud, no account.
+Mnemai remembers who you are, what you are working on, what you decided and how you like answers — and every AI you talk to gets that context. The memory is a folder of plain Markdown files on your computer. No cloud, no account.
 
-<a href="../../releases/latest/download/Mnema-Setup.exe"><img src="https://img.shields.io/badge/Download%20for-Windows-0078D4?style=for-the-badge" alt="Windows"></a> <a href="../../releases/latest/download/Mnema-macos-arm64.dmg"><img src="https://img.shields.io/badge/Download%20for-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a> <a href="../../releases/latest/download/Mnema-x86_64.AppImage"><img src="https://img.shields.io/badge/Download%20for-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Linux"></a>
+<a href="../../releases/latest/download/Mnemai-Setup.exe"><img src="https://img.shields.io/badge/Download%20for-Windows-0078D4?style=for-the-badge" alt="Windows"></a> <a href="../../releases/latest/download/Mnemai-macos-arm64.dmg"><img src="https://img.shields.io/badge/Download%20for-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a> <a href="../../releases/latest/download/Mnemai-x86_64.AppImage"><img src="https://img.shields.io/badge/Download%20for-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Linux"></a>
 
-<sub><a href="../../releases">all files</a> · macOS Intel: <a href="../../releases/latest/download/Mnema-macos-x64.dmg">x64.dmg</a></sub>
+<sub><a href="../../releases">all files</a> · macOS Intel: <a href="../../releases/latest/download/Mnemai-macos-x64.dmg">x64.dmg</a></sub>
 
 <img src="docs/img/en/hero.gif" width="880" alt="A question, and the answer comes from memory: the week plan as a table, with the price and the meeting rule it already knows">
 
@@ -56,11 +56,11 @@ Mnema remembers who you are, what you are working on, what you decided and how y
 
 ## 🧠 It knows you
 
-<p align="center"><img src="docs/img/en/memory.gif" width="860" alt="Portrait and memory map: topics as bubbles, the size is how much Mnema knows"></p>
+<p align="center"><img src="docs/img/en/memory.gif" width="860" alt="Portrait and memory map: topics as bubbles, the size is how much Mnemai knows"></p>
 
-- **A portrait every AI reads first:** who you are, what you are building, how you like to work. Mnema writes it as it learns, you can fix it by hand.
+- **A portrait every AI reads first:** who you are, what you are building, how you like to work. Mnemai writes it as it learns, you can fix it by hand.
 - **A memory map:** each topic is a bubble, a pulse means it changed recently, a lock means some AIs don't see it.
-- **Old facts don't pass for new ones:** every fact carries its date, and Mnema asks again about a status older than a month.
+- **Old facts don't pass for new ones:** every fact carries its date, and Mnemai asks again about a status older than a month.
 - **More than one folder:** connect an Obsidian vault or a team folder — read only, the program itself blocks writing there.
 
 ## 🗣️ Consortium: several AIs, one answer
@@ -82,7 +82,7 @@ Mnema remembers who you are, what you are working on, what you decided and how y
 
 ## 🌱 It learns by itself
 
-<p align="center"><img src="docs/img/en/learning.gif" width="860" alt="You mention something in passing, and the feed shows what Mnema read, understood and wrote down, and why"></p>
+<p align="center"><img src="docs/img/en/learning.gif" width="860" alt="You mention something in passing, and the feed shows what Mnemai read, understood and wrote down, and why"></p>
 
 - **Sure means saved:** a fact it is sure of (80% or more) is written at once, a doubtful one waits to be heard again.
 - **Personal goes apart:** money, health and private matters land in tagged cards you can hide from any AI.
@@ -90,18 +90,18 @@ Mnema remembers who you are, what you are working on, what you decided and how y
 
 ## ✈️ Reads Telegram, never writes there
 
-<p align="center"><img src="docs/img/en/telegram.gif" width="860" alt="Telegram connected read only: you pick the chats, Mnema learns from them"></p>
+<p align="center"><img src="docs/img/en/telegram.gif" width="860" alt="Telegram connected read only: you pick the chats, Mnemai learns from them"></p>
 
-- **You pick the chats:** Mnema learns about you and the people around you only from those.
-- **Read only, by design:** the Telegram client inside Mnema can only read; any other command is refused before it is sent.
-- **Stays on your computer:** the login is encrypted in the system's store, and Mnema has no servers of its own.
+- **You pick the chats:** Mnemai learns about you and the people around you only from those.
+- **Read only, by design:** the Telegram client inside Mnemai can only read; any other command is refused before it is sent.
+- **Stays on your computer:** the login is encrypted in the system's store, and Mnemai has no servers of its own.
 
 ## 📉 Saves tokens
 
-<p align="center"><img src="docs/img/en/tokens.gif" width="560" alt="A question about a 153,000-character contract: 29,643 input tokens for the whole text, 6,159 with Mnema"></p>
+<p align="center"><img src="docs/img/en/tokens.gif" width="560" alt="A question about a 153,000-character contract: 29,643 input tokens for the whole text, 6,159 with Mnemai"></p>
 
 - **Only what matters goes out:** memory, documents and web pages are read on your computer, and the model gets the relevant parts.
-- **Measured:** on a question about a 153,000-character contract the whole text took 29,643 input tokens; Mnema sent 6,159, and only the Mnema answer was right.
+- **Measured:** on a question about a 153,000-character contract the whole text took 29,643 input tokens; Mnemai sent 6,159, and only the Mnemai answer was right.
 - **Visible every time:** under each answer you see how many tokens were saved.
 
 ## 🔐 Private by design
@@ -130,14 +130,14 @@ Download the file for your system (every version with its number is in [Releases
 
 | System | File | How |
 |---|---|---|
-| Windows 10 and 11 | [`Mnema-Setup.exe`](../../releases/latest/download/Mnema-Setup.exe) | Run it. No administrator rights needed. A portable `.zip` is there as well. |
-| macOS 11 and newer | Apple Silicon: [`Mnema-macos-arm64.dmg`](../../releases/latest/download/Mnema-macos-arm64.dmg), Intel: [`Mnema-macos-x64.dmg`](../../releases/latest/download/Mnema-macos-x64.dmg) | Open it and drag Mnema to Applications. |
-| Linux x86-64 (Ubuntu 22.04 and newer, Fedora, Debian…) | [`Mnema-x86_64.AppImage`](../../releases/latest/download/Mnema-x86_64.AppImage) | `chmod +x Mnema-*.AppImage` and run it. The same program as a folder: `.tar.gz`, run `Mnema` inside. |
+| Windows 10 and 11 | [`Mnemai-Setup.exe`](../../releases/latest/download/Mnemai-Setup.exe) | Run it. No administrator rights needed. A portable `.zip` is there as well. |
+| macOS 11 and newer | Apple Silicon: [`Mnemai-macos-arm64.dmg`](../../releases/latest/download/Mnemai-macos-arm64.dmg), Intel: [`Mnemai-macos-x64.dmg`](../../releases/latest/download/Mnemai-macos-x64.dmg) | Open it and drag Mnemai to Applications. |
+| Linux x86-64 (Ubuntu 22.04 and newer, Fedora, Debian…) | [`Mnemai-x86_64.AppImage`](../../releases/latest/download/Mnemai-x86_64.AppImage) | `chmod +x Mnemai-*.AppImage` and run it. The same program as a folder: `.tar.gz`, run `Mnemai` inside. |
 
 The packages are not code-signed yet, so each system warns once:
 
 - **Windows** SmartScreen says «Windows protected your PC». Click **More info → Run anyway**.
-- **macOS** says it can't check the developer. Right-click Mnema in Applications → **Open**, or open System Settings → Privacy & Security → **Open Anyway**.
+- **macOS** says it can't check the developer. Right-click Mnemai in Applications → **Open**, or open System Settings → Privacy & Security → **Open Anyway**.
 - **Linux** AppImage needs FUSE 2: `sudo apt install libfuse2` (on Ubuntu 24.04: `libfuse2t64`). Or use the `.tar.gz`.
 
 To check a file, compare its sha256 with the `.sha256` file beside it: `certutil -hashfile <file> SHA256` on Windows, `shasum -a 256 <file>` on macOS, `sha256sum <file>` on Linux.
@@ -154,7 +154,7 @@ python -m venv .venv
 .venv\Scripts\pip install -r requirements-dev.txt
 .venv\Scripts\python tools\fetch_vendor.py      # llama.cpp, Xray, WebView2 from their official releases, verified
 .venv\Scripts\python -m mnema.desktop           # run the program
-.venv\Scripts\python tools\package.py           # dist\Mnema-Setup-<version>.exe and the portable zip
+.venv\Scripts\python tools\package.py           # dist\Mnemai-Setup-<version>.exe and the portable zip
 ```
 
 macOS and Linux:
@@ -164,8 +164,8 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python tools/fetch_vendor.py           # llama.cpp and Xray for this system, verified by sha256
 .venv/bin/python -m mnema.desktop                # run the program
-.venv/bin/python tools/package.py                # macOS: dist/Mnema-<version>-macos-arm64.dmg
-                                                 # Linux: dist/Mnema-<version>-x86_64.AppImage and .tar.gz
+.venv/bin/python tools/package.py                # macOS: dist/Mnemai-<version>-macos-arm64.dmg
+                                                 # Linux: dist/Mnemai-<version>-x86_64.AppImage and .tar.gz
 ```
 
 Every push is tested on Windows, macOS and Linux; the three packages are built, started once with their window and kept as files of the run (`.github/workflows`).
@@ -217,7 +217,7 @@ AGPL-3.0. Free for personal use and for open-source projects. A commercial licen
 © 2026 Anton Sannikov
 
 <div align="center">
-<img src="docs/img/brand/logo.svg" width="40" alt="Mnema">
+<img src="docs/img/brand/logo.svg" width="40" alt="Mnemai">
 
-<sub>If Mnema remembers something useful for you, a ⭐ helps others find it.</sub>
+<sub>If Mnemai remembers something useful for you, a ⭐ helps others find it.</sub>
 </div>

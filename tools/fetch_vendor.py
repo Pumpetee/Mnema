@@ -5,7 +5,7 @@ this runs on (Windows, macOS, Linux).
     python tools/fetch_vendor.py --check   # only verify what is in vendor/
     python tools/fetch_vendor.py --ocr     # only the scan recognisers (the unit tests need them)
 
-Nothing here is built by Mnema; the repository keeps only these pins.
+Nothing here is built by Mnemai; the repository keeps only these pins.
 
 | Folder          | What                                   | Source                                         | Check            |
 |-----------------|----------------------------------------|------------------------------------------------|------------------|

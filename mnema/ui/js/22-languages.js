@@ -19,7 +19,7 @@ const NO_I18N =
   ".mtprev,.mth b,.mbub b,.mbub span,.mtlist,.rlq,.mtmh b";
 async function loadLang() {
   if (!LANGS.some(([k]) => k === I18N.lang)) {
-    // a language Mnema no longer has (Arabic was removed): English instead
+    // a language Mnemai no longer has (Arabic was removed): English instead
     I18N.lang = "en";
     LS.set("lang", "en");
     post("/api/agent", { lang: "en" }).catch(() => {}); // the answers follow the interface again

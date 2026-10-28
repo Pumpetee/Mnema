@@ -3,8 +3,8 @@ async function viewMemory(tab) {
   if (!MEM.on && !MEM.peek) {
     $("#view").innerHTML =
       `<div class="page"><div class="wrap"><div class="memoff">${ic("eyeoff")}<h1>${tr("Память выключена")}</h1>
-      <p>${tr("Сейчас Mnema — обычный чат с любым ИИ: ничего о тебе не знает и ничего не запоминает. Консорциум, документы, действия с файлами, встречи и локальные модели работают.")}</p>
-      <p>${tr("С памятью ИИ знают, кто ты, над чем работаешь и как тебе отвечать, а Mnema учится по ходу разговора. Всё хранится у тебя на компьютере обычными файлами.")}</p>
+      <p>${tr("Сейчас Mnemai — обычный чат с любым ИИ: ничего о тебе не знает и ничего не запоминает. Консорциум, документы, действия с файлами, встречи и локальные модели работают.")}</p>
+      <p>${tr("С памятью ИИ знают, кто ты, над чем работаешь и как тебе отвечать, а Mnemai учится по ходу разговора. Всё хранится у тебя на компьютере обычными файлами.")}</p>
       <div class="row" style="justify-content:center"><button class="btn" data-memon>${tr("Включить память")}</button><button class="btn g" id="mempeek">${tr("Посмотреть записанное")}</button></div></div></div></div>`;
     $("#mempeek").onclick = () => {
       MEM.peek = true;
@@ -40,7 +40,7 @@ function bindDemo() {
 }
 const noteGet = (rel) => api("/api/note?rel=" + encodeURIComponent(rel));
 const raw = async (rel) => (await noteGet(rel)).raw || "";
-// the editor sends the version it opened: a file Mnema changed meanwhile is not overwritten (the server says 409)
+// the editor sends the version it opened: a file Mnemai changed meanwhile is not overwritten (the server says 409)
 async function noteSave(rel, text, base) {
   try {
     await post("/api/note", { rel, raw: text, base });
@@ -184,7 +184,7 @@ async function memPortrait() {
       color: "#10b981",
       chips: projects.filter((p) => p.status !== "archive").map((p) => [p.title, p.status || ""]),
       tell: true,
-      what: tr("Над чем ты работаешь. Mnema заводит проект сама, когда ты о нём рассказываешь."),
+      what: tr("Над чем ты работаешь. Mnemai заводит проект сама, когда ты о нём рассказываешь."),
       empty: tr("Пока нет. Упомяни в чате, над чем работаешь."),
     },
     {
@@ -204,7 +204,7 @@ async function memPortrait() {
       hidden: /\ntags:\s*\[/.test(c.raw),
       items: bullets(c.raw),
       edit: c.rel,
-      what: tr("Тема, о которой Mnema собирает факты."),
+      what: tr("Тема, о которой Mnemai собирает факты."),
     })),
     {
       title: tr("События и решения"),
@@ -230,12 +230,12 @@ async function memPortrait() {
   $("#mt").innerHTML =
     `<div class="card phero"><div class="pav">${esc((name || "?").slice(0, 1).toUpperCase())}</div><div class="pbody">
       <div class="pname" data-noi18n>${esc(name || tr("Ты"))}</div>
-      <div class="pabout">${tr("Это твой портрет. Mnema подставляет его каждому ИИ, с которым ты говоришь, — чтобы тот сразу знал, кто ты и как с тобой работать.")}</div>
-      ${intro.length ? `<div class="who">${intro.map(inline).join("<br>")}</div>` : building ? `<div class="pnone pbuild">${tr("Собираю портрет из того, что уже знаю о тебе…")}</div>` : `<div class="pnone">${tr("Пока Mnema почти ничего о тебе не знает. Портрет заполнится сам по ходу разговоров — или пройди «Знакомство»: пара минут, и она будет знать главное.")}</div>`}
+      <div class="pabout">${tr("Это твой портрет. Mnemai подставляет его каждому ИИ, с которым ты говоришь, — чтобы тот сразу знал, кто ты и как с тобой работать.")}</div>
+      ${intro.length ? `<div class="who">${intro.map(inline).join("<br>")}</div>` : building ? `<div class="pnone pbuild">${tr("Собираю портрет из того, что уже знаю о тебе…")}</div>` : `<div class="pnone">${tr("Пока Mnemai почти ничего о тебе не знает. Портрет заполнится сам по ходу разговоров — или пройди «Знакомство»: пара минут, и она будет знать главное.")}</div>`}
       <div class="pstats"><span>${ic("book")}<b data-count="${all.length}">0</b> ${tr("фактов")}</span><span>${ic("check")}<b data-count="${learned}">0</b> ${tr("выучено само")}</span>${ms.updated ? `<span>${ic("redo")}${tr("обновлено")} ${ago(ms.updated)}</span>` : ""}</div>
       <div class="pacts">${[
         ["data-int", "👋", "#6366f1", "#a855f7", "Знакомство", "пара минут вопросов"],
-        ["data-quiz", "🎯", "#10b981", "#14b8a6", "Насколько Mnema меня знает", "проверь её на себе"],
+        ["data-quiz", "🎯", "#10b981", "#14b8a6", "Насколько Mnemai меня знает", "проверь её на себе"],
         ["data-cmp", "🔍", "#0ea5e9", "#6366f1", "С памятью и без", "один вопрос, два ответа"],
         ["data-tell", "💬", "#f59e0b", "#f97316", "Рассказать о себе", "своими словами"],
         ['data-edit="70 Memory/Profile.md"', "✏️", "#ec4899", "#a855f7", "Поправить самому", "открыть портрет"],

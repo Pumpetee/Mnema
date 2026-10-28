@@ -1,5 +1,5 @@
 # ruff: noqa: F821  — the demo, the server and their helpers come from readme_shots via exec
-"""Every screen of Mnema for a design review: the demo memory from readme_shots, every view, settings section,
+"""Every screen of Mnemai for a design review: the demo memory from readme_shots, every view, settings section,
 menu and window — in the asked themes, widths and languages.
 
     python tools/qa/design_shots.py ru light,dark 1366,900     →  tools/qa/design/<lang>-<theme>-<width>/*.png

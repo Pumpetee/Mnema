@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------- a VPN key: Mnema connects through it itself (vpnkey.py, Xray inside)
+// ---------------------------------------------------------------- a VPN key: Mnemai connects through it itself (vpnkey.py, Xray inside)
 const VK_SVCS = ["Hiddify", "Happ", "v2rayN", "V2Box", "NekoBox", "Streisand", "Outline", "Другой сервис"];
 // the service tiles: a letter medal in the service's own colours
 const VK_LOOK = {

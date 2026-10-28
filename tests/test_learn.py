@@ -295,7 +295,7 @@ class TestPolicy(Base):
         "отчёт": [{"text": "Отвечать без вступлений", "kind": "rule", "confidence": 0.9}],
         "уверен": [
             {
-                "text": "Главный проект — запуск Mnema",
+                "text": "Главный проект — запуск Mnemai",
                 "kind": "fact",
                 "where": "inbox",
                 "key": "главный проект",
@@ -313,7 +313,7 @@ class TestPolicy(Base):
     def test_mixed_confident_goes_in_silently(self):
         r = self.go("я уверен")
         self.assertEqual(r["written"], 1)
-        self.assertIn("Главный проект — запуск Mnema", self.v.read_raw("00 Inbox/Inbox.md"))
+        self.assertIn("Главный проект — запуск Mnemai", self.v.read_raw("00 Inbox/Inbox.md"))
         self.assertIn("выучено", self.v.read_raw("00 Inbox/Inbox.md"))
 
     def test_personal_from_elsewhere_goes_straight_to_a_hidden_section(self):
@@ -396,7 +396,7 @@ class TestPolicy(Base):
         self.assertNotIn("Екатеринбург", me)
 
     def ask_in_chat(self, text):
-        """A message in a conversation in Mnema: learning may ask under it."""
+        """A message in a conversation in Mnemai: learning may ask under it."""
         from mnema.chat import engine as CH
         from mnema.learn.sources import Episode
 

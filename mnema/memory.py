@@ -348,7 +348,7 @@ def remember(
     said — the day the owner actually said it (learning from old chats): the line and its event carry that date,
     so a month-old decision never reads as today's.
 
-    client_id "owner" — the person himself, "learner" — Mnema's own learning (owner's rights,
+    client_id "owner" — the person himself, "learner" — Mnemai's own learning (owner's rights,
     marked "выучено" so it's visible what came from learning). A heading or topic may carry tags that hide it from
     some assistants: "profile:Деньги #money", "card:Здоровье #health"."""
     fact = " ".join(fact.split())
@@ -701,7 +701,7 @@ def generate_index(vault: Vault) -> str:
 def build_context(vault: Vault, client: Client, today: dt.date | None = None) -> str:
     deny = set(client.deny_tags)
     parts = [
-        f"## Память владельца (Mnema) · для {client.name} · {ru_date(today)}",
+        f"## Память владельца (Mnemai) · для {client.name} · {ru_date(today)}",
         "Это то, что владелец разрешил тебе знать о нём. Опирайся на это, не переспрашивай известное. "
         "Если факт помечен датой статуса и он старый — уточни. Новое важное предлагай сохранить в память.",
     ]

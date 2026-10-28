@@ -2,7 +2,7 @@
 back gets its own prompt. The interface says «рецепт», not «промт»: clearer for people who don't write prompts.
 
 When a request looks like a task the owner already gave before (the second similar request — or every task, as set),
-Mnema doesn't do it straight away. It asks first: "I'll write a prompt so next time you don't explain it again and
+Mnemai doesn't do it straight away. It asks first: "I'll write a prompt so next time you don't explain it again and
 don't spend tokens on clarifications". Only with consent:
   write     — a model writes the prompt (goal, input, steps, result format, checks), it is saved as a Markdown file in
               the memory folder «90 System/Recipes/», then the task is done by it;

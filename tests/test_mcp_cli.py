@@ -90,7 +90,7 @@ class TestMcp(unittest.TestCase):
         )
         self.assertEqual(len(r), 7)  # notification gets no reply
         self.assertEqual(r[0]["result"]["protocolVersion"], "2025-06-18")
-        self.assertEqual(r[0]["result"]["serverInfo"]["name"], "mnema")
+        self.assertEqual(r[0]["result"]["serverInfo"]["name"], "mnemai")
         self.assertEqual({t["name"] for t in r[1]["result"]["tools"]} >= {"memory_context", "memory_remember"}, True)
         self.assertIn("Иван", r[2]["result"]["content"][0]["text"])
         self.assertFalse(r[3]["result"]["isError"])
@@ -203,6 +203,20 @@ class TestCli(unittest.TestCase):
         self.assertGreater(len(parts), 1)
         self.assertTrue(all(len(p) < 10000 for p in parts))  # Claude Code keeps max 10 000 chars per hook
 
+    def test_migrate_old_name(self):
+        """Запись прежней Mnema (mnema) в настройках Claude переходит на mnemai, чужие серверы не трогаются."""
+        from mnema.cli import migrate_mcp
+
+        cfg = self.dir / "old.json"
+        old = {"command": "C:/x/mnema-cli.exe", "args": ["mcp", "--client", "claude"], "env": {}}
+        cfg.write_text(json.dumps({"mcpServers": {"other": {"command": "x"}, "mnema": old}}), encoding="utf-8")
+        self.assertEqual(migrate_mcp({"claude-desktop": cfg}), ["claude-desktop"])
+        data = json.loads(cfg.read_text(encoding="utf-8"))
+        self.assertNotIn("mnema", data["mcpServers"])
+        self.assertEqual(data["mcpServers"]["mnemai"]["args"], old["args"])
+        self.assertIn("other", data["mcpServers"])
+        self.assertEqual(migrate_mcp({"claude-desktop": cfg}), [])  # повторно — ничего
+
     def test_install_desktop(self):
         v = self.dir / "vault"
         run_cli("init", str(v))
@@ -210,14 +224,14 @@ class TestCli(unittest.TestCase):
         cfg.write_text(json.dumps({"mcpServers": {"other": {"command": "x"}}}), encoding="utf-8")
         dry = run_cli("install", "claude-desktop", "--config", str(cfg), vault=v)
         self.assertIn("--apply", dry.stdout.decode("utf-8"))
-        self.assertNotIn("mnema", cfg.read_text(encoding="utf-8"))  # dry run changes nothing
+        self.assertNotIn("mnemai", cfg.read_text(encoding="utf-8"))  # dry run changes nothing
         run_cli("install", "claude-desktop", "--config", str(cfg), "--apply", vault=v)
         data = json.loads(cfg.read_text(encoding="utf-8"))
         self.assertIn("other", data["mcpServers"])  # existing servers kept
-        self.assertEqual(data["mcpServers"]["mnema"]["args"][:3], ["-m", "mnema", "mcp"])
+        self.assertEqual(data["mcpServers"]["mnemai"]["args"][:3], ["-m", "mnema", "mcp"])
         self.assertTrue(cfg.with_suffix(".json.bak").exists())
         # The exact command written into the config must actually start the server.
-        srv = data["mcpServers"]["mnema"]
+        srv = data["mcpServers"]["mnemai"]
         p = subprocess.run(
             [srv["command"], *srv["args"]],
             input=json.dumps({"jsonrpc": "2.0", "id": 1, "method": "ping"}).encode() + b"\n",

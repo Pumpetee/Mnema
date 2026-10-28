@@ -12,7 +12,7 @@ Over the last 20 seconds:
          taking ≥ 40 % of it;
 - warm — temperature ≥ 80 °C, or memory ≥ 85 %, or the processor ≥ 70 % with the model taking ≥ 25 %;
 - cool — otherwise; idle — the local model is not running.
-Hot for a minute while the model works → Mnema itself lowers the model's priority (windows and the browser stay responsive)
+Hot for a minute while the model works → Mnemai itself lowers the model's priority (windows and the browser stay responsive)
 and says so. Fewer cores or stopping the model is the owner's call: buttons in the indicator.
 """
 

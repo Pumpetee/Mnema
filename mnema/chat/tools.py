@@ -7,7 +7,7 @@ Any model (Claude by subscription, a key, the built-in one) asks for an action w
     - первый шаг
     ```
 
-Mnema stops the answer there, shows the owner what is asked («Создать файл …» — Да / Нет / Да для этого разговора),
+Mnemai stops the answer there, shows the owner what is asked («Создать файл …» — Да / Нет / Да для этого разговора),
 does it, gives the model the result and lets it go on. No programs are run, nothing is sent anywhere: only files in
 the memory folder and in the work folders the owner added (Настройки → Программа → «Действия с файлами»).
 
@@ -45,7 +45,7 @@ BLOCK_RE = re.compile(r"```mnema[ \t]+(\w+)([^\n]*)\n?(.*?)(?:```|\Z)", re.S)
 ARG_RE = re.compile(r'(\w+)\s*=\s*"([^"]*)"')
 
 RULE = """=== Действия с файлами ===
-Ты можешь работать с файлами владельца. Чтобы сделать действие, напиши в ответе ОДИН блок и остановись — Mnema спросит
+Ты можешь работать с файлами владельца. Чтобы сделать действие, напиши в ответе ОДИН блок и остановись — Mnemai спросит
 владельца, сделает и пришлёт результат, после чего ты продолжишь:
 
 ```mnema read_file path="полный путь"
@@ -271,8 +271,8 @@ def _snapshot(
 
 
 def read_only(vault: Vault, p: Path) -> bool:
-    """A place Mnema never writes to, whatever the folders for actions say: an Obsidian vault (a folder with
-    .obsidian in it or above it) and the extra memory folders — Mnema reads them and writes only into its own memory."""
+    """A place Mnemai never writes to, whatever the folders for actions say: an Obsidian vault (a folder with
+    .obsidian in it or above it) and the extra memory folders — Mnemai reads them and writes only into its own memory."""
     p = p.resolve()
     own = vault.root.resolve()
     if p == own or own in p.parents:
@@ -290,7 +290,7 @@ def read_only(vault: Vault, p: Path) -> bool:
 def _write_bytes(vault: Vault, client: str, p: Path, data: bytes, summary: str) -> None:
     if read_only(vault, p):
         raise Refused(
-            "это хранилище Obsidian или дополнительная папка памяти — Mnema их только читает и ничего в них не пишет"
+            "это хранилище Obsidian или дополнительная папка памяти — Mnemai их только читает и ничего в них не пишет"
         )
     rel = in_vault(vault, p)
     if rel and p.suffix.lower() == ".md":

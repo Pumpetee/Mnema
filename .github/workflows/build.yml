@@ -19,16 +19,16 @@ jobs:
         include:
           - os: windows-latest
             files: |
-              dist/Mnema-Setup-*.exe*
-              dist/Mnema-*-windows-x64.zip*
+              dist/Mnemai-Setup-*.exe*
+              dist/Mnemai-*-windows-x64.zip*
           - os: macos-latest
-            files: dist/Mnema-*-macos-*.dmg*
+            files: dist/Mnemai-*-macos-*.dmg*
           - os: macos-15-intel
-            files: dist/Mnema-*-macos-*.dmg*
+            files: dist/Mnemai-*-macos-*.dmg*
           - os: ubuntu-22.04
             files: |
-              dist/Mnema-*.AppImage*
-              dist/Mnema-*-linux-*.tar.gz*
+              dist/Mnemai-*.AppImage*
+              dist/Mnemai-*-linux-*.tar.gz*
     runs-on: ${{ matrix.os }}
     env:
       MNEMA_NO_DETECT: "1"
@@ -55,13 +55,13 @@ jobs:
         run: python tools/package.py --skip-tests
       - name: The window opens (Windows)
         if: runner.os == 'Windows'
-        run: python tools/qa/gui_smoke.py dist/Mnema/Mnema.exe dist/Mnema/mnema-cli.exe
+        run: python tools/qa/gui_smoke.py dist/Mnemai/Mnemai.exe dist/Mnemai/mnemai-cli.exe
       - name: The window opens (macOS)
         if: runner.os == 'macOS'
-        run: python tools/qa/gui_smoke.py dist/Mnema.app/Contents/MacOS/Mnema dist/Mnema.app/Contents/MacOS/mnema-cli
+        run: python tools/qa/gui_smoke.py dist/Mnemai.app/Contents/MacOS/Mnemai dist/Mnemai.app/Contents/MacOS/mnemai-cli
       - name: The window opens (Linux)
         if: runner.os == 'Linux'
-        run: xvfb-run -a python tools/qa/gui_smoke.py dist/Mnema/Mnema dist/Mnema/mnema-cli
+        run: xvfb-run -a python tools/qa/gui_smoke.py dist/Mnemai/Mnemai dist/Mnemai/mnemai-cli
       - uses: actions/upload-artifact@v4
         with:
           name: mnema-${{ matrix.os }}
@@ -82,7 +82,7 @@ jobs:
       - name: Names without the version, for the README's direct links (releases/latest/download/…)
         run: |
           cd out
-          for f in Mnema-*; do
+          for f in Mnemai-*; do
             case "$f" in *.sha256) continue ;; esac
             cp "$f" "$(echo "$f" | sed -E 's/-[0-9]+\.[0-9]+\.[0-9]+//')"
           done

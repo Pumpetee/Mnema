@@ -1,4 +1,4 @@
-"""Mnema station: the owner's own server with a copy of the memory.
+"""Mnemai station: the owner's own server with a copy of the memory.
 
 - computers sync with it (sync.py, target "station") — the sync key gives full access to the synced files;
 - any agent or AI that speaks MCP connects over HTTP (POST /mcp, JSON-RPC) with its own MCP key; each key is tied to
@@ -162,7 +162,7 @@ def make_server(vault: Vault, host: str = "127.0.0.1", port: int = 8765) -> Thre
 def serve(vault: Vault, host: str, port: int) -> None:
     srv = make_server(vault, host, port)
     k = keys(vault)
-    print(f"Mnema station: http://{host}:{port}")
-    print(f"Ключ синхронизации (вставь в Mnema → Настройки → Синхронизация): {k['sync']}")
+    print(f"Mnemai station: http://{host}:{port}")
+    print(f"Ключ синхронизации (вставь в Mnemai → Настройки → Синхронизация): {k['sync']}")
     print("MCP-ключ для агента: mnema station-key --client claude")
     srv.serve_forever()

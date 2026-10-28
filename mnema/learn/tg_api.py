@@ -4,12 +4,12 @@ Login like Telegram Desktop: the owner's api_id and api_hash (my.telegram.org �
 number, the code Telegram sends, and the cloud password if there is one. The session lives in the secret store, never
 in the memory folder.
 
-Read only, by construction: the client Mnema uses (ReadOnly below) refuses every Telegram request except reading
+Read only, by construction: the client Mnemai uses (ReadOnly below) refuses every Telegram request except reading
 and logging in — a closed list of 23 requests (ALLOWED). Sending, editing, deleting, forwarding, reacting, marking as
-read, joining, leaving, changing the profile — none of it can be called, whatever the rest of the code does. Mnema reads
+read, joining, leaving, changing the profile — none of it can be called, whatever the rest of the code does. Mnemai reads
 the conversations in the chats the owner picked (none picked — nothing is read): his messages and the others', each
 line with who said it, one episode per chat per day; the learning takes facts about him and the people around him.
-Channels and bots can't be picked. Everything goes through Mnema's proxy or VPN.
+Channels and bots can't be picked. Everything goes through Mnemai's proxy or VPN.
 """
 
 from __future__ import annotations
@@ -80,7 +80,7 @@ def _proxy():
     return (kind, p.hostname, p.port or (1080 if kind == "socks5" else 8080), True, p.username, p.password)
 
 
-# Every request Mnema may send — a closed list, nothing else passes. Logging in (the code goes to the owner's own
+# Every request Mnemai may send — a closed list, nothing else passes. Logging in (the code goes to the owner's own
 # account) and reading: the chat list, his own messages, who is who. No «Get» with a side effect: pressing a bot's
 # button, asking an inline bot, showing his location or counting a view are all outside the list.
 ALLOWED = {
@@ -115,7 +115,7 @@ class WriteRefused(PermissionError):
 
 
 def allowed(request) -> bool:
-    """A Telegram request Mnema may send: reading or logging in, nothing else."""
+    """A Telegram request Mnemai may send: reading or logging in, nothing else."""
     t = type(request)
     return f"{t.__module__.rsplit('.', 1)[-1]}.{t.__name__}" in ALLOWED
 
@@ -127,7 +127,7 @@ def _read_only_client():
         async def __call__(self, request, ordered=False, flood_sleep_threshold=None):
             for r in request if utils.is_list_like(request) else [request]:
                 if not allowed(r):
-                    raise WriteRefused(f"Mnema only reads Telegram: {type(r).__name__} refused")
+                    raise WriteRefused(f"Mnemai only reads Telegram: {type(r).__name__} refused")
             return await super().__call__(request, ordered, flood_sleep_threshold)
 
     return ReadOnly
@@ -147,8 +147,8 @@ async def _client(vault: Vault, session: str = ""):
         api_id,
         api_hash,
         proxy=_proxy(),
-        device_model="Mnema",
-        app_version="Mnema",
+        device_model="Mnemai",
+        app_version="Mnemai",
         receive_updates=False,
     )
     await c.connect()
@@ -235,7 +235,7 @@ def enter_password(vault: Vault, password: str) -> dict:
 
 
 def forget(vault: Vault) -> dict:
-    """Mnema forgets the session; Telegram shows it under Settings → Devices until it is ended there."""
+    """Mnemai forgets the session; Telegram shows it under Settings → Devices until it is ended there."""
     _secret(vault, "tg.session", "")
     _pending.clear()
     _save_cfg(vault, who="", uid=None)

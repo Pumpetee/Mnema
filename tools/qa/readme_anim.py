@@ -57,10 +57,10 @@ def demo_strings(lang: str) -> dict:
     from mnema.chat.providers import claude_exe
 
     prompt = (
-        f"Translate the values of this demo for the Mnema app (a fictional founder Alex, his car-service CRM «Garage», "
+        f"Translate the values of this demo for the Mnemai app (a fictional founder Alex, his car-service CRM «Garage», "
         f"his team Oleg, Maria, Sergio) from English into {NAMES[lang]}. Return ONLY a JSON object: the same English "
         "keys, the translations as values. Keep Markdown (tables, **bold**), line breaks, numbers, prices, emoji and "
-        "product names (Mnema, Claude, ChatGPT, Gemini, QuickBooks, PDF). Names of people and companies may be "
+        "product names (Mnemai, Claude, ChatGPT, Gemini, QuickBooks, PDF). Names of people and companies may be "
         "adapted to the language's script; «quotes» in the language's own style. Short labels stay short.\n\n"
         + json.dumps({k: k for k in sorted(en)}, ensure_ascii=False, indent=0)
     )
@@ -453,7 +453,7 @@ with sync_playwright() as p:
         page.unroute("**/api/telegram")
 
     if want("tokens"):
-        # the measured case from the welcome: a 153 000-character contract, input tokens without and with Mnema
+        # the measured case from the welcome: a 153 000-character contract, input tokens without and with Mnemai
         page.goto(base + "#chat")
         page.wait_for_timeout(1500)
         page.evaluate(
@@ -489,7 +489,7 @@ with sync_playwright() as p:
         )
 
     if want("learning"):
-        # you say something in passing; the feed shows what Mnema read, understood, wrote down — and why
+        # you say something in passing; the feed shows what Mnemai read, understood, wrote down — and why
         page.goto(base + "#chat")
         page.wait_for_timeout(1800)
         quiet(page)

@@ -81,7 +81,7 @@ async function localModal(first, onClose) {
        })
        .join("")}
      <div class="lmods">${lmAddCard()}</div>
-     <div class="lmfoot"><span class="hint">${tr("Компьютер")}: ${tr("память")} ${d.hardware.ram_gb} ${tr("ГБ")} · ${tr("свободно на диске")} ${d.hardware.disk_free_gb} ${tr("ГБ")}${bps ? " · " + tr("скорость интернета") + " " + mbps(bps) : ""}. ${tr("Модели лежат в папке Mnema.")}</span>
+     <div class="lmfoot"><span class="hint">${tr("Компьютер")}: ${tr("память")} ${d.hardware.ram_gb} ${tr("ГБ")} · ${tr("свободно на диске")} ${d.hardware.disk_free_gb} ${tr("ГБ")}${bps ? " · " + tr("скорость интернета") + " " + mbps(bps) : ""}. ${tr("Модели лежат в папке Mnemai.")}</span>
        <button class="btn g sm" id="lmclose">${first ? "Не сейчас" : "Закрыть"}</button></div></div>`;
     if (html !== pop._html && !$(".lmaddp", pop)) {
       const c0 = $(".card", pop),

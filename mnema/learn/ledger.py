@@ -1,4 +1,4 @@
-"""Ledger: everything Mnema ever learned or considered, with how sure it is and what the owner decided.
+"""Ledger: everything Mnemai ever learned or considered, with how sure it is and what the owner decided.
 
 States
   weak            seen, not sure yet — waits for the fact to repeat (not shown in the queue)

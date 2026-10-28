@@ -1,21 +1,21 @@
-"""Old versions on this computer — found and cleared by the installer (`mnema-cli upgrade`, run right after the files
+"""Old versions on this computer — found and cleared by the installer (`mnemai-cli upgrade`, run right after the files
 are copied).
 
 The first builds were a portable archive: unpacked anywhere, no installer, no record of where. So they are looked for
 by every trace they leave:
-- where Mnema was running when the installer closed it (the installer saves the paths before closing);
-- the autostart entry (HKCU\\...\\Run\\Mnema);
+- where Mnemai was running when the installer closed it (the installer saves the paths before closing);
+- the autostart entry (HKCU\\...\\Run\\Mnemai);
 - shortcuts on the desktop and in the Start menu;
 - the usual places people unpack to: the home folder, Desktop, Downloads, Documents (OneDrive too), Programs,
-  folders named Mnema* at the root of a drive — three levels deep.
-A program folder is Mnema.exe next to `_internal`. The new install itself and a developer's source tree are never touched.
+  folders named Mnemai* at the root of a drive — three levels deep.
+A program folder is Mnemai.exe next to `_internal`. The new install itself and a developer's source tree are never touched.
 
 What happens to an old version found: it is closed, its autostart moves to the new
 program, its shortcuts are removed, the folder is deleted. The memory and settings are not deleted.
 
 Old data — clean start: memory of the first builds lies in the old layout (me.md,
 rules.md, projects/ …), which the new version doesn't read. The old memory folder stays untouched. The old settings
-(config.json, the window's storage) are put aside into ~/.mnema/old-<version>-<date>, so the new Mnema opens its
+(config.json, the window's storage) are put aside into ~/.mnema/old-<version>-<date>, so the new Mnemai opens its
 first screen and creates new memory in a separate folder. Downloaded local models stay — no reason to download
 gigabytes again.
 """
@@ -44,8 +44,8 @@ def home() -> Path:
 
 
 def is_app_dir(d: Path) -> bool:
-    """A program folder: the program next to `_internal` (Mnema.exe on Windows, Mnema on Linux — the unpacked .tar.gz)."""
-    return (d / "_internal").is_dir() and ((d / "Mnema.exe").is_file() or (d / "Mnema").is_file())
+    """A program folder: the program next to `_internal` (Mnemai.exe on Windows, Mnemai on Linux — the unpacked .tar.gz)."""
+    return (d / "_internal").is_dir() and any((d / n).is_file() for n in ("Mnemai.exe", "Mnemai", "Mnema.exe", "Mnema"))
 
 
 def is_dev_tree(d: Path) -> bool:
@@ -73,12 +73,12 @@ def old_layout(p: Path) -> bool:
 
 
 def free_memory_path() -> Path:
-    """Where new memory goes by default: ~/Mnema, unless the first build's memory or a program folder (a portable
-    Mnema unpacked into the home folder) lies there — an old program folder is deleted on the next install."""
-    own = os.environ.get("MNEMA_HOME")  # a separate Mnema (a test run, a second profile) never offers the main memory
-    base = Path(own).parent / "Mnema" if own else Path.home() / "Mnema"
+    """Where new memory goes by default: ~/Mnemai, unless the first build's memory or a program folder (a portable
+    Mnemai unpacked into the home folder) lies there — an old program folder is deleted on the next install."""
+    own = os.environ.get("MNEMA_HOME")  # a separate Mnemai (a test run, a second profile) never offers the main memory
+    base = Path(own).parent / "Mnemai" if own else Path.home() / "Mnemai"
     if old_layout(base) or is_app_dir(base):
-        base = base.with_name("Mnema Memory")
+        base = base.with_name("Mnemai Memory")
     return base
 
 
@@ -99,7 +99,7 @@ def _exe_dir(path: str) -> Path | None:
     if path.lower().endswith(".exe") or ".exe " in path.lower() or '.exe"' in path.lower():
         path = path[: path.lower().index(".exe") + 4].strip('"')
     p = Path(path)
-    return p.parent if p.name.lower() == "mnema.exe" else None
+    return p.parent if p.name.lower() in ("mnemai.exe", "mnema.exe") else None
 
 
 def run_entry() -> str:
@@ -109,7 +109,12 @@ def run_entry() -> str:
 
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as k:
-            return str(winreg.QueryValueEx(k, "Mnema")[0])
+            for name in ("Mnemai", "Mnema"):
+                try:
+                    return str(winreg.QueryValueEx(k, name)[0])
+                except OSError:
+                    continue
+            return ""
     except OSError:
         return ""
 
@@ -118,7 +123,11 @@ def set_run_entry(exe: Path) -> None:
     import winreg
 
     with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0, winreg.KEY_SET_VALUE) as k:
-        winreg.SetValueEx(k, "Mnema", 0, winreg.REG_SZ, f'"{exe}" --hidden')
+        winreg.SetValueEx(k, "Mnemai", 0, winreg.REG_SZ, f'"{exe}" --hidden')
+        try:
+            winreg.DeleteValue(k, "Mnema")  # автозапуск прежней Mnema
+        except OSError:
+            pass
 
 
 def shortcut_dirs() -> list[Path]:
@@ -270,7 +279,17 @@ def _kill_in(d: Path) -> None:
     )
 
 
-PROGRAM_FILES = ("Mnema.exe", "mnema-cli.exe", "_internal", "README.txt", "version.txt", "unins000.exe", "unins000.dat")
+PROGRAM_FILES = (
+    "Mnemai.exe",
+    "mnemai-cli.exe",
+    "Mnema.exe",
+    "mnema-cli.exe",
+    "_internal",
+    "README.txt",
+    "version.txt",
+    "unins000.exe",
+    "unins000.dat",
+)
 
 
 def remove_dir(d: Path, tries: int = 6) -> bool:
@@ -291,10 +310,10 @@ def remove_dir(d: Path, tries: int = 6) -> bool:
             d.rmdir()  # empty now: the folder goes as well
         except OSError:
             pass
-        if not (d / "Mnema.exe").exists() and not (d / "_internal").exists():
+        if not any((d / n).exists() for n in ("Mnemai.exe", "Mnema.exe")) and not (d / "_internal").exists():
             return True
         time.sleep(1.0)
-    return not (d / "Mnema.exe").exists()
+    return not any((d / n).exists() for n in ("Mnemai.exe", "Mnema.exe"))
 
 
 def put_aside_old_settings(h: Path, today: dt.date | None = None) -> dict | None:
@@ -321,7 +340,7 @@ def put_aside_old_settings(h: Path, today: dt.date | None = None) -> dict | None
 
 
 def move_mcp(old_dirs: list[Path], new_dir: Path, configs: dict | None = None) -> list[str]:
-    """Claude Desktop, Claude Code and Cursor keep the path to mnema-cli.exe: one that pointed into a removed old
+    """Claude Desktop, Claude Code and Cursor keep the path to mnemai-cli.exe: one that pointed into a removed old
     build now points to the new program. Other servers in those files are left exactly as they were."""
     from .cli import mcp_configs
 
@@ -331,13 +350,14 @@ def move_mcp(old_dirs: list[Path], new_dir: Path, configs: dict | None = None) -
             data = json.loads(Path(cfg).read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        srv = (data.get("mcpServers") or {}).get("mnema")
+        servers = data.get("mcpServers") or {}
+        srv = servers.get("mnemai") or servers.get("mnema")
         cmd = str((srv or {}).get("command") or "")
-        if not cmd.lower().endswith("mnema-cli.exe"):
+        if not cmd.lower().endswith(("mnemai-cli.exe", "mnema-cli.exe")):
             continue
         if not any(_same(Path(cmd).parent, Path(o)) for o in old_dirs):
             continue
-        srv["command"] = str(Path(new_dir) / "mnema-cli.exe")
+        srv["command"] = str(Path(new_dir) / "mnemai-cli.exe")
         try:
             shutil.copy(cfg, str(cfg) + ".bak")
             Path(cfg).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -348,7 +368,7 @@ def move_mcp(old_dirs: list[Path], new_dir: Path, configs: dict | None = None) -
 
 
 def run(new_dir: Path, running: list[str], lang: str = "ru") -> dict:
-    new_exe = new_dir / "Mnema.exe"
+    new_exe = new_dir / "Mnemai.exe"
     old = find_old(new_dir, running)
     run_dir = _exe_dir(run_entry())
     for o in old:
@@ -368,6 +388,9 @@ def run(new_dir: Path, running: list[str], lang: str = "ru") -> dict:
     if autostart and sys.platform == "win32":
         set_run_entry(new_exe)
     mcp = move_mcp([Path(o["path"]) for o in old if o.get("removed")], new_dir) if old else []
+    from .cli import migrate_mcp
+
+    mcp = sorted(set(mcp) | set(migrate_mcp()))  # запись mnema из прежней Mnema -> mnemai
     data = put_aside_old_settings(home())
     rep = {"old": old, "autostart_moved": autostart, "data": data, "mcp_moved": mcp}
     rep["text"] = report_text(rep, lang)
@@ -381,7 +404,7 @@ def report_text(rep: dict, lang: str = "ru") -> str:
         v = o["version"] or ("первая сборка" if ru else "first build")
         if ru:
             lines.append(
-                f"Прежняя Mnema ({v}) в {o['path']} — "
+                f"Прежняя Mnemai ({v}) в {o['path']} — "
                 + (
                     (
                         "закрыта и удалена."
@@ -394,7 +417,7 @@ def report_text(rep: dict, lang: str = "ru") -> str:
             )
         else:
             lines.append(
-                f"Previous Mnema ({v}) in {o['path']} — "
+                f"Previous Mnemai ({v}) in {o['path']} — "
                 + (
                     (
                         "closed and removed."
@@ -417,9 +440,9 @@ def report_text(rep: dict, lang: str = "ru") -> str:
     if d:
         lines.append(
             (
-                f"Старая память осталась нетронутой в {d['old_memory']}. Новая Mnema начнёт с чистого листа в отдельной папке."
+                f"Старая память осталась нетронутой в {d['old_memory']}. Новая Mnemai начнёт с чистого листа в отдельной папке."
                 if ru
-                else f"The old memory is untouched in {d['old_memory']}. The new Mnema starts clean in a separate folder."
+                else f"The old memory is untouched in {d['old_memory']}. The new Mnemai starts clean in a separate folder."
             )
         )
     if not lines:

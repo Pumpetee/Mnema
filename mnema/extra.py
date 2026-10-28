@@ -1,5 +1,5 @@
 """Extra memory folders: other folders the owner adds to the memory (Настройки → Программа → «Дополнительные папки
-памяти», or «Подключить Obsidian»). A folder that is itself a Mnema memory goes in by its own access rules; any other
+памяти», or «Подключить Obsidian»). A folder that is itself a Mnemai memory goes in by its own access rules; any other
 folder (an Obsidian vault, notes, documents) is indexed on the computer — every Markdown and text file — and only the
 passages that match the question go to the model, under the same budget as the memory. Topics the owner hid from
 this AI (#money, #health, #private, their Russian forms) are cut from those files too.

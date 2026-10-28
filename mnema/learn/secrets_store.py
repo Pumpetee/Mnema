@@ -55,7 +55,7 @@ else:
 
 # ---------------------------------------------------------------- the system's own secret store (macOS, Linux)
 
-SERVICE = "Mnema"
+SERVICE = "Mnemai"
 MARK = "store:"
 
 

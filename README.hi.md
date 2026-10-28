@@ -1,24 +1,24 @@
 <div align="center">
 
-<img src="docs/img/brand/logo.svg" width="112" alt="Mnema">
+<img src="docs/img/brand/logo.svg" width="112" alt="Mnemai">
 
-# Mnema
+# Mnemai
 
 <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2600&pause=900&color=A78BFA&center=true&vCenter=true&width=720&height=46&lines=%E0%A4%B9%E0%A4%B0%20AI%20%E0%A4%95%E0%A5%87%20%E0%A4%B2%E0%A4%BF%E0%A4%8F%20%E0%A4%8F%E0%A4%95%20%E0%A4%B9%E0%A5%80%20%E0%A4%AF%E0%A4%BE%E0%A4%A6%E0%A4%A6%E0%A4%BE%E0%A4%B6%E0%A5%8D%E0%A4%A4;%E0%A4%AE%E0%A5%81%E0%A4%AB%E0%A4%BC%E0%A5%8D%E0%A4%A4%2C%20%E0%A4%A4%E0%A5%81%E0%A4%AE%E0%A5%8D%E0%A4%B9%E0%A4%BE%E0%A4%B0%E0%A5%87%20%E0%A4%95%E0%A4%82%E0%A4%AA%E0%A5%8D%E0%A4%AF%E0%A5%82%E0%A4%9F%E0%A4%B0%20%E0%A4%AA%E0%A4%B0%2C%20%E0%A4%AC%E0%A4%BF%E0%A4%A8%E0%A4%BE%20%E0%A4%85%E0%A4%95%E0%A4%BE%E0%A4%89%E0%A4%82%E0%A4%9F" alt="हर AI के लिए एक ही याददाश्त">
 
-<a href="https://github.com/Pumpetee/Mnema/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnema?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnema/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnema/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnema/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnema?style=flat-square&color=ec4899" alt="last commit"></a>
+<a href="https://github.com/Pumpetee/Mnemai/releases/latest"><img src="https://img.shields.io/github/v/release/Pumpetee/Mnemai?style=flat-square&color=8b5cf6&label=release" alt="release"></a> <a href="https://github.com/Pumpetee/Mnemai/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/Pumpetee/Mnemai/tests.yml?branch=main&style=flat-square&label=tests" alt="tests"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-0ea5e9?style=flat-square" alt="license"></a> <a href="https://github.com/Pumpetee/Mnemai/commits/main"><img src="https://img.shields.io/github/last-commit/Pumpetee/Mnemai?style=flat-square&color=ec4899" alt="last commit"></a>
 
 <img src="https://img.shields.io/badge/MCP-Claude%20%C2%B7%20Cursor-7c3aed?style=flat-square&logo=modelcontextprotocol&logoColor=white" alt="MCP: Claude · Cursor"> <img src="https://img.shields.io/badge/Obsidian-%E0%A4%B8%E0%A4%BF%E0%A4%B0%E0%A5%8D%E0%A4%AB%E0%A4%BC%20%E0%A4%AA%E0%A4%A2%E0%A4%BC%E0%A4%A8%E0%A5%87%20%E0%A4%95%E0%A5%87%20%E0%A4%B2%E0%A4%BF%E0%A4%8F-7c3aed?style=flat-square&logo=obsidian&logoColor=white" alt="Obsidian: सिर्फ़ पढ़ने के लिए"> <img src="https://img.shields.io/badge/Telegram-%E0%A4%B8%E0%A4%BF%E0%A4%B0%E0%A5%8D%E0%A4%AB%E0%A4%BC%20%E0%A4%AA%E0%A4%A2%E0%A4%BC%E0%A4%A8%E0%A5%87%20%E0%A4%95%E0%A5%87%20%E0%A4%B2%E0%A4%BF%E0%A4%8F-229ED9?style=flat-square&logo=telegram&logoColor=white" alt="Telegram: सिर्फ़ पढ़ने के लिए"> <img src="https://img.shields.io/badge/AES--256-%E0%A4%8F%E0%A4%A8%E0%A5%8D%E0%A4%95%E0%A5%8D%E0%A4%B0%E0%A4%BF%E0%A4%AA%E0%A5%8D%E0%A4%B6%E0%A4%A8-15803d?style=flat-square" alt="AES-256: एन्क्रिप्शन"> <img src="https://img.shields.io/badge/Markdown-%E0%A4%A4%E0%A5%81%E0%A4%AE%E0%A5%8D%E0%A4%B9%E0%A4%BE%E0%A4%B0%E0%A5%80%20%E0%A4%AB%E0%A4%BC%E0%A4%BE%E0%A4%87%E0%A4%B2%E0%A5%87%E0%A4%82-555555?style=flat-square&logo=markdown&logoColor=white" alt="Markdown: तुम्हारी फ़ाइलें"> <img src="https://img.shields.io/badge/Python-3.13-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python: 3.13">
 
-<a href="docs/guide/hi.md"><img src="https://img.shields.io/badge/Mnema%20%E0%A4%97%E0%A4%BE%E0%A4%87%E0%A4%A1-%E0%A4%B9%E0%A4%B0%20%E0%A4%B8%E0%A5%8D%E0%A4%95%E0%A5%8D%E0%A4%B0%E0%A5%80%E0%A4%A8%20%E0%A4%94%E0%A4%B0%20%E0%A4%B9%E0%A4%B0%20%E0%A4%B8%E0%A5%87%E0%A4%9F%E0%A4%BF%E0%A4%82%E0%A4%97-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnema गाइड"></a>
+<a href="docs/guide/hi.md"><img src="https://img.shields.io/badge/Mnemai%20%E0%A4%97%E0%A4%BE%E0%A4%87%E0%A4%A1-%E0%A4%B9%E0%A4%B0%20%E0%A4%B8%E0%A5%8D%E0%A4%95%E0%A5%8D%E0%A4%B0%E0%A5%80%E0%A4%A8%20%E0%A4%94%E0%A4%B0%20%E0%A4%B9%E0%A4%B0%20%E0%A4%B8%E0%A5%87%E0%A4%9F%E0%A4%BF%E0%A4%82%E0%A4%97-8b5cf6?style=for-the-badge&logo=gitbook&logoColor=white" alt="Mnemai गाइड"></a>
 
-<a href="https://github.com/Pumpetee/Mnema"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnema"></a><br><sub>रिपॉज़िटरी खोलने के लिए स्कैन करें · github.com/Pumpetee/Mnema</sub>
+<a href="https://github.com/Pumpetee/Mnemai"><img src="docs/img/brand/qr.svg" width="220" alt="QR: github.com/Pumpetee/Mnemai"></a><br><sub>रिपॉज़िटरी खोलने के लिए स्कैन करें · github.com/Pumpetee/Mnemai</sub>
 
 </div>
 
 ## भाषाएँ
 
-Mnema नौ भाषाएँ बोलता है। इंटरफ़ेस, मदद और AI के जवाब उसी भाषा में आते हैं जो तुम चुनते हो, भले ही तुम किसी और भाषा में लिखो। यह README और Mnema गाइड हर भाषा में उपलब्ध हैं।
+Mnemai नौ भाषाएँ बोलता है। इंटरफ़ेस, मदद और AI के जवाब उसी भाषा में आते हैं जो तुम चुनते हो, भले ही तुम किसी और भाषा में लिखो। यह README और Mnemai गाइड हर भाषा में उपलब्ध हैं।
 
 <table>
 <tr><td align="center" width="10%"><img src="https://flagcdn.com/w80/gb.png" width="36" alt="English"><br><b>English</b><br><sub><a href="README.md">README</a> · <a href="docs/guide/en.md">Guide</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/ru.png" width="36" alt="Русский"><br><b>Русский</b><br><sub><a href="README.ru.md">README</a> · <a href="docs/guide/ru.md">Справочник</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/cn.png" width="36" alt="中文"><br><b>中文</b><br><sub><a href="README.zh.md">README</a> · <a href="docs/guide/zh.md">指南</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/es.png" width="36" alt="Español"><br><b>Español</b><br><sub><a href="README.es.md">README</a> · <a href="docs/guide/es.md">Guía</a></sub></td><td align="center" width="10%"><img src="https://flagcdn.com/w80/in.png" width="36" alt="हिन्दी"><br><b>✓ हिन्दी</b><br><sub><a href="README.hi.md">README</a> · <a href="docs/guide/hi.md">गाइड</a></sub></td></tr>
@@ -27,11 +27,11 @@ Mnema नौ भाषाएँ बोलता है। इंटरफ़े�
 
 <div align="center">
 
-Mnema याद रखता है कि तुम कौन हो, किस पर काम कर रहे हो, तुमने क्या तय किया और तुम्हें जवाब कैसे पसंद हैं — और तुम जिस भी AI से बात करते हो, उसे यह संदर्भ मिल जाता है। याददाश्त तुम्हारे कंप्यूटर पर सादी Markdown फ़ाइलों का एक फ़ोल्डर है। न क्लाउड, न अकाउंट।
+Mnemai याद रखता है कि तुम कौन हो, किस पर काम कर रहे हो, तुमने क्या तय किया और तुम्हें जवाब कैसे पसंद हैं — और तुम जिस भी AI से बात करते हो, उसे यह संदर्भ मिल जाता है। याददाश्त तुम्हारे कंप्यूटर पर सादी Markdown फ़ाइलों का एक फ़ोल्डर है। न क्लाउड, न अकाउंट।
 
-<a href="../../releases/latest/download/Mnema-Setup.exe"><img src="https://img.shields.io/badge/%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1%20%E0%A4%95%E0%A4%B0%E0%A5%87%E0%A4%82%3A-Windows-0078D4?style=for-the-badge" alt="Windows"></a> <a href="../../releases/latest/download/Mnema-macos-arm64.dmg"><img src="https://img.shields.io/badge/%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1%20%E0%A4%95%E0%A4%B0%E0%A5%87%E0%A4%82%3A-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a> <a href="../../releases/latest/download/Mnema-x86_64.AppImage"><img src="https://img.shields.io/badge/%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1%20%E0%A4%95%E0%A4%B0%E0%A5%87%E0%A4%82%3A-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Linux"></a>
+<a href="../../releases/latest/download/Mnemai-Setup.exe"><img src="https://img.shields.io/badge/%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1%20%E0%A4%95%E0%A4%B0%E0%A5%87%E0%A4%82%3A-Windows-0078D4?style=for-the-badge" alt="Windows"></a> <a href="../../releases/latest/download/Mnemai-macos-arm64.dmg"><img src="https://img.shields.io/badge/%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1%20%E0%A4%95%E0%A4%B0%E0%A5%87%E0%A4%82%3A-macOS-111111?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a> <a href="../../releases/latest/download/Mnemai-x86_64.AppImage"><img src="https://img.shields.io/badge/%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1%20%E0%A4%95%E0%A4%B0%E0%A5%87%E0%A4%82%3A-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white" alt="Linux"></a>
 
-<sub><a href="../../releases">सभी फ़ाइलें</a> · macOS Intel: <a href="../../releases/latest/download/Mnema-macos-x64.dmg">x64.dmg</a></sub>
+<sub><a href="../../releases">सभी फ़ाइलें</a> · macOS Intel: <a href="../../releases/latest/download/Mnemai-macos-x64.dmg">x64.dmg</a></sub>
 
 <img src="docs/img/hi/hero.gif" width="880" alt="एक सवाल, और जवाब याददाश्त से आता है: हफ़्ते की योजना एक टेबल में, तय कीमत और मीटिंग के नियम के साथ, जो उसे पहले से पता हैं">
 
@@ -56,11 +56,11 @@ Mnema याद रखता है कि तुम कौन हो, किस
 
 ## 🧠 यह तुम्हें जानता है
 
-<p align="center"><img src="docs/img/hi/memory.gif" width="860" alt="प्रोफ़ाइल और मेमोरी मैप: विषय बुलबुलों के रूप में, आकार बताता है कि Mnema को कितना पता है"></p>
+<p align="center"><img src="docs/img/hi/memory.gif" width="860" alt="प्रोफ़ाइल और मेमोरी मैप: विषय बुलबुलों के रूप में, आकार बताता है कि Mnemai को कितना पता है"></p>
 
-- **एक प्रोफ़ाइल जिसे हर AI सबसे पहले पढ़ता है:** तुम कौन हो, क्या बना रहे हो, कैसे काम करना पसंद करते हो। Mnema इसे सीखते-सीखते लिखता है, और तुम इसे हाथ से ठीक कर सकते हो।
+- **एक प्रोफ़ाइल जिसे हर AI सबसे पहले पढ़ता है:** तुम कौन हो, क्या बना रहे हो, कैसे काम करना पसंद करते हो। Mnemai इसे सीखते-सीखते लिखता है, और तुम इसे हाथ से ठीक कर सकते हो।
 - **मेमोरी मैप:** हर विषय एक बुलबुला है, धड़कन का मतलब है कि वह हाल ही में बदला है, और ताला बताता है कि कुछ AI उसे नहीं देखते।
-- **पुरानी बातें नई बनकर नहीं चलतीं:** हर तथ्य के साथ उसकी तारीख होती है, और एक महीने से पुरानी स्थिति के बारे में Mnema दोबारा पूछता है।
+- **पुरानी बातें नई बनकर नहीं चलतीं:** हर तथ्य के साथ उसकी तारीख होती है, और एक महीने से पुरानी स्थिति के बारे में Mnemai दोबारा पूछता है।
 - **एक से ज़्यादा फ़ोल्डर:** अपना Obsidian वॉल्ट या टीम का फ़ोल्डर जोड़ो — सिर्फ़ पढ़ने के लिए, प्रोग्राम खुद वहाँ लिखने से रोकता है।
 
 ## 🗣️ कंसोर्शियम: कई AI, एक जवाब
@@ -82,7 +82,7 @@ Mnema याद रखता है कि तुम कौन हो, किस
 
 ## 🌱 यह खुद सीखता है
 
-<p align="center"><img src="docs/img/hi/learning.gif" width="860" alt="तुम बातों-बातों में कुछ कह देते हो, और फ़ीड दिखाती है कि Mnema ने क्या पढ़ा, क्या समझा और क्या लिखा, और क्यों"></p>
+<p align="center"><img src="docs/img/hi/learning.gif" width="860" alt="तुम बातों-बातों में कुछ कह देते हो, और फ़ीड दिखाती है कि Mnemai ने क्या पढ़ा, क्या समझा और क्या लिखा, और क्यों"></p>
 
 - **पक्का है तो सेव है:** जिस तथ्य पर उसे यक़ीन है (80% या ज़्यादा), वह तुरंत लिख दिया जाता है, और संदिग्ध तथ्य दोबारा सुने जाने का इंतज़ार करता है।
 - **निजी बातें अलग रहती हैं:** पैसे, सेहत और निजी मामले टैग वाले कार्ड में जाते हैं, जिन्हें तुम किसी भी AI से छिपा सकते हो।
@@ -90,18 +90,18 @@ Mnema याद रखता है कि तुम कौन हो, किस
 
 ## ✈️ Telegram पढ़ता है, वहाँ कभी लिखता नहीं
 
-<p align="center"><img src="docs/img/hi/telegram.gif" width="860" alt="Telegram सिर्फ़ पढ़ने के लिए जुड़ा है: चैट तुम चुनते हो, Mnema उन्हीं से सीखता है"></p>
+<p align="center"><img src="docs/img/hi/telegram.gif" width="860" alt="Telegram सिर्फ़ पढ़ने के लिए जुड़ा है: चैट तुम चुनते हो, Mnemai उन्हीं से सीखता है"></p>
 
-- **चैट तुम चुनते हो:** Mnema तुम्हारे और तुम्हारे आसपास के लोगों के बारे में सिर्फ़ उन्हीं चैट से सीखता है।
-- **डिज़ाइन से ही सिर्फ़ पढ़ना:** Mnema के अंदर का Telegram क्लाइंट सिर्फ़ पढ़ सकता है; कोई भी दूसरा कमांड भेजे जाने से पहले ही ठुकरा दिया जाता है।
-- **तुम्हारे कंप्यूटर पर ही रहता है:** लॉगिन सिस्टम के स्टोर में एन्क्रिप्ट होकर रहता है, और Mnema के अपने कोई सर्वर नहीं हैं।
+- **चैट तुम चुनते हो:** Mnemai तुम्हारे और तुम्हारे आसपास के लोगों के बारे में सिर्फ़ उन्हीं चैट से सीखता है।
+- **डिज़ाइन से ही सिर्फ़ पढ़ना:** Mnemai के अंदर का Telegram क्लाइंट सिर्फ़ पढ़ सकता है; कोई भी दूसरा कमांड भेजे जाने से पहले ही ठुकरा दिया जाता है।
+- **तुम्हारे कंप्यूटर पर ही रहता है:** लॉगिन सिस्टम के स्टोर में एन्क्रिप्ट होकर रहता है, और Mnemai के अपने कोई सर्वर नहीं हैं।
 
 ## 📉 टोकन बचाता है
 
-<p align="center"><img src="docs/img/hi/tokens.gif" width="560" alt="153,000 अक्षरों के कॉन्ट्रैक्ट के बारे में एक सवाल: पूरे टेक्स्ट के लिए 29,643 इनपुट टोकन, Mnema के साथ 6,159"></p>
+<p align="center"><img src="docs/img/hi/tokens.gif" width="560" alt="153,000 अक्षरों के कॉन्ट्रैक्ट के बारे में एक सवाल: पूरे टेक्स्ट के लिए 29,643 इनपुट टोकन, Mnemai के साथ 6,159"></p>
 
 - **सिर्फ़ ज़रूरी हिस्सा बाहर जाता है:** याददाश्त, दस्तावेज़ और वेब पेज तुम्हारे कंप्यूटर पर पढ़े जाते हैं, और मॉडल को सिर्फ़ काम के हिस्से मिलते हैं।
-- **नापा-तौला नतीजा:** 153,000 अक्षरों के कॉन्ट्रैक्ट पर एक सवाल में पूरे टेक्स्ट ने 29,643 इनपुट टोकन लिए; Mnema ने 6,159 भेजे, और सिर्फ़ Mnema का जवाब सही था।
+- **नापा-तौला नतीजा:** 153,000 अक्षरों के कॉन्ट्रैक्ट पर एक सवाल में पूरे टेक्स्ट ने 29,643 इनपुट टोकन लिए; Mnemai ने 6,159 भेजे, और सिर्फ़ Mnemai का जवाब सही था।
 - **हर बार दिखता है:** हर जवाब के नीचे तुम देखते हो कि कितने टोकन बचे।
 
 ## 🔐 बनावट से ही निजी
@@ -130,14 +130,14 @@ Mnema याद रखता है कि तुम कौन हो, किस
 
 | सिस्टम | फ़ाइल | कैसे |
 |---|---|---|
-| Windows 10 और 11 | [`Mnema-Setup.exe`](../../releases/latest/download/Mnema-Setup.exe) | इसे चलाएँ। एडमिनिस्ट्रेटर अधिकारों की आवश्यकता नहीं है। एक पोर्टेबल `.zip` भी उपलब्ध है। |
-| macOS 11 और उसके बाद के संस्करण | Apple Silicon: [`Mnema-macos-arm64.dmg`](../../releases/latest/download/Mnema-macos-arm64.dmg), Intel: [`Mnema-macos-x64.dmg`](../../releases/latest/download/Mnema-macos-x64.dmg) | इसे खोलें और Mnema को Applications में खींचकर डालें। |
-| Linux x86-64 (Ubuntu 22.04 और उसके बाद के संस्करण, Fedora, Debian…) | [`Mnema-x86_64.AppImage`](../../releases/latest/download/Mnema-x86_64.AppImage) | `chmod +x Mnema-*.AppImage` चलाएँ और फिर इसे चलाएँ। वही प्रोग्राम फ़ोल्डर के रूप में: `.tar.gz`, उसके अंदर `Mnema` चलाएँ। |
+| Windows 10 और 11 | [`Mnemai-Setup.exe`](../../releases/latest/download/Mnemai-Setup.exe) | इसे चलाएँ। एडमिनिस्ट्रेटर अधिकारों की आवश्यकता नहीं है। एक पोर्टेबल `.zip` भी उपलब्ध है। |
+| macOS 11 और उसके बाद के संस्करण | Apple Silicon: [`Mnemai-macos-arm64.dmg`](../../releases/latest/download/Mnemai-macos-arm64.dmg), Intel: [`Mnemai-macos-x64.dmg`](../../releases/latest/download/Mnemai-macos-x64.dmg) | इसे खोलें और Mnemai को Applications में खींचकर डालें। |
+| Linux x86-64 (Ubuntu 22.04 और उसके बाद के संस्करण, Fedora, Debian…) | [`Mnemai-x86_64.AppImage`](../../releases/latest/download/Mnemai-x86_64.AppImage) | `chmod +x Mnemai-*.AppImage` चलाएँ और फिर इसे चलाएँ। वही प्रोग्राम फ़ोल्डर के रूप में: `.tar.gz`, उसके अंदर `Mnemai` चलाएँ। |
 
 पैकेज अभी कोड-साइन नहीं किए गए हैं, इसलिए हर सिस्टम एक बार चेतावनी देगा:
 
 - **Windows** SmartScreen «Windows protected your PC» कहता है। **More info → Run anyway** पर क्लिक करें।
-- **macOS** कहता है कि वह डेवलपर की जाँच नहीं कर सकता। Applications में Mnema पर राइट-क्लिक करें → **Open**, या System Settings → Privacy & Security खोलें → **Open Anyway**।
+- **macOS** कहता है कि वह डेवलपर की जाँच नहीं कर सकता। Applications में Mnemai पर राइट-क्लिक करें → **Open**, या System Settings → Privacy & Security खोलें → **Open Anyway**।
 - **Linux** AppImage के लिए FUSE 2 आवश्यक है: `sudo apt install libfuse2` (Ubuntu 24.04 पर: `libfuse2t64`)। या `.tar.gz` का उपयोग करें।
 
 किसी फ़ाइल की जाँच करने के लिए, उसके sha256 की तुलना उसके साथ मौजूद `.sha256` फ़ाइल से करें: Windows पर `certutil -hashfile <file> SHA256`, macOS पर `shasum -a 256 <file>`, Linux पर `sha256sum <file>`।
@@ -154,7 +154,7 @@ python -m venv .venv
 .venv\Scripts\pip install -r requirements-dev.txt
 .venv\Scripts\python tools\fetch_vendor.py      # llama.cpp, Xray, WebView2 from their official releases, verified
 .venv\Scripts\python -m mnema.desktop           # run the program
-.venv\Scripts\python tools\package.py           # dist\Mnema-Setup-<version>.exe and the portable zip
+.venv\Scripts\python tools\package.py           # dist\Mnemai-Setup-<version>.exe and the portable zip
 ```
 
 macOS और Linux:
@@ -164,8 +164,8 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python tools/fetch_vendor.py           # llama.cpp and Xray for this system, verified by sha256
 .venv/bin/python -m mnema.desktop                # run the program
-.venv/bin/python tools/package.py                # macOS: dist/Mnema-<version>-macos-arm64.dmg
-                                                 # Linux: dist/Mnema-<version>-x86_64.AppImage and .tar.gz
+.venv/bin/python tools/package.py                # macOS: dist/Mnemai-<version>-macos-arm64.dmg
+                                                 # Linux: dist/Mnemai-<version>-x86_64.AppImage and .tar.gz
 ```
 
 हर push का परीक्षण Windows, macOS और Linux पर किया जाता है; तीनों पैकेज बनाए जाते हैं, एक बार उनकी विंडो के साथ चलाए जाते हैं और रन की फ़ाइलों के रूप में सहेजे जाते हैं (`.github/workflows`)।
@@ -216,7 +216,7 @@ AGPL-3.0। व्यक्तिगत उपयोग और ओपन-सो�
 © 2026 Anton Sannikov
 
 <div align="center">
-<img src="docs/img/brand/logo.svg" width="40" alt="Mnema">
+<img src="docs/img/brand/logo.svg" width="40" alt="Mnemai">
 
-<sub>अगर Mnema तुम्हारे लिए कुछ काम की बात याद रखता है, तो एक ⭐ दूसरों को इसे ढूँढने में मदद करता है।</sub>
+<sub>अगर Mnemai तुम्हारे लिए कुछ काम की बात याद रखता है, तो एक ⭐ दूसरों को इसे ढूँढने में मदद करता है।</sub>
 </div>

@@ -1,8 +1,8 @@
 """Connect by a VPN key — the same link people paste into Hiddify, Happ or v2rayN: pick the service, then import the
 key from the clipboard or type it in.
 
-Mnema carries Xray-core (vendor/xray, MPL-2.0, official build). A key becomes an Xray outbound; Xray listens on
-127.0.0.1 as a local SOCKS proxy only for Mnema, and Mnema's proxy setting points there — chats with AI, search and
+Mnemai carries Xray-core (vendor/xray, MPL-2.0, official build). A key becomes an Xray outbound; Xray listens on
+127.0.0.1 as a local SOCKS proxy only for Mnemai, and Mnemai's proxy setting points there — chats with AI, search and
 model downloads go through it. The rest of the computer is not touched: no system proxy, no adapter, no admin rights.
 
 Keys understood:
@@ -309,7 +309,7 @@ def connect(vault, key: str, service: str = "") -> dict:
     key = (key or "").strip()
     cands = keys_from_subscription(key) if key.startswith(("http://", "https://")) else [key]
     if not cands:
-        raise ValueError("в подписке нет ключей, которые понимает Mnema")
+        raise ValueError("в подписке нет ключей, которые понимает Mnemai")
     last = ""
     for k in cands[:8]:
         try:

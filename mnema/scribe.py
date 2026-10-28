@@ -366,7 +366,7 @@ def _launch(vault: Vault, d: Path, name: str, tracks: list, duration: int, model
                         f"{SC.minutes(est)}. Отдать облачному Whisper? Будет быстрее, "
                         f"но запись уйдёт с компьютера и оплатится по ключу.",
                     )
-                    SC.notify("Mnema: расшифровка встречи ждёт решения — компьютер или облако")
+                    SC.notify("Mnemai: расшифровка встречи ждёт решения — компьютер или облако")
                     s["_answer"].wait(timeout=900)
                     where = "cloud" if s.get("choice") == "cloud" else "local"
                     s.update(status="transcribing", question="")
@@ -439,16 +439,16 @@ def _launch(vault: Vault, d: Path, name: str, tracks: list, duration: int, model
                     except OSError:
                         pass
             s.update(status="done", chat=r["chat"], file=str(d / "Расшифровка.md"), phase="")
-            SC.notify(f"Mnema: расшифровка «{name}» готова")
+            SC.notify(f"Mnemai: расшифровка «{name}» готова")
         except Exception as e:
             s.update(status="error", error=human_error(e), phase="")
-            SC.notify(f"Mnema: расшифровка «{name}» не вышла")
+            SC.notify(f"Mnemai: расшифровка «{name}» не вышла")
 
     threading.Thread(target=work, daemon=True, name="mnema-scribe").start()
 
 
 def _learn(vault: Vault, segs: list[dict], name: str) -> None:
-    """The owner's own words teach Mnema; the other side is context."""
+    """The owner's own words teach Mnemai; the other side is context."""
     from .learn import engine as LE
     from .learn.sources import Episode
 

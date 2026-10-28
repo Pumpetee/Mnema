@@ -322,7 +322,7 @@ WEB.gather = lambda q, urls=None, pages=4, budget=7000, search_too=False: (
     or {"context": "Курс 81 рубль", "sources": [{"title": "Курс", "url": "https://cbr.ru"}], "read_chars": 14}
 )
 ask("Какой курс доллара сегодня?", web=True)
-row("Интернет: вкл", "при вопросе про сегодня Mnema ищет", f"поисков {len(searched)}", len(searched) > 0)
+row("Интернет: вкл", "при вопросе про сегодня Mnemai ищет", f"поисков {len(searched)}", len(searched) > 0)
 searched.clear()
 s = system(ask("Какой курс доллара сегодня?", web=False))
 row("Интернет: выкл", "не ищет и говорит модели, что поиска нет", f"поисков {len(searched)}", not searched)
@@ -391,8 +391,8 @@ agent({"self_ask": False})
 row(
     "Свои вопросы о проектах: выкл",
     "не спрашивает",
-    str(SA.pick(V, "что по проекту Mnema?", _dt.datetime.now())),
-    SA.pick(V, "что по проекту Mnema?", _dt.datetime.now()) is None,
+    str(SA.pick(V, "что по проекту Mnemai?", _dt.datetime.now())),
+    SA.pick(V, "что по проекту Mnemai?", _dt.datetime.now()) is None,
 )
 agent({"self_ask": True})
 
